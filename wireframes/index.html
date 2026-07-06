@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  화면 ID : INDEX — 플로우 허브 (제품 화면 아님 · 개발/리뷰 도구)
+  목적    : B1 관통 데모(P1→P3→S1)의 진입점. 리뷰 라운드 1의 클릭 워크스루가
+            이 페이지에서 시작된다(docs/04 §2.2). 각 화면의 상태 스위처
+            딥링크를 조합별로 나열해 "상태 누락 0" 검사를 클릭으로 수행한다.
+  대응 문서: docs/04-wireframe-plan.md §1(배치)·§2.2(리뷰 루프)·§4(파일 구조)
+  상태 스위처: 해당 없음(정적 허브 — wf.js 미로드). 본문 딥링크가 각 화면의
+            ?state= / ?lang= / ?fx= / ?color= 를 대신 구동한다.
+  주의    : 딥링크의 state 값이 화면이 등록한 목록에 없으면 wf.js가 기본
+            상태로 폴백한다(깨지지 않음). 어긋난 값은 review/batch1-notes.md에 기록.
+  ============================================================
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>indoro 와이어프레임 허브</title>
+<link rel="stylesheet" href="shared/wf.css">
+<style>
+  /* ---- 허브 전용 스타일 (제품 컴포넌트 아님) ---- */
+  .hub-banner {
+    background: repeating-linear-gradient(135deg, #f5efdc 0 8px, #eadfae 8px 16px);
+    border-bottom: 1px solid #c9b96a;
+    padding: 10px 16px;
+    font-size: var(--text-supporting-size);
+    color: #4a3f14;
+    text-align: center;
+    font-weight: var(--font-weight-semibold);
+  }
+  .hub-head { padding: 20px 16px 4px; }
+  .hub-head h1 { font-size: var(--text-heading-2-size); line-height: var(--text-heading-2-leading); }
+  .hub-section { padding: 16px 16px 0; }
+  .hub-section:last-child { padding-bottom: 32px; }
+  .hub-section h2 {
+    font-size: var(--text-heading-4-size);
+    font-weight: var(--text-heading-4-weight);
+    color: var(--color-text-secondary);
+    text-transform: none;
+    margin-bottom: 8px;
+  }
+  .hub-card { margin-bottom: 0; }
+  .hub-card .hub-file {
+    font-family: var(--font-family-code);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    overflow-wrap: anywhere;
+  }
+  .hub-step {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 28px; height: 28px; border-radius: var(--radius-full);
+    background: var(--color-accent); color: var(--color-on-accent);
+    font-weight: var(--font-weight-bold); font-size: var(--font-size-base);
+  }
+  .hub-open {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 44px; padding: 8px 14px;
+    border-radius: var(--radius-element);
+    background: var(--color-accent); color: var(--color-on-accent);
+    font-weight: var(--font-weight-semibold); text-decoration: none;
+  }
+  .hub-open svg { width: 16px; height: 16px; }
+  .hub-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .hub-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 40px; padding: 4px 10px;
+    border: 1px solid var(--color-border-emphasized);
+    border-radius: var(--radius-full);
+    background: var(--color-background-surface);
+    color: var(--color-text-primary);
+    font-size: var(--text-supporting-size); line-height: 1.4;
+    text-decoration: none;
+  }
+  .hub-link code {
+    font-family: var(--font-family-code);
+    font-size: var(--font-size-xs);
+    background: var(--color-accent-muted);
+    border-radius: var(--radius-inner);
+    padding: 1px 5px;
+  }
+  .hub-link:active { background: var(--color-overlay-pressed); }
+  .hub-arrow {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 6px 0; color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+  }
+  .hub-arrow svg { width: 24px; height: 24px; }
+  .hub-card--placeholder {
+    border-style: dashed;
+    background: var(--color-background-muted);
+    color: var(--color-text-secondary);
+    padding: 12px 16px;
+  }
+  .hub-card--placeholder .hub-file { color: var(--color-text-disabled); }
+  .hub-tag {
+    display: inline-block; padding: 1px 8px;
+    border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-full);
+    font-size: var(--font-size-xs); color: var(--color-text-secondary);
+    background: var(--color-background-surface);
+  }
+  .hub-kv { margin: 0; padding-left: 0; list-style: none; }
+  .hub-kv li { display: flex; gap: 8px; padding: 2px 0; font-size: var(--text-supporting-size); line-height: 1.6; }
+  .hub-kv code {
+    font-family: var(--font-family-code); font-size: var(--font-size-xs);
+    background: var(--color-accent-muted); border-radius: var(--radius-inner);
+    padding: 1px 5px; white-space: nowrap; align-self: flex-start; margin-top: 2px;
+  }
+  .hub-doclinks { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>
+</head>
+<body>
+
+<!-- 개발 도구 배너 — 제품 아님(빗금 규약은 wf-toolbar와 동일 계열) -->
+<div class="hub-banner">와이어프레임 허브 — 제품 아님 · 리뷰 워크스루 진입점</div>
+
+<header class="hub-head stack" style="gap:4px">
+  <h1>indoro 와이어프레임</h1>
+  <p class="t-secondary t-supporting">
+    약국 진입점 복약 안내 — 약사 입력(P군) → QR → 환자 웹뷰(S군).
+    정본: <code>docs/02</code>(약사측)·<code>docs/03</code>(환자측)·<code>docs/04</code>(계획·수용 기준).
+  </p>
+</header>
+
+<!-- ============ 관통 데모 (B1) ============ -->
+<section class="hub-section">
+  <h2>관통 데모 — B1 코어 (P1 → P3 → S1)</h2>
+  <p class="t-secondary t-supporting" style="margin-bottom:10px">
+    데모 시나리오: P1에서 FX-A 3항목 입력 → "확인하고 발급"(P2 시트) →
+    P3 QR 제시 → 환자 폰에서 S1 열람. QR은 placeholder이므로 데모에서는
+    아래 카드 링크로 S1에 진입한다(D7 리허설만 LAN 실QR 옵션).
+  </p>
+
+  <div class="stack" style="gap:0">
+
+    <!-- ── 1. P1 새 처방 입력 ── -->
+    <article class="card hub-card">
+      <div class="hstack" style="margin-bottom:6px">
+        <span class="hub-step">1</span>
+        <h3 style="font-size:var(--text-heading-3-size)">P1 새 처방 입력</h3>
+        <span class="spacer"></span>
+        <a class="hub-open" href="pharmacist/p1-input.html">열기
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <p class="hub-file">pharmacist/p1-input.html</p>
+      <p class="t-supporting" style="margin-top:6px">
+        수기 처방전을 항목 카드 1..N으로 구조화 — 입력 KPI(20~40초/항목)의 본체.
+        P2 확인 시트(오버레이)와 G1·G2 자리 표시 포함. 인벤토리: docs/02 §3·§4.
+      </p>
+      <!-- 상태 스위처 딥링크 — 인벤토리 "상태 변형" 전수 -->
+      <div class="hub-links">
+        <a class="hub-link" href="pharmacist/p1-input.html"><code>기본</code>FX-A · 카드 1 자동 확장</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=confirm"><code>?state=confirm</code>P2 확인 시트</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=submitting"><code>?state=submitting</code>제출 중 · 버튼 잠금</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=offline"><code>?state=offline</code>오프라인 — 자동완성 비활성 · "QR 즉시"</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=error422"><code>?state=error422</code>422 인라인 + 카드 자동 확장</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=error409"><code>?state=error409</code>TOKEN_COLLISION → P8 안내</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?state=nocrypto"><code>?state=nocrypto</code>crypto 미지원 — 제출 차단</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?fx=b"><code>?fx=b</code>전 패턴 10항목</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?fx=c"><code>?fx=c</code>엣지 — 시드 밖 · ml · ½ · PRN</a>
+        <a class="hub-link" href="pharmacist/p1-input.html?color=0"><code>?color=0</code>배지 그레이스케일</a>
+      </div>
+    </article>
+
+    <div class="hub-arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v14m0 0l-6-6m6 6l6-6"/></svg>
+      "발급" 탭 = [T1] · rx.created
+    </div>
+
+    <!-- ── 2. P3 발급 완료·QR 표시 ── -->
+    <article class="card hub-card">
+      <div class="hstack" style="margin-bottom:6px">
+        <span class="hub-step">2</span>
+        <h3 style="font-size:var(--text-heading-3-size)">P3 발급 완료 · QR 표시</h3>
+        <span class="spacer"></span>
+        <a class="hub-open" href="pharmacist/p3-qr.html">열기
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <p class="hub-file">pharmacist/p3-qr.html</p>
+      <p class="t-supporting" style="margin-top:6px">
+        발급된 링크를 환자 손에 물리적으로 옮기는 접점 — 인쇄 기본(D21)·화면 폴백.
+        스캔 실패 원탭(사유 4택) 포함. 인벤토리: docs/02 §5.
+      </p>
+      <div class="hub-links">
+        <a class="hub-link" href="pharmacist/p3-qr.html"><code>기본</code>인쇄 뷰 (has_printer=1)</a>
+        <a class="hub-link" href="pharmacist/p3-qr.html?state=screen"><code>?state=screen</code>화면 제시 폴백 — 크게 보기</a>
+        <a class="hub-link" href="pharmacist/p3-qr.html?state=offline"><code>?state=offline</code>오프라인 발급 — 코드 없음 · 동기화 대기 배지</a>
+        <a class="hub-link" href="pharmacist/p3-qr.html?state=redisplay"><code>?state=redisplay</code>재표시 모드 — 성공 배너 없음</a>
+        <a class="hub-link" href="pharmacist/p3-qr.html?fx=c"><code>?fx=c</code>엣지 — 곧 만료 건</a>
+        <a class="hub-link" href="pharmacist/p3-qr.html?color=0"><code>?color=0</code>배지 그레이스케일</a>
+      </div>
+    </article>
+
+    <div class="hub-arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v14m0 0l-6-6m6 6l6-6"/></svg>
+      환자 폰 QR 스캔 → GET /p/{token} (view.first)
+    </div>
+
+    <!-- ── 3. S1 복약 요약 랜딩 ── -->
+    <article class="card hub-card">
+      <div class="hstack" style="margin-bottom:6px">
+        <span class="hub-step">3</span>
+        <h3 style="font-size:var(--text-heading-3-size)">S1 복약 요약 랜딩</h3>
+        <span class="spacer"></span>
+        <a class="hub-open" href="patient/s1-landing.html">열기
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <p class="hub-file">patient/s1-landing.html</p>
+      <p class="t-supporting" style="margin-top:6px">
+        환자 웹뷰 단일 문서 — S2 약 카드(전부 펼침)·C1 언어 토글·C2 공유 포함.
+        3초 이해·시간표 칩 앵커 점프·hi/en 이중화. 인벤토리: docs/03 §3~§6.
+      </p>
+      <div class="hub-links">
+        <a class="hub-link" href="patient/s1-landing.html"><code>기본</code>FX-A · 힌디</a>
+        <a class="hub-link" href="patient/s1-landing.html?lang=en"><code>?lang=en</code>영어</a>
+        <a class="hub-link" href="patient/s1-landing.html?fx=b"><code>?fx=b</code>전 패턴 10항목 — 무게 상한 검증</a>
+        <a class="hub-link" href="patient/s1-landing.html?fx=c"><code>?fx=c</code>엣지 — 수정됨 · 곧 만료 · PRN · CUSTOM · ½</a>
+        <a class="hub-link" href="patient/s1-landing.html?fx=c&amp;lang=en"><code>?fx=c&amp;lang=en</code>엣지 × 영어 조합</a>
+        <a class="hub-link" href="patient/s1-landing.html?color=0"><code>?color=0</code>배지 그레이스케일 — T4 프록시</a>
+      </div>
+      <p class="t-supporting t-secondary" style="margin-top:8px">
+        JS 비활성 검증: 브라우저에서 JS 끄고 열람 — 전 정보·언어 전환(?lang 링크)·공유(wa.me)가 성립해야 함(수용 기준).
+      </p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 상태 스위처 안내 ============ -->
+<section class="hub-section">
+  <h2>상태 스위처 사용법</h2>
+  <div class="card hub-card">
+    <ul class="hub-kv">
+      <li><code>?state=</code><span>인벤토리 "상태 변형" 전환. 미등록 값은 기본 상태로 폴백.</span></li>
+      <li><code>?lang=hi|en</code><span>환자측 언어 토글(html[lang] CSS 토글). 약사측 UI는 영어 고정.</span></li>
+      <li><code>?fx=a|b|c</code><span>공용 픽스처(shared/fixtures.js): A=일상 3항목 · B=전 패턴 10항목 · C=엣지.</span></li>
+      <li><code>?color=0</code><span>항목 배지 hue 오프 — "색은 보조 부호, 숫자가 정본" 그레이스케일 검증.</span></li>
+    </ul>
+    <hr class="divider">
+    <p class="t-supporting t-secondary">
+      각 화면 우상단의 빗금 개발 툴바(제품 아님)에서도 동일 전환 가능.
+      파라미터는 조합 가능(예: <code>?fx=c&amp;lang=en&amp;color=0</code>).
+    </p>
+  </div>
+</section>
+
+<!-- ============ B2 자리 (비활성) ============ -->
+<section class="hub-section">
+  <h2>B2 — 도달 실패 · 재조회 경로 <span class="hub-tag">예정 · 비활성</span></h2>
+  <div class="stack" style="gap:8px">
+    <div class="card hub-card hub-card--placeholder">
+      <b>S3 동기화 대기</b> — 오프라인 발급 sync 공백 흡수 (200 · meta refresh 30s)
+      <p class="hub-file">patient/s3-pending.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>S4 만료 / 폐기</b> — A(만료)/B(폐기) 변형 스위처 (410)
+      <p class="hub-file">patient/s4-expired.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>S5 코드 입력 홈</b> — 가족 대행 short_code 열람 (form GET · JS 불요)
+      <p class="hub-file">patient/s5-code.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>P4 최근 발급 목록</b> — "아까 그 손님" 재조회 허브 (행에 QR 미노출)
+      <p class="hub-file">pharmacist/p4-list.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>P5 처방 상세 · 열람 현황</b> — 재표시/수정/재발급 분기
+      <p class="hub-file">pharmacist/p5-detail.html</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ B3 자리 (비활성) ============ -->
+<section class="hub-section">
+  <h2>B3 — 운영 · 설정 · 복구 <span class="hub-tag">예정 · 비활성</span></h2>
+  <div class="stack" style="gap:8px">
+    <div class="card hub-card hub-card--placeholder">
+      <b>P0 온보딩 · 약국 설정</b> — 기기 1회 등록 (타이핑 0)
+      <p class="hub-file">pharmacist/p0-onboarding.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>P6 수정 폼</b> — 토큰·URL·QR 불변 정정 (P1 재사용)
+      <p class="hub-file">pharmacist/p6-edit.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>P7 폐기 · 재발급</b> — 사유별 프리필 분기 (2단 플로우)
+      <p class="hub-file">pharmacist/p7-reissue.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>P8 outbox · 연결 상태</b> — 미전송 건 가시화 + G1·G2 상태 변형
+      <p class="hub-file">pharmacist/p8-outbox.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>S6 개인정보 상세 고지</b> — DPDP 상세면
+      <p class="hub-file">patient/s6-privacy.html</p>
+    </div>
+    <div class="card hub-card hub-card--placeholder">
+      <b>S7 일반 오류</b> — 같은 URL 재시도만 (500)
+      <p class="hub-file">patient/s7-error.html</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 리뷰 문서 ============ -->
+<section class="hub-section">
+  <h2>리뷰 · 진행 문서</h2>
+  <div class="card hub-card">
+    <div class="hub-doclinks">
+      <a class="hub-link" href="README.md"><code>README.md</code>수용 기준 체크리스트 · 진행 현황</a>
+      <a class="hub-link" href="review/batch1-notes.md"><code>review/batch1-notes.md</code>B1 리뷰 주석 백로그</a>
+      <a class="hub-link" href="review/proxy-tests.md"><code>review/proxy-tests.md</code>T1~T5 프록시 테스트 기록</a>
+    </div>
+    <p class="t-supporting t-secondary" style="margin-top:8px">
+      주석 형식: <code>- [ ] 화면ID/요소: 문제 — 수정 지시</code>.
+      주석 정본은 notes 파일 단일 채널 — 메신저는 알림용으로만(docs/04 §2.2).
+    </p>
+  </div>
+</section>
+
+</body>
+</html>

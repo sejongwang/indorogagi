@@ -1,0 +1,429 @@
+<!doctype html>
+<!-- ============================================================
+  화면 ID: P3 · 발급 완료·QR 표시
+  목적: 발급된 링크를 환자 손에 물리적으로 옮기는 화면 — 최초 발급과 재표시(P5 경유) 겸용.
+        도달 퍼널(스캔율 30%)의 물리 접점. 인쇄 QR이 기본 경로(D21, has_printer=1),
+        화면 제시는 폴백. QR 전체화면 노출은 이 화면에서만(§8.2 어깨너머 촬영 방지).
+  대응 인벤토리: docs/02-wireframe-pharmacist.md §5 (P3) · docs/01 §2.5(스캔 실패 사다리)·§5(short_code)
+  상태 스위처: ?state=screen | print | offline | reissue | fail-sheet
+               ?fx=a|b|c · ?color=0|1  (약사측 — 언어 토글 없음, UI 영어 고정)
+    - screen    : 화면 제시(폴백) — 밝기 최대 안내 + "크게 보기" 전체화면
+    - print     : 인쇄 모드(기본 경로 D21) — 인쇄 미리보기 카드(ECC Q·≥2cm 주석)
+    - offline   : 오프라인 발급 — QR 정상(로컬 렌더 D18) + 코드 없음("QR만" 모드 §10-9)
+                  + "동기화 대기" 배지 + outbox 안내 + 구두 안내 문구(§2.3 교육 스크립트)
+    - reissue   : 재표시 모드(P5 "QR 다시 보기" 경유 가정) — 발급 성공 배너 없이 QR·코드만
+                  + "발급 N일 전" 맥락 라벨 (P7 재발급과 무관 — 재발급 완료는 배너 있는 일반 발급)
+    - fail-sheet: 스캔 실패 신고 시트 열림 — 사유 4택(§2.5), 2탭 완결
+  ------------------------------------------------------------
+  수용 기준 체크리스트 (docs/04 §3 P3 행 — 판정 정본):
+    [v] QR이 스크롤 0 첫 화면 중앙 — 360×640 기준, screen/print/offline/reissue 전 변형에서 QR이
+        첫 화면 내 중앙 배치(최대 크기 min(264px,74vw))
+    [v] "새 처방 입력" 1탭(최상단) — 앱바 우측 상시 버튼(전 상태 공통) → P1 + 새 [T0]
+    [v] 스캔 실패 신고 2탭 — ① "Scan failed?" 버튼 → ② 사유 4택 탭 = scan.failed 기록·시트 닫힘
+    [v] 4변형 재현 — 인쇄 / 화면 폴백(인쇄 실패 → "Show on screen" 버튼으로도 전환 데모) /
+        오프라인(코드 없음 · 동기화 대기 배지 · outbox 안내) / 재표시(배너 없음 · 맥락 라벨)
+  전 화면 공통 기준:
+    [v] 320px 가로 스크롤 0 · 터치 타깃 ≥48×48px · 주 행동 버튼 전폭·min-height 56px
+    [v] 인벤토리 "핵심 요소와 바인딩" 8행 누락 0 (항목 번호 나열/QR/인쇄 뷰/화면 제시/짧은 코드/
+        유효기간/보조 액션 4종/스캔 실패 원탭)
+    [v] 계측 마커 주석 — rx.created(P2에서 기록됨)·scan.failed·qr.redisplayed·[T0]·v0 미계측 항목 명기
+    [v] 이모지 0 · 라이트 고정 · 더미 데이터는 INDORO_FX만(하드코딩 없음)
+  ============================================================ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P3 발급 완료·QR 표시 — indoro 와이어프레임</title>
+<link rel="stylesheet" href="../shared/wf.css">
+<style>
+  /* ---------- P3 페이지 전용 (색상은 전부 wf.css 토큰만 사용) ---------- */
+  .screen { padding-bottom: 184px; }              /* 2행 하단 바 높이 보정 */
+
+  /* QR 스테이지 — 스크롤 0 첫 화면 중앙, 최대 크기 */
+  .qr-stage { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .qr-stage .ph--qr { width: min(264px, 74vw); }  /* 360px→264 · 320px→236, 가로 스크롤 0 */
+
+  /* 짧은 코드 — monospace 24px+ (수용 기준: K7F3-9Q2M 형식) */
+  .short-code {
+    font-family: var(--font-family-code);
+    font-size: var(--font-size-2xl);              /* 24px */
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.08em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .scan-line { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; text-align: center; }
+  .scan-line svg { flex: none; color: var(--color-icon-primary); }
+  .validity { justify-content: center; flex-wrap: wrap; }
+  .validity svg { color: var(--color-icon-secondary); flex: none; }
+
+  /* 오프라인 — 코드 자리 placeholder ("QR만" 모드) */
+  .code-ph { width: 100%; min-height: 56px; }
+
+  /* 인쇄 미리보기 카드 — 58mm 감열 라벨 목업 */
+  .print-card { width: min(248px, 84vw); margin-inline: auto; text-align: center; }
+  .print-card .ph--qr { width: 184px; max-width: 100%; }
+  .print-card .short-code { margin-top: 8px; }
+
+  /* 하단 고정 바 — 2행(주 행동 + 보조 3버튼) */
+  .bottom-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .bar-row { display: flex; gap: 8px; }
+  .bar-row .btn { flex: 1; min-width: 0; }
+  .bar-row2 .btn { font-size: var(--text-supporting-size); font-weight: var(--font-weight-medium); padding-inline: 4px; }
+
+  /* 전체화면 QR 오버레이 ("크게 보기" — 흰 배경 고대비, P3에서만) */
+  .fs-overlay {
+    position: fixed; inset: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; z-index: 50;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: 24px; cursor: pointer;
+    background: var(--color-background-surface);
+  }
+  .fs-overlay.is-open { display: flex; }
+  .fs-overlay .ph--qr { width: min(78vw, 52vh); }
+  .fs-overlay .short-code { font-size: var(--font-size-3xl); }
+
+  /* 스캔 실패 사유 시트 (2탭 완결: 버튼 → 사유) */
+  .sheet-scrim { position: fixed; inset: 0; z-index: 40; background: var(--color-overlay); }
+  .sheet {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; z-index: 41;
+    background: var(--color-background-surface);
+    border-radius: var(--radius-container) var(--radius-container) 0 0;
+    box-shadow: var(--shadow-high);
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  .sheet .opt {
+    width: 100%; min-height: 56px; margin-top: 8px;
+    justify-content: flex-start; text-align: left;
+    background: var(--color-background-surface);
+    border: 1px solid var(--color-border-emphasized);
+  }
+  .sheet .opt svg { flex: none; color: var(--color-icon-secondary); }
+
+  /* 상태별 미세 조정 — G2 연결 점 오프라인 표시 */
+  html[data-state="offline"] .conn-dot { background: var(--color-text-disabled); }
+
+  /* 배지 나열(봉투 번호 대조) */
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* 인쇄: print 상태에서는 미리보기 카드만 지면에 (wf.css가 앱바·하단바·툴바 숨김) */
+  @media print {
+    .np { display: none !important; }
+    .print-card { border: 0; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 앱바: "새 처방 입력" 최상단 1탭 (카운터 회전율 — 입력 동선 최우선) + G2 연결 점 -->
+  <header class="appbar">
+    <span class="appbar-title">Prescription QR</span>
+    <span class="spacer"></span>
+    <span class="t-supporting t-secondary" data-wf-show="offline">Offline</span>
+    <span class="conn-dot" title="connection"></span>
+    <!-- 계측: [T0] "New Rx" 탭 → P1 폼 리셋 + 새 client_input_id 생성·gross 타이머 재시작 (§11 T0) -->
+    <a class="btn btn-primary btn-inline" id="btnNewRx" href="p1-input.html">New Rx</a>
+  </header>
+
+  <main class="screen stack">
+
+    <!-- 계측: rx.created는 P2 "발급" 탭의 POST /api/prescriptions 커밋 트랜잭션에서 이미 서버 기록됨
+         (도달률 분모 — §6.2). P3 도착 시점에 추가 발급 이벤트 없음. -->
+    <!-- 발급 성공 배너 — 재표시(reissue) 모드에서는 숨김("발급 성공 배너 없이 QR·코드만") -->
+    <div class="hstack np" data-wf-hide="reissue">
+      <span class="status-chip st-active" data-wf-hide="offline">Issued</span>
+      <!-- 오프라인: 서버 미전송 — issued_at_client(+05:30) 스탬프로 로컬 발급, sync 시 rx.created 소급 -->
+      <span class="status-chip st-pending" data-wf-show="offline">Sync pending</span>
+      <span class="t-supporting t-secondary" id="issueMeta"></span>
+    </div>
+
+    <!-- 재표시 모드 맥락 라벨: P5 "QR 다시 보기" 경유 가정 — "발급 N일 전"
+         (FX-A는 당일 발급이라 "Issued today", FX-C는 6/10 발급이라 "Issued 26 days ago"로 데모.
+          미션 예시 "발급 3일 전"은 이 라벨의 내용 예 — 값은 fixtures created_at 기준 산출) -->
+    <!-- 계측: qr.redisplayed — P5의 GET /api/prescriptions/{id}/qr 호출 시 서버 기록.
+         발급(rx.created) 아님 — 도달률 분모 오염 방지(§6.3-②). P3 재표시 자체는 추가 계측 없음. -->
+    <div class="hstack np" data-wf-show="reissue">
+      <span class="flag" id="reissueAgo"></span>
+      <span class="t-supporting t-secondary" id="reissueMeta"></span>
+    </div>
+
+    <!-- ================= QR 스테이지 (screen/offline/reissue 공통 · print에서는 미리보기 카드로 대체) ================= -->
+    <!-- QR 바인딩: 201 응답 access.url (쿼리 없는 /p/{token} — D2). 실인코딩 없음 — placeholder.
+         제품: 클라 JS 렌더 단일 경로(~5KB 인라인, D18) — 오프라인에서도 QR은 정상(로컬 렌더). quiet zone 4모듈. -->
+    <section class="card qr-stage" data-wf-hide="print" aria-label="QR code">
+      <div class="ph ph--qr">QR<span class="ph-size">V4-M 33&times;33 &middot; quiet zone 4 &middot; ~5KB client JS render</span></div>
+
+      <!-- 짧은 코드 병기 — access.short_code_display (Crockford Base32 8자, 하이픈 표시 — D3) -->
+      <div class="short-code" id="shortCode" data-wf-hide="offline"></div>
+      <p class="t-supporting t-secondary t-center" data-wf-hide="offline">Backup code &mdash; family can type it at indoro.example</p>
+
+      <!-- 오프라인 = "QR만" 모드: short_code는 sync 시 서버 발급(§2.3·§10-9) — 코드 영역 플레이스홀더 -->
+      <div class="ph code-ph" data-wf-show="offline">Code &mdash; issued after sync<span class="ph-size">QR-only mode (offline)</span></div>
+
+      <!-- 환자 안내 1줄 (영어+힌디 병기 — 약사측은 언어 토글 없음, 항상 병기 노출) -->
+      <p class="scan-line">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        <span lang="hi">कैमरे से स्कैन करें</span>
+        <span class="t-secondary">&middot;</span>
+        <span lang="en">Scan with phone camera</span>
+      </p>
+
+      <hr class="divider" style="width:100%">
+
+      <!-- 유효기간 — access.expires_at ("8월 5일까지 유효" 상당) + D-3 이내 곧 만료 플래그(FX-C 데모) -->
+      <div class="hstack validity">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+        <span class="t-supporting" id="validTill"></span>
+        <span class="flag flag-expiring" id="expFlag" hidden></span>
+      </div>
+
+      <!-- 화면 제시 폴백 수칙: 웹은 시스템 밝기 제어 불가 — 기기 밝기 최대는 P0 온보딩 수칙으로 대체 -->
+      <p class="t-supporting t-secondary t-center" data-wf-show="screen fail-sheet">Set device brightness to maximum before showing (P0 checklist)</p>
+    </section>
+
+    <!-- ================= 인쇄 모드: 인쇄 미리보기 카드 (기본 경로 — D21) ================= -->
+    <!-- 제품 동작: has_printer=1이면 P3 도착 즉시 인쇄 다이얼로그 자동 호출(1탭 절약).
+         와이어프레임에서는 자동 호출을 생략하고 "Print" 버튼 탭으로 데모(리뷰 방해 방지). v0 = 브라우저 인쇄,
+         ESC/POS 직결은 §10-3 확정 후. "재출력" = 로컬 재인쇄 — 서버 호출 없음. -->
+    <!-- 인쇄 QR 스펙 주석: ECC Q · 모듈 크기 기준 한 변 ≥2cm · quiet zone 4모듈 (§2.1 — 약봉투 부착 후 접힘·오염 내성) -->
+    <section data-wf-show="print" aria-label="Print preview">
+      <div class="card card--emphasized print-card" id="printCard">
+        <h3 id="ppName"></h3>
+        <p class="t-supporting t-secondary" id="ppArea"></p>
+        <hr class="divider">
+        <div class="ph ph--qr">QR<span class="ph-size">V4-M 33&times;33 &middot; &ge;2cm &middot; ECC Q</span></div>
+        <div class="short-code" id="ppCode"></div>
+        <p class="scan-line t-supporting">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+          <span lang="hi">कैमरे से स्कैन करें</span>
+          <span class="t-secondary">&middot;</span>
+          <span lang="en">Scan with phone camera</span>
+        </p>
+        <p class="t-supporting t-secondary" id="ppValid"></p>
+      </div>
+      <p class="t-supporting t-secondary t-center np" style="margin-top:8px">58 mm thermal label &middot; v0 prints via browser dialog</p>
+    </section>
+
+    <!-- ================= 오프라인 발급 안내 (outbox + 구두 교육 스크립트 §2.3) ================= -->
+    <section class="card np" data-wf-show="offline" aria-label="Offline guidance">
+      <p class="card-title">Tell the patient</p>
+      <!-- 구두 안내 문구 — §2.3 교육 스크립트 "지금 안 열리면 집에서 다시 열어보세요" (hi/en 병기) -->
+      <p><span lang="hi">अभी नहीं खुले तो घर पर फिर से खोलें</span></p>
+      <p class="t-supporting t-secondary"><span lang="en">&ldquo;If it doesn&rsquo;t open now, open it again at home.&rdquo;</span></p>
+      <hr class="divider">
+      <!-- outbox 안내: 로컬 토큰으로 발급 완료 — 온라인 복귀 시 자동 sync(백오프 재시도), 코드는 그때 발급 -->
+      <p class="t-supporting t-secondary">Saved to outbox &mdash; will sync automatically when back online.</p>
+      <!-- B3: p8-outbox.html 생성 시 href="p8-outbox.html" 복원(활성화). B1에는 P8 미배치 — 404 방지로
+           href 제거 + aria-disabled (wf.css .btn[aria-disabled=true]가 자동 비활성: opacity+pointer-events;
+           href 제거로 키보드 Enter 내비게이션도 차단) -->
+      <a class="btn btn-ghost" aria-disabled="true">Open outbox</a>
+    </section>
+
+    <!-- ================= 항목 번호 나열 — items[].position 색+숫자 (봉투 번호 안전망 §2.1 ③) ================= -->
+    <!-- 삭제로 번호가 재부여된 경우의 최종 재확인 지점. 배지 hue는 position 고정(1..10), ?color=0이면 회색+숫자 -->
+    <section class="card np" aria-label="Packet numbers">
+      <p class="card-title">Packet numbers</p>
+      <div class="badge-row" id="badgeRow"></div>
+      <p class="t-supporting t-secondary" style="margin-top:8px">Check the same numbers are written on the medicine packets.</p>
+    </section>
+
+    <!-- 스캔 실패 기록 확인 플래그 (시트에서 사유 선택 후 표시 — 세션 데모용) -->
+    <p class="np" id="scanRecordedRow" hidden>
+      <span class="flag"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2.5 8.5 6 12l7.5-8"/></svg><span id="scanRecordedTxt"></span></span>
+    </p>
+
+    <!-- 환자 시연 데모 피드백 (staff 미리보기 — first_view 비소모) -->
+    <p class="np" id="demoNoteRow" hidden>
+      <span class="flag">Staff preview shown &mdash; does not count as patient view</span>
+    </p>
+
+  </main>
+
+  <!-- ================= 하단 고정 바: 주 행동(전폭 56px) + 보조 액션 ================= -->
+  <!-- 계측: 인쇄·전체화면·환자 시연 탭은 v0 미계측 — 이벤트 사전(§6.2) 밖. 약사 UI 클라 비콘 없음(D16),
+       필요 시 서버 기록 API로만 확장. -->
+  <div class="bottom-bar">
+    <div class="bar-row">
+      <!-- 화면 제시 폴백 주 행동: 전체화면 크게 보기 (흰 배경 고대비 — 스캔 실패 사다리 2단 §2.5) -->
+      <button class="btn btn-primary" type="button" id="btnFullscreen" data-wf-hide="print">Show fullscreen</button>
+      <!-- 인쇄 모드 주 행동: 브라우저 인쇄 = 재출력 겸용(로컬 재인쇄 — 서버 호출 없음) -->
+      <button class="btn btn-primary" type="button" id="btnPrint" data-wf-show="print">Print</button>
+    </div>
+    <div class="bar-row bar-row2">
+      <!-- 인쇄 경로 진입(미리보기) — screen/offline/reissue에서 노출 -->
+      <button class="btn btn-secondary" type="button" id="btnGoPrint" data-wf-hide="print">Print</button>
+      <!-- 상태 변형: 인쇄 실패 → 화면 제시 폴백 (print 상태에서만 노출) -->
+      <button class="btn btn-secondary" type="button" id="btnGoScreen" data-wf-show="print">Show on screen</button>
+      <!-- "환자에게 시연" = GET /api/prescriptions/{id} 미리보기 렌더 — 환자 라우트 /p/{token} 미경유(§6.3 2중화),
+           staff 쿠키와 무관하게 first_view 비소모. 오프라인에서는 서버 조회 불가 — 비활성. -->
+      <button class="btn btn-secondary" type="button" id="btnDemo">Demo for patient</button>
+      <!-- 스캔 실패 원탭 → 사유 4택 시트 (2탭 완결) -->
+      <button class="btn btn-secondary" type="button" id="btnScanFail">Scan failed?</button>
+    </div>
+  </div>
+
+  <!-- ================= 전체화면 QR 오버레이 (탭하면 닫힘) ================= -->
+  <div class="fs-overlay np" id="fsOverlay" role="dialog" aria-label="Fullscreen QR">
+    <div class="ph ph--qr">QR<span class="ph-size">V4-M 33&times;33 &middot; quiet zone 4</span></div>
+    <div class="short-code" id="fsCode" data-wf-hide="offline"></div>
+    <p class="scan-line">
+      <span lang="hi">कैमरे से स्कैन करें</span>
+      <span class="t-secondary">&middot;</span>
+      <span lang="en">Scan with phone camera</span>
+    </p>
+    <p class="t-supporting t-secondary">Tap anywhere to close</p>
+  </div>
+
+  <!-- ================= 스캔 실패 사유 시트 (사유 4택 — §2.5 스캔 불가 단말 실측) ================= -->
+  <!-- 계측: scan.failed — POST /api/prescriptions/{id}/scan-failure, 서버 events[scan.failed] 기록.
+       reason enum: no_qr_camera(폰에 카메라QR 없음) | camera_broken(카메라 고장) |
+                    feature_phone(피처폰) | refused(거부). 온보딩 첫 주 집중 계측 — 스캔 불가 단말 비율 실측. -->
+  <div class="sheet-scrim np" id="sheetScrim" data-wf-show="fail-sheet"></div>
+  <div class="sheet np" data-wf-show="fail-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h4 id="sheetTitle">Why did the scan fail?</h4>
+    <p class="t-supporting t-secondary">One tap &mdash; helps count phones that cannot scan.</p>
+    <button class="btn opt" type="button" data-reason="no_qr_camera">Phone has no QR scanner</button>
+    <button class="btn opt" type="button" data-reason="camera_broken">Camera not working</button>
+    <button class="btn opt" type="button" data-reason="feature_phone">Feature phone (no camera)</button>
+    <button class="btn opt" type="button" data-reason="refused">Patient declined</button>
+    <button class="btn btn-ghost" type="button" id="btnSheetCancel" style="width:100%;margin-top:8px">Cancel</button>
+  </div>
+
+  <script src="../shared/fixtures.js"></script>
+  <script src="../shared/wf.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    /* 마지막 비-시트 상태 기억 — 시트 닫기 시 복귀 지점 */
+    var prevNonFail = "screen";
+
+    var ctx = WF.init({
+      screen: "P3",
+      states: ["screen", "print", "offline", "reissue", "fail-sheet"],
+      langs: null,                    /* 약사측 — 영어 고정, hi/en 병기는 환자 안내 1줄만 */
+      fxList: ["a", "b", "c"],
+      showColor: true,                /* 항목 번호 배지 있음 — ?color=0 회색 검증 모드 */
+      reloadOn: ["fx"],
+      onChange: function (c, key) { if (key === "state") applyState(c.state); }
+    });
+
+    var fx = WF.fixture();
+    if (!fx) return;
+    var meta = window.INDORO_FX.meta;
+    var rx = fx.prescription, acc = fx.access, items = fx.items;
+
+    /* ---------- 유틸 (기준일 = meta.demo_today, 표시 시각은 IST +05:30) ---------- */
+    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    function fmtDate(iso) {                       /* "2026-08-05T..." → "5 Aug 2026" */
+      var p = iso.slice(0, 10).split("-");
+      return (+p[2]) + " " + MONTHS[+p[1] - 1] + " " + p[0];
+    }
+    function daysFromToday(iso) {                 /* 날짜 단위 차이 (미래=+, 과거=−) */
+      return Math.round((Date.parse(iso.slice(0, 10)) - Date.parse(meta.demo_today)) / 864e5);
+    }
+    function fmtTimeIST(iso) {
+      var d = new Date(Date.parse(iso) + 198e5); /* +05:30 */
+      var h = d.getUTCHours(), m = d.getUTCMinutes();
+      var ap = h >= 12 ? "pm" : "am"; h = h % 12; if (h === 0) h = 12;
+      return h + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- 픽스처 바인딩 (하드코딩 금지 — INDORO_FX만) ---------- */
+    var label = rx.patient_label || "(no label)";
+    $("issueMeta").textContent = fmtTimeIST(rx.created_at) + " IST · " + label + " · " +
+      items.length + (items.length === 1 ? " item" : " items");
+
+    $("shortCode").textContent = acc.short_code_display;
+    $("ppCode").textContent = acc.short_code_display;
+    $("fsCode").textContent = acc.short_code_display;
+
+    var validTxt = "Valid till " + fmtDate(acc.expires_at);
+    $("validTill").textContent = validTxt;
+    $("ppValid").textContent = validTxt;
+    var daysLeft = daysFromToday(acc.expires_at);
+    if (daysLeft <= 3) {                          /* FX-C: 2026-07-09 만료 → D-3 "곧 만료" */
+      $("expFlag").textContent = "Expires in " + daysLeft + (daysLeft === 1 ? " day" : " days");
+      $("expFlag").hidden = false;
+    }
+
+    /* 재표시 맥락 라벨 — created_at 기준 상대 표기 (FX-A: today · FX-C: 26 days ago) */
+    var ago = -daysFromToday(rx.created_at);
+    $("reissueAgo").textContent = ago <= 0 ? "Issued today" :
+      (ago === 1 ? "Issued yesterday" : "Issued " + ago + " days ago");
+    $("reissueMeta").textContent = fmtDate(rx.created_at) + " · " + label + " · " +
+      items.length + (items.length === 1 ? " item" : " items");
+
+    /* 항목 번호 배지 — position 1..10 = hue-1..10 고정 (재배열 금지) */
+    var row = $("badgeRow");
+    items.forEach(function (it) {
+      var b = document.createElement("span");
+      b.className = "badge-item hue-" + it.position;
+      b.textContent = it.position;
+      row.appendChild(b);
+    });
+
+    /* 인쇄 미리보기 — 약국명·지역 (pharmacies.name/area, has_printer=1 → 인쇄 기본 경로 D21) */
+    $("ppName").textContent = fx.pharmacy.name;
+    $("ppArea").textContent = fx.pharmacy.area;
+
+    /* ---------- 상태 적용 ---------- */
+    function applyState(s) {
+      if (s !== "fail-sheet") prevNonFail = s;
+      /* 오프라인: "환자에게 시연"은 GET /api/prescriptions/{id} 필요 — 비활성 */
+      $("btnDemo").setAttribute("aria-disabled", s === "offline" ? "true" : "false");
+      if (s === "reissue") {
+        WF.mark("qr.redisplayed — P5 'QR 다시 보기' 경유 재표시 (서버 기록 · rx.created 아님)");
+      }
+    }
+    applyState(ctx.state);
+
+    /* ---------- 인터랙션 ---------- */
+    /* [T0] 새 처방 입력 — 1탭(앱바 최상단). P1에서 새 client_input_id 생성 */
+    $("btnNewRx").addEventListener("click", function () {
+      WF.mark("[T0] 예약 — 새 처방 입력 → P1에서 client_input_id 재생성·타이머 시작");
+    });
+
+    /* 전체화면 크게 보기 (v0 미계측) */
+    $("btnFullscreen").addEventListener("click", function () {
+      $("fsOverlay").classList.add("is-open");
+    });
+    $("fsOverlay").addEventListener("click", function () {
+      $("fsOverlay").classList.remove("is-open");
+    });
+
+    /* 인쇄 (v0 미계측 · 재출력 = 로컬 재인쇄, 서버 호출 없음) */
+    $("btnPrint").addEventListener("click", function () { window.print(); });
+    $("btnGoPrint").addEventListener("click", function () { WF.set("state", "print"); });
+    /* 인쇄 실패 → 화면 제시 폴백 */
+    $("btnGoScreen").addEventListener("click", function () { WF.set("state", "screen"); });
+
+    /* 환자에게 시연 — staff 미리보기 렌더 (환자 라우트 미경유, first_view 비소모 §6.3) */
+    $("btnDemo").addEventListener("click", function () {
+      WF.mark("미리보기 렌더 — GET /api/prescriptions/{id} (환자 라우트 미경유 · first_view 비소모)");
+      $("demoNoteRow").hidden = false;
+      window.setTimeout(function () { $("demoNoteRow").hidden = true; }, 3000);
+    });
+
+    /* 스캔 실패 신고 — 2탭 완결: ① 버튼 → ② 사유 */
+    $("btnScanFail").addEventListener("click", function () {
+      WF.set("state", "fail-sheet");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".sheet .opt"), function (btn) {
+      btn.addEventListener("click", function () {
+        var reason = btn.getAttribute("data-reason");
+        /* 계측: scan.failed — POST /api/prescriptions/{id}/scan-failure {reason} → events[scan.failed] */
+        WF.mark("scan.failed — POST /api/prescriptions/{id}/scan-failure", { reason: reason });
+        $("scanRecordedTxt").textContent = "Recorded: " + btn.textContent;
+        $("scanRecordedRow").hidden = false;
+        WF.set("state", prevNonFail || "screen");
+      });
+    });
+    $("btnSheetCancel").addEventListener("click", function () { WF.set("state", prevNonFail || "screen"); });
+    $("sheetScrim").addEventListener("click", function () { WF.set("state", prevNonFail || "screen"); });
+  })();
+  </script>
+</body>
+</html>

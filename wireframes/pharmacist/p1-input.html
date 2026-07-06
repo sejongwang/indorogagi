@@ -1,0 +1,909 @@
+<!doctype html>
+<!--
+  ============================================================================
+  화면 ID: P1 새 처방 입력 폼 (+ P2 제출 확인 시트 오버레이 · G1/G2 자리표시)
+  목적: 수기 처방전 1장을 항목 카드 1..N으로 구조화 — 입력 KPI(active_input_ms / n_items
+        20~40초)가 측정되는 유일한 화면. P2는 발급 직전 1스크롤 대조 시트.
+  대응 인벤토리: docs/02-wireframe-pharmacist.md §3(P1) · §4(P2) · §10(G1·G2) · §11(계측 배치 맵)
+  생성 규칙: docs/04-wireframe-plan.md §2.1 (+사용자 오버라이드: astryx neutral 증류 토큰, 모바일 360×640)
+  상태 스위처: ?state=default | autocomplete-open | item-collapsed | confirm-sheet | error422 | offline
+              ?fx=a|b|c · ?color=0|1  (?lang 미등록 — 약사측 UI는 영어 고정, 병기 없음)
+  더미 데이터: window.INDORO_FX만 사용(화면 하드코딩 금지). 실제 API·QR 인코딩·계측 전송 없음.
+
+  [수용 기준 자가 체크 — docs/04 §3 P1 행]
+  - [통과] 최근 약 칩 경로 ≤4탭: ①최근 칩(항목 전체 프리필) ②"Review & Issue" ③시트 "Issue" = 3탭
+  - [통과] 자동완성 채택 ≤5탭+약명 타이핑 1회: ①약명 필드 진입(타이핑 1회) ②후보 채택(패턴·식전후·단위
+           3필드 프리필 + 용량 슬롯 자동) ③기간 칩(첫 항목은 기본값 없음) ④"Review & Issue" ⑤"Issue" = 5탭
+  - [통과] 시드 밖 풀입력 ≤8탭+타이핑 1회: ①필드 진입(타이핑) ②"Use as new drug name"(DB-optional)
+           ③패턴 칩(용량 자동) ④식전후 칩 ⑤기간 칩 ⑥"Review & Issue" ⑦"Issue" = 7탭 (단위는 tablet 기본 상시 노출 — 탭 0)
+  - [통과] 숫자 키보드 호출 0회: 수량·기간·총량·PRN 상한 전부 스테퍼/칩 — 숫자 input 요소 자체가 없음
+           (타이핑 필드는 약명/별칭/메모/CUSTOM 지시문뿐)
+  - [보류·리뷰 판정] FX-A 3항목 워크스루 항목당 ≤40초 — 팀 3인 스톱워치 판정(네트워크 지연 미반영 낙관치 기록)
+  - [통과] 2번째 항목 duration_days 승계: "+ Add drug" 시 직전 값 복사 + "Inherited from item N" 노트
+           (기간 수동 변경 시 노트 제거)
+  - [통과] 카드 접힘 1행 요약(약명 · 1-0-1 · After food · 5 d): 항목 추가 시 자동 접힘, 탭 재확장,
+           ?state=item-collapsed 로 전체 접힘 재현
+  - [통과] 422 인라인 + 카드 자동 확장: ?state=error422 — fields[].path("items.0.drug_name_raw")를
+           카드·필드에 매핑(is-invalid + .field-error), 카드 1 자동 확장, 상단 배너
+  - [통과] 오프라인 변형: ?state=offline — 자동완성만 조용히 비활성(최근 레일은 로컬이라 생존),
+           상단 오프라인 배너, 제출 버튼 라벨 "Offline Issue — QR now" 전환, 연결 점 회색,
+           발급 시 P3 이동 URL에 &state=offline 전파(P3 "QR만" 변형 착지, §10-9 · color=0도 유지)
+
+  [수용 기준 자가 체크 — docs/04 §3 P2 행]
+  - [통과] FX-A 3항목 총높이 ≤2화면·1스크롤 대조(행당 약 72px 컴팩트 행). 대조 ≤5초는 리뷰 스톱워치 판정
+  - [통과] 행 탭 → 시트 닫고 해당 카드 확장 복귀(+스크롤)
+  - [통과] ml 항목 총량 단위 경고 존: dose_unit=ml 항목을 "total N ml — ml, not bottles"로 나열
+           (FX-B 5번·FX-C 2번에서 표시, FX-A는 존 숨김) + total 수동수정≠자동Σ 비차단 경고
+  - [통과] "Issue" 하단 고정(시트 sticky foot — 엄지 존) · 전폭 · min-height 56px
+
+  [전 화면 공통 자가 체크 — docs/04 §3]
+  - [통과] 360×640 기준 제작, 320px 페이지 가로 스크롤 0(최근 약 레일만 내부 가로 스크롤 컨테이너,
+           용량 그리드는 320px에서 1열로 자동 폴딩)
+  - [통과] 터치 타깃 ≥48×48(칩·스테퍼 버튼·자동완성 행·시트 행·접힘 카드), 주 행동 버튼 전폭·min-height 56px
+  - [통과] 인벤토리 P1 (a)(b)(c)(d) 요소 누락 0: 안내 언어 칩(자기표기, 접힘 금지)/별칭 접힘/번호 색+숫자
+           배지(position=hue 고정, 삭제 시 재부여)/약명 자유입력+자동완성/최근 약 레일/패턴 칩 9종(코어8+CUSTOM,
+           sort_order 순)/용량 4스테퍼 M→N→E→H(slots 밖 0 강제 비활성)/단위 7칩 상시 노출/식전후 4종+Not set/
+           기간 프리셋 칩+스테퍼/총량 자동Σ+탭 수정/패턴 가변 영역(WEEKLY 요일 칩·PRN 사유 셀렉트+상한 스테퍼·
+           STAT 기간 비활성·CUSTOM 지시문+구두 설명 체크 필수+주의 카드 고지)/메모 접힘/약 추가/하단 고정 바
+  - [통과] 상태 변형: 임무 지정 6종 스위처 등록. 인벤토리의 나머지 변형은 다음으로 재현·주석화 —
+           제출 중=시트 "Issue" 탭 데모(버튼 잠금+"Issuing…"), 로딩=패턴 ETag 캐시 즉시 렌더(대기 없음),
+           crypto 미지원=주석(C안 폴백), 타임아웃 재전송·outbox 전환=주석+콘솔 데모, 409 TOKEN_COLLISION=주석(P8)
+  - [통과] 계측 마커 주석 docs/02 §11과 1:1([T0]/T0+/자동완성 채택/[T1]/T1' 재전송) + WF.mark 콘솔 데모
+  - [통과] 이모지 0(아이콘은 인라인 SVG 단순 도형) · 라이트 고정 · 말줄임 0(랩 허용) · 숫자 ASCII·0.5는 ½
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P1 · New Prescription — indoro wireframe</title>
+<link rel="stylesheet" href="../shared/wf.css">
+<style>
+/* ---------- P1 전용 레이아웃 (공용 클래스 재정의 없음 — 신규 클래스만, 색은 토큰만) ---------- */
+
+/* 상단 배너(오프라인/422) — 앱바(56px) 아래 sticky */
+.p1-banner { position: sticky; top: 56px; z-index: 25; display: flex; gap: 8px; align-items: flex-start;
+  padding: 10px 16px; font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); }
+.p1-banner svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.p1-banner--offline { background: var(--color-warning-muted); color: var(--color-warning); }
+.p1-banner--error { background: var(--color-error-muted); color: var(--color-error); }
+
+/* G2 연결 점 — 오프라인 상태에서 회색 (상태 CSS는 html[data-state]로 직접) */
+html[data-state="offline"] .conn-dot { background: var(--color-text-disabled); }
+
+/* 접힘 카드(1행 요약) — 카드 전체가 버튼 */
+.item-sum { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px;
+  text-align: left; cursor: pointer; }
+.sum-body { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.sum-name { font-size: var(--text-heading-4-size); }
+.sum-meta { font-size: var(--text-supporting-size); }
+.sum-caret { width: 20px; height: 20px; color: var(--color-icon-secondary); flex: none; }
+
+/* 펼침 카드 내부 */
+.item-head { display: flex; align-items: center; gap: 4px; }
+.item-fold { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; min-height: 48px;
+  padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.item-title { font-weight: var(--font-weight-bold); }
+.fgroup { margin-top: 14px; }
+.inline-note { display: block; margin-top: 4px; font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+
+/* 용량 4스테퍼 그리드 — 360px(카드 내부 294px → 트랙 141px) 2열 · 320px 자동 1열.
+   스테퍼 고유폭 146px가 141px 트랙을 5px 넘지만 열 간격 12px·카드 패딩 16px 안에서 흡수 —
+   카드 밖 미돌출·페이지 가로 스크롤 0·터치 48px 유지(헤드리스 실측). min 148px이면 360px서 1열로 접혀 금지 */
+.dose-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px 12px; }
+.dose-slot { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.slot-name { font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); }
+
+/* 자동완성 드롭다운 (목업 — GET /api/drugs?q= 대역은 INDORO_FX.drugs_seed) */
+.ac-wrap { position: relative; }
+.ac-pop { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 35;
+  background: var(--color-background-popover); border: 1px solid var(--color-border-emphasized);
+  border-radius: var(--radius-element); box-shadow: var(--shadow-med); overflow: hidden; }
+.ac-row { display: block; width: 100%; min-height: 48px; padding: 8px 12px; border: 0;
+  border-top: 1px solid var(--color-border); background: transparent; text-align: left; cursor: pointer; }
+.ac-row:first-child { border-top: 0; }
+.ac-row:active { background: var(--color-overlay-pressed); }
+.ac-main { display: block; font-weight: var(--font-weight-semibold); }
+.ac-sub { display: block; font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+.ac-new .ac-main { color: var(--color-text-accent); }
+
+/* 최근 약 레일 — 내부 가로 스크롤(페이지 가로 스크롤 아님) */
+.rail { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 2px; }
+.rail .chip { flex: none; }
+
+/* 기간·총량 행 */
+.duration-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qty-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.qty-num { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); font-variant-numeric: tabular-nums; }
+.dim { opacity: 0.45; pointer-events: none; }
+
+/* 패턴 가변 영역 구분 + CUSTOM 고지 */
+.zone { margin-top: 14px; border-top: 1px dashed var(--color-border-emphasized); padding-top: 12px; }
+.notice { background: var(--color-accent-muted); border-radius: var(--radius-element); padding: 10px 12px;
+  font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+.check { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; padding: 4px 0; cursor: pointer; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--color-accent); flex: none; }
+
+/* P2 제출 확인 시트 (하단 시트 오버레이) */
+.sheet-backdrop { position: fixed; inset: 0; z-index: 40; background: var(--color-overlay);
+  display: none; align-items: flex-end; justify-content: center; }
+.sheet-backdrop.is-open { display: flex; }
+.sheet { width: 100%; max-width: 480px; max-height: 88dvh; display: flex; flex-direction: column;
+  background: var(--color-background-surface); box-shadow: var(--shadow-high);
+  border-radius: var(--radius-container) var(--radius-container) 0 0; }
+.sheet-head { display: flex; align-items: center; gap: 4px; padding: 10px 12px; border-bottom: 1px solid var(--color-border); }
+.sheet-title { font-size: var(--text-heading-3-size); font-weight: var(--text-heading-3-weight); }
+.sheet-body { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.sheet-foot { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--color-border);
+  background: var(--color-background-surface); }
+.sum-row { display: flex; align-items: flex-start; gap: 12px; width: 100%; min-height: 56px; padding: 10px 12px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-element);
+  background: var(--color-background-card); text-align: left; cursor: pointer; }
+.sum-row .badge-item--sm { margin-top: 2px; }
+.sum-row-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sum-quote { margin-top: 4px; padding: 6px 10px; border-left: 3px solid var(--color-border-emphasized);
+  font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+.warn-zone { background: var(--color-warning-muted); color: var(--color-warning); border-radius: var(--radius-element);
+  padding: 10px 12px; font-size: var(--text-supporting-size); display: flex; flex-direction: column; gap: 4px; }
+.warn-zone[hidden] { display: none; }   /* display:flex가 hidden 속성을 이기지 않게 */
+.offline-note { background: var(--color-background-orange); color: var(--color-text-orange);
+  border-radius: var(--radius-element); padding: 10px 12px;
+  font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); }
+</style>
+</head>
+<body>
+
+<!-- == 앱바: 제목 + G2 연결 점 + G2 outbox 배지(자리표시) =================== -->
+<header class="appbar">
+  <span class="appbar-title">New Prescription</span>
+  <span class="spacer"></span>
+  <!-- G2 자리표시(전역 컴포넌트): 연결 상태 점 — 오프라인 상태에서 회색 -->
+  <span class="conn-dot" title="Connection"></span>
+  <!-- G2 자리표시: 미전송 N건 배지 — 카운트는 INDORO_FX.outbox.length. 탭 = P8 outbox 시트(B3에서 구현) -->
+  <button class="appbar-btn" type="button" id="obBadge" title="Unsent queue (P8)"></button>
+</header>
+
+<!-- G1 자리표시(전역 컴포넌트, B3에서 상태 구현): staff 쿠키 주기 self-check — 부재 시
+     "Device re-registration needed" 배너 + 원탭 재설정(온보딩 URL 재방문, docs/02 §10 G1).
+     마크업은 422 배너와 동일 골격(.p1-banner 에러 변형)에 버튼 1개. -->
+
+<!-- 오프라인 배너 (?state=offline 에서만) — 자동완성 비활성·outbox 적재 고지 -->
+<div class="p1-banner p1-banner--offline" data-wf-show="offline">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l18 18M9.5 6.2A9.8 9.8 0 0 1 21 9.5M5.6 8.4A9.6 9.6 0 0 0 3 9.5m3.4 3.2a6.4 6.4 0 0 1 5-1.9m4.2 1.9a6.5 6.5 0 0 0-1.7-1.2M9.8 15.9a3.3 3.3 0 0 1 4.4 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+  <span>Offline. Issues queue in the outbox and QR still works instantly. Autocomplete is off. Keep this tab open.</span>
+</div>
+
+<!-- 422 배너 (?state=error422 에서만) — fields[].path를 카드·필드 인라인에 매핑 + 해당 카드 자동 확장 -->
+<div class="p1-banner p1-banner--error" data-wf-show="error422">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V13M12 16.2v.3"/></svg>
+  <span>Server rejected (422). Fix the highlighted field below. <span class="t-supporting">VALIDATION_ERROR &middot; items.0.drug_name_raw: required</span></span>
+</div>
+
+<!-- 계측: [T0] 폼 오픈 — client_input_id 생성(UUIDv4, D10) + gross 타이머 시작(performance.now 단조시계)
+     + active 버킷 계측 개시 (docs/02 §11). 이 화면 자체의 서버 이벤트·클라 비콘은 없음 — rx.form_opened 미도입(D16). -->
+<!-- 폼 초기화 시 crypto.getRandomValues 가용성 검사 — 미존재면 오프라인 발급 비활성(C안 폴백, Math.random 금지 — H4). 데모는 콘솔 로그만. -->
+<main class="screen stack" id="main">
+
+  <!-- (a) 처방 헤더 — 1행 고정: 안내 언어 칩(접힘 금지) · 별칭은 접힘 -->
+  <section class="card" id="hdrCard">
+    <!-- 바인딩: prescriptions.lang — 프리필 pharmacies.default_patient_lang. QR 직스캔의 기본 렌더 언어(D2).
+         자기표기 "हिन्दी / English"(국기 금지) · 환자와 구두 확인 후 확정(§3.3) -->
+    <span class="field-label">Guide language <span class="t-secondary t-supporting">confirm with patient</span></span>
+    <div class="chip-row" id="hdrLang"></div>
+    <!-- 바인딩: prescriptions.patient_label ≤20자 · 기본 접힘(스킵이 기본 동선) · 실명 금지(§8.1) -->
+    <div id="aliasZone" class="fgroup"></div>
+  </section>
+
+  <!-- (b) 항목 카드 1..N — 계측: T0+ 모든 keydown/tap 타임스탬프 버킷 합산, 30초+ 갭 제외(active_input_ms),
+       갭마다 idle_gaps_count++ (document 레벨 리스너 데모) -->
+  <!-- 계측: 자동완성 채택 시 used_autocomplete_count++ (드롭다운 후보 행 탭) -->
+  <div class="stack" id="itemList"></div>
+
+  <!-- (c) 약 추가 — 새 카드 position+1, 직전 카드 1행 요약 접힘, duration_days 승계(2번째 항목부터) -->
+  <button class="btn btn-secondary" type="button" data-act="add" id="addBtn">+ Add drug</button>
+  <span class="t-supporting t-secondary t-center" id="addNote"></span>
+
+</main>
+
+<!-- (d) 하단 고정 바: 항목 수 + "확인하고 발급" + G2 연결 상태 점 · "탭 닫지 마세요" 수칙 상시 문구 -->
+<div class="bottom-bar">
+  <span style="display:flex;flex-direction:column;gap:2px;flex:none;">
+    <span class="hstack"><span class="conn-dot"></span><b id="itemCount">0 items</b></span>
+    <span class="t-supporting t-secondary">Keep this tab open</span>
+  </span>
+  <button class="btn btn-primary" type="button" data-act="review" id="reviewBtn">
+    <span data-wf-hide="offline">Review &amp; Issue</span>
+    <span data-wf-show="offline">Offline Issue &mdash; QR now</span>
+  </button>
+</div>
+
+<!-- == P2 제출 확인 시트 (P1 위 하단 시트 오버레이 — 별도 라우트 아님, 접힘 요약의 재배치라 렌더 비용 0) == -->
+<div class="sheet-backdrop" id="sheetBack">
+  <section class="sheet" aria-label="Confirm before issuing">
+    <header class="sheet-head">
+      <button class="appbar-btn" type="button" data-act="sheet-close">Back</button>
+      <div style="min-width:0;">
+        <div class="sheet-title">Confirm &amp; Issue</div>
+        <!-- 헤더 바인딩: lang(발급 언어) + patient_label -->
+        <div class="t-supporting t-secondary" id="sheetSub"></div>
+      </div>
+    </header>
+    <div class="sheet-body">
+      <p class="t-supporting t-secondary">Compare each row with the paper prescription. Tap a row to edit that item. Rows follow envelope numbers (position order).</p>
+      <!-- 항목별 요약 행: position 색+숫자 배지 + drug_name_raw + 슬롯 파생 표기(1-0-1-0) + 단위 + 식전후 +
+           기간 + 총량. CUSTOM은 instructions 원문 + 구두 설명 체크 상태. 행 탭 → 해당 카드로 복귀(시트 닫기) -->
+      <div class="stack" id="sheetRows"></div>
+      <!-- 경고 존: total_quantity 불일치(비차단) + ml 항목 "총량 단위 = ml(병 아님)" 확인(§3.3) -->
+      <div class="warn-zone" id="sheetWarn" hidden></div>
+      <!-- 오프라인 발급 고지(§10-9): QR 즉시, 코드는 동기화 후 -->
+      <div class="offline-note" data-wf-show="offline">Offline issue: QR works now. Short code arrives after sync. Tell the patient: &ldquo;If it does not open now, open it again at home.&rdquo;</div>
+    </div>
+    <footer class="sheet-foot">
+      <!-- 계측: [T1] "발급" 탭 — gross 확정 → input_duration_ms, active 확정 → active_input_ms,
+           issued_at_client 스탬프(+05:30 허용). client_metrics(+ idle_gaps_count, used_autocomplete_count,
+           retry_count, app_version:"v0-web") 동봉. 서버가 커밋 트랜잭션에서 rx.created 기록 — 도달률 분모(§6.2).
+           확인 시트 열람 시간은 gross에 포함(§6.3 — 대조도 입력 원가). -->
+      <!-- 계측: T1' 제출 타임아웃 → 동일 client_input_id 자동 재전송(retry_count++) → 연속 실패 시 outbox 전환.
+           409 TOKEN_COLLISION은 P8 확인 목록 등재 안내(§2.3). 제출 중 상태: 버튼 잠금 + "Issuing…"
+           (더블탭은 멱등키 D10이 방어하지만 UX로도 억제) — "Issue" 탭 데모로 재현. -->
+      <button class="btn btn-primary" type="button" data-act="issue" id="issueBtn">
+        <span data-wf-hide="offline">Issue</span>
+        <span data-wf-show="offline">Issue Offline</span>
+      </button>
+    </footer>
+  </section>
+</div>
+
+<script src="../shared/fixtures.js"></script>
+<script src="../shared/wf.js"></script>
+<script>
+"use strict";
+/* == 0. 초기화 =========================================================== */
+var ctx = WF.init({
+  screen: "P1",
+  states: ["default", "autocomplete-open", "item-collapsed", "confirm-sheet", "error422", "offline"],
+  langs: null,                    /* 약사측: 영어 고정(병기 없음) */
+  fxList: ["a", "b", "c"],
+  showColor: true,
+  reloadOn: ["fx"],               /* state/color는 인플레이스 — onChange에서 재렌더 */
+  onChange: function (c, key) { if (key === "state") { rebuildForState(); } }
+});
+
+var FXROOT = window.INDORO_FX, META = FXROOT.meta, SEED = FXROOT.drugs_seed;
+var fx = WF.fixture();
+
+/* 계측 데모: [T0] client_input_id(UUIDv4) — crypto 필수(H4: Math.random 폴백 금지) */
+var CID = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "demo-client-input-id(crypto 미지원 — 오프라인 발급 비활성/C안)";
+var MET = { t0: performance.now(), active: 0, last: null, gaps: 0, auto: 0, retry: 0 };
+document.addEventListener("pointerdown", metBump, true);
+document.addEventListener("keydown", metBump, true);
+function metBump() {
+  var now = performance.now();
+  if (MET.last != null) {
+    var gap = now - MET.last;
+    if (gap < 30000) { MET.active += gap; } else { MET.gaps++; }
+  }
+  MET.last = now;
+}
+
+/* == 1. 유틸 ============================================================= */
+function clone(x) { return JSON.parse(JSON.stringify(x)); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function fmtN(v) {              /* 숫자 ASCII, 0.5 → ½ */
+  if (v == null) return "0";
+  var i = Math.floor(v), f = v - i;
+  if (Math.abs(f - 0.5) < 1e-9) return (i === 0 ? "" : String(i)) + "½";
+  return String(v);
+}
+function unitEn(u) { return (META.dose_units[u] || { en: u }).en; }
+function timingEn(t) { return t ? (META.timing_food[t] || { en: t }).en : "Not set"; }
+function patOf(it) { return META.patterns[it.pattern_key] || null; }
+function sumDoses(it) { return (it.doses.M || 0) + (it.doses.N || 0) + (it.doses.E || 0) + (it.doses.H || 0); }
+function digits4(it) { return ["M", "N", "E", "H"].map(function (s) { return fmtN(it.doses[s] || 0); }).join("-"); }
+function digitsShort(it) {
+  var d = it.doses;
+  var arr = (d.H || 0) > 0 ? ["M", "N", "E", "H"] : ["M", "N", "E"];
+  return arr.map(function (s) { return fmtN(d[s] || 0); }).join("-");
+}
+function patShort(it) {         /* 접힘 요약·레일용 파생 표기 */
+  var p = patOf(it);
+  if (!p) return "?";
+  if (p.schedule_type === "prn") return "SOS";
+  if (p.schedule_type === "custom") return "Custom";
+  if (p.schedule_type === "weekly") {
+    var dw = it.extra_params && it.extra_params.day_of_week;
+    return "1/wk" + (dw ? " (" + (META.days_of_week[dw] || { en: dw }).en.slice(0, 3) + ")" : "");
+  }
+  if (p.schedule_type === "once") return "1×";
+  return digitsShort(it) + (it.dose_unit === "ml" ? " ml" : "");
+}
+function autoTotal(it) {        /* Σ슬롯×일수 — prn/custom은 수동(null) */
+  var p = patOf(it);
+  if (!p) return null;
+  var s = sumDoses(it);
+  if (p.schedule_type === "daily") return s * (it.duration_days || 0);
+  if (p.schedule_type === "weekly") return s * Math.max(1, Math.round((it.duration_days || 0) / 7));
+  if (p.schedule_type === "once") return s;
+  return null;
+}
+function recalc(it) {
+  var a = autoTotal(it);
+  if (a != null && !it._totalEdited) it.total_quantity = a;
+}
+function istNow() {             /* issued_at_client 데모 스탬프(+05:30 허용) */
+  return new Date(Date.now() + 330 * 60000).toISOString().replace(/\.\d+Z$/, "+05:30");
+}
+
+/* 패턴 칩 라벨(약사 관용 표기) — pattern_key는 fixtures와 동일 유지.
+   [알려진 한계 — 후속 배치] 단일 소스 규칙(docs/02 공통 규칙 5: GET /api/patterns = META.patterns)상
+   약사용 축약 라벨(abbr_en)·영문 파생표기(digits_en: WEEKLY용 "1/wk")는 fixtures META로 이전해야 하나
+   이번 수정 범위가 본 파일 한정(shared/ 수정 금지)이라 로컬 사전 유지. P6/P7 재사용 전에 이전할 것.
+   미등록 pattern_key는 META name_en으로 폴백 — 카탈로그 추가 시 undefined 렌더 방지. */
+var PATTERN_LABEL = { OD_MORNING: "OD morning", OD_NIGHT: "OD night", BD: "BD", TDS: "TDS", QID: "QID",
+  WEEKLY_ONCE: "Weekly", STAT_SINGLE: "STAT", PRN: "PRN", CUSTOM: "Custom" };
+function patternLabel(k) {
+  var p = META.patterns[k];
+  return PATTERN_LABEL[k] || (p && p.name_en) || k;
+}
+function patternSub(k) {        /* 파생 표기 — WEEKLY의 meta.digits는 환자용 데바나가리라 영어 대체 */
+  var p = META.patterns[k];
+  return p.schedule_type === "weekly" ? "1/wk" : p.digits;
+}
+
+/* 최근 약 레일 원천 — 로컬 캐시 목업: 픽스처 항목에서 인벤토리 튜플 6필드만 추출
+   (drug_name_raw+pattern_key+doses+dose_unit+timing_food+duration_days — docs/02 §3 (b)).
+   상위 8, CUSTOM 제외. 서버 변경 없음. note·prn_reason_key 등 환자별 인스턴스 필드는
+   캐시에 담지 않는다 — 이전 처방의 메모가 다음 환자 항목으로 새는 데이터플로 차단 */
+var RECENTS = (function () {
+  var seen = {}, out = [];
+  ["a", "c", "b"].forEach(function (k) {
+    ((FXROOT[k] && FXROOT[k].items) || []).forEach(function (it) {
+      if (it.pattern_key === "CUSTOM") return;
+      var key = it.drug_name_raw.toLowerCase();
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push({ drug_name_raw: it.drug_name_raw, pattern_key: it.pattern_key,
+        doses: clone(it.doses), dose_unit: it.dose_unit,
+        timing_food: it.timing_food, duration_days: it.duration_days });
+    });
+  });
+  return out.slice(0, 8);
+})();
+
+/* == 2. 폼 모델 — 상태별 초기화 ========================================== */
+var M = null;
+function freshItem(pos, inheritFrom) {
+  return { position: pos, drug_name_raw: "", drug_id: null, drug: null, pattern_key: null,
+    doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: null,
+    duration_days: inheritFrom ? inheritFrom.duration_days : null, total_quantity: 0,
+    prn_reason_key: null, prn_max_per_day: null, prn_min_gap_hours: null,
+    extra_params: null, note: null,
+    _inheritFrom: inheritFrom ? inheritFrom.position : null, _totalEdited: false, _noteOpen: false };
+}
+function initModel() {
+  var st = WF.ctx.state;
+  M = { lang: fx.prescription.lang, alias: fx.prescription.patient_label, aliasOpen: false,
+    items: [], expanded: -1, errors: [] };
+  if (st === "autocomplete-open") {
+    /* 폼 오픈 직후 시나리오: 카드 1 자동 생성(빈 상태 없음 — 탭 절약) + "Dol" 2~3자 타이핑 시점 */
+    M.lang = fx.pharmacy.default_patient_lang;   /* 프리필 원천 데모 */
+    M.alias = null;
+    var it = freshItem(1, null);
+    it.drug_name_raw = "Dol";
+    M.items = [it];
+    M.expanded = 0;
+  } else {
+    M.items = clone(fx.items);
+    M.items.forEach(function (it) { it._inheritFrom = null; it._totalEdited = false; it._noteOpen = false; });
+    if (st === "item-collapsed" || st === "confirm-sheet") {
+      M.expanded = -1;
+    } else if (st === "error422") {
+      /* 422 fields[].path = items.0.drug_name_raw → 카드 1 자동 확장 + 인라인 매핑 */
+      M.items[0].drug_name_raw = "";
+      M.items[0].drug_id = null;
+      M.expanded = 0;
+      M.errors = [{ path: "items.0.drug_name_raw", issue: "required", msg: "Drug name is required" }];
+    } else {
+      M.expanded = M.items.length - 1;   /* default/offline: 마지막 카드 입력 중 */
+    }
+  }
+}
+function errFor(i, field) {
+  for (var k = 0; k < M.errors.length; k++) {
+    if (M.errors[k].path === "items." + i + "." + field) return M.errors[k];
+  }
+  return null;
+}
+
+/* == 3. 렌더 ============================================================= */
+var $ = function (sel) { return document.querySelector(sel); };
+
+function renderHeader() {
+  $("#hdrLang").innerHTML = [["hi", "हिन्दी"], ["en", "English"]].map(function (L) {
+    return '<button class="chip" type="button" data-act="lang" data-l="' + L[0] + '" aria-pressed="' + (M.lang === L[0]) + '">' + L[1] + "</button>";
+  }).join("");
+  var z = $("#aliasZone");
+  if (M.aliasOpen) {
+    z.innerHTML = '<label class="field"><span class="field-label">Patient alias (optional)</span>' +
+      '<input class="input" type="text" maxlength="20" data-in="alias" value="' + esc(M.alias || "") + '" placeholder="e.g. R.K. / Amma">' +
+      '<span class="field-help">Do not write real names</span></label>';
+  } else {
+    z.innerHTML = '<button class="btn btn-ghost" type="button" data-act="alias-open" style="justify-content:flex-start;padding-left:0;">' +
+      (M.alias ? "Alias: " + esc(M.alias) + ' <span class="t-supporting t-secondary">tap to edit</span>' : "+ Patient alias (optional)") + "</button>";
+  }
+}
+
+function svgCaret() {
+  return '<svg class="sum-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+}
+
+function cardCollapsed(it, i) {
+  /* 접힘 1행 요약: 약명 · 1-0-1 · After food · 5 d (docs/02 (c) — P2 대조 재료) */
+  var meta = patShort(it) + " · " + timingEn(it.timing_food) + " · " + (it.duration_days != null ? it.duration_days + " d" : "—");
+  return '<button type="button" class="card item-sum" data-act="expand" data-i="' + i + '" aria-expanded="false">' +
+    '<span class="badge-item hue-' + Math.min(it.position, 10) + '">' + it.position + "</span>" +
+    '<span class="sum-body"><b class="sum-name">' + (esc(it.drug_name_raw) || '<span class="t-secondary">(no name)</span>') + "</b>" +
+    '<span class="sum-meta t-secondary">' + meta + "</span></span>" + svgCaret() + "</button>";
+}
+
+function doseGrid(it) {
+  var p = patOf(it);
+  var slotNames = { M: "Morning", N: "Noon", E: "Evening", H: "Night" };
+  var allOff = !p || p.schedule_type === "prn" || p.schedule_type === "custom";
+  var cells = META.slot_order.map(function (s) {
+    var on = !allOff && p.slots.indexOf(s) >= 0;      /* slots 밖 슬롯 = 0 강제 비활성(§4.3 검증의 거울) */
+    return '<div class="dose-slot"><span class="slot-name">' + slotNames[s] + "</span>" +
+      '<div class="stepper' + (on ? "" : " is-off") + '">' +
+      '<button class="stepper-btn" type="button" data-act="dose" data-slot="' + s + '" data-d="-1" aria-label="decrease ' + slotNames[s] + '"' + (on ? "" : " disabled") + ">&minus;</button>" +
+      '<output class="stepper-value">' + fmtN(it.doses[s] || 0) + "</output>" +
+      '<button class="stepper-btn" type="button" data-act="dose" data-slot="' + s + '" data-d="1" aria-label="increase ' + slotNames[s] + '"' + (on ? "" : " disabled") + ">+</button>" +
+      "</div></div>";
+  }).join("");
+  var help = !p ? '<span class="inline-note">Pick a pattern first — slots follow the pattern</span>'
+    : (allOff ? '<span class="inline-note">' + (p.schedule_type === "prn" ? "PRN: no fixed slots — set limits below" : "Custom: write instructions below") + "</span>" : "");
+  return '<div class="dose-grid">' + cells + "</div>" + help;
+}
+
+function patternZone(it) {
+  var p = patOf(it);
+  if (!p) return "";
+  var h = "";
+  if (p.schedule_type === "weekly") {
+    /* WEEKLY_ONCE → extra_params.day_of_week 필수 */
+    var dw = it.extra_params && it.extra_params.day_of_week;
+    h += '<div class="zone"><span class="field-label">Day of week <span class="t-supporting t-secondary">required</span></span><div class="chip-row">' +
+      Object.keys(META.days_of_week).map(function (k) {
+        return '<button class="chip" type="button" data-act="day" data-dw="' + k + '" aria-pressed="' + (dw === k) + '">' + META.days_of_week[k].en.slice(0, 3) + "</button>";
+      }).join("") + "</div></div>";
+  }
+  if (p.schedule_type === "prn") {
+    /* PRN → prn_reason_key 셀렉트 + prn_max_per_day·prn_min_gap_hours 스테퍼(숫자 키보드 0) */
+    h += '<div class="zone"><span class="field-label">PRN (only when needed)</span>' +
+      '<label class="field"><span class="field-help" style="margin:0 0 4px;">Reason</span>' +
+      '<select class="input" data-in="prnreason"><option value=""' + (it.prn_reason_key ? "" : " selected") + ">Select reason…</option>" +
+      Object.keys(META.prn_reasons).map(function (k) {
+        return '<option value="' + k + '"' + (it.prn_reason_key === k ? " selected" : "") + ">" + META.prn_reasons[k].en + "</option>";
+      }).join("") + "</select></label>" +
+      '<div class="qty-row" style="margin-top:10px;"><span class="t-supporting t-secondary">Max per day</span>' +
+      '<div class="stepper"><button class="stepper-btn" type="button" data-act="prnmax" data-d="-1" aria-label="decrease max per day">&minus;</button><output class="stepper-value">' + fmtN(it.prn_max_per_day || 0) + '</output><button class="stepper-btn" type="button" data-act="prnmax" data-d="1" aria-label="increase max per day">+</button></div>' +
+      '<span class="t-supporting t-secondary">Min gap</span>' +
+      '<div class="stepper"><button class="stepper-btn" type="button" data-act="prngap" data-d="-1" aria-label="decrease gap hours">&minus;</button><output class="stepper-value">' + fmtN(it.prn_min_gap_hours || 0) + ' h</output><button class="stepper-btn" type="button" data-act="prngap" data-d="1" aria-label="increase gap hours">+</button></div></div></div>';
+  }
+  if (it.pattern_key === "CUSTOM") {
+    /* CUSTOM → instructions + "구두로 설명했습니다" 체크 필수 + 주의 카드 고지(§3.4) */
+    var xp = it.extra_params || {};
+    h += '<div class="zone"><label class="field"><span class="field-label">Special instructions <span class="t-supporting t-secondary">required</span></span>' +
+      '<textarea class="input" rows="3" data-in="custom-ins" placeholder="e.g. 2 tab for 3 days, then 1 tab for 3 days…">' + esc(xp.instructions || "") + "</textarea></label>" +
+      '<label class="check"><input type="checkbox" data-in="custom-verbal"' + (xp.verbal_counseling_given ? " checked" : "") + "><span>I explained this verbally to the patient <b>(required)</b></span></label>" +
+      '<p class="notice">Patient screen shows a caution card instead of a video for custom instructions.</p></div>';
+  }
+  return h;
+}
+
+function cardExpanded(it, i) {
+  var err = errFor(i, "drug_name_raw");
+  var p = patOf(it);
+  var isStat = p && p.schedule_type === "once";
+  var manualQty = !p || p.schedule_type === "prn" || p.schedule_type === "custom" || it._totalEdited;
+  var qtyUnit = unitEn(it.dose_unit);            /* ml 선택 시 총량 라벨도 ml(§3.3) */
+
+  var h = '<section class="card card--emphasized" data-card="' + i + '">';
+  /* 번호 배지: position=hue 고정(1..10), 삭제 시 재부여 — 봉투 유성펜 번호와 동일(§2.1 ②'), P3 번호 재확인이 안전망 */
+  h += '<div class="item-head"><button class="item-fold" type="button" data-act="fold" aria-expanded="true">' +
+    '<span class="badge-item hue-' + Math.min(it.position, 10) + '">' + it.position + "</span>" +
+    '<span class="item-title">Item ' + it.position + "</span></button>" +
+    (M.items.length > 1 ? '<button class="btn btn-ghost" type="button" data-act="remove" data-i="' + i + '">Remove</button>' : "") + "</div>";
+
+  /* 약명 — 유일한 타이핑 필드. 2자부터 자동완성(드롭다운 목업), 미스·미채택도 동일 경로 발급(DB-optional §4.5) */
+  h += '<div class="fgroup ac-wrap"><label class="field"><span class="field-label">Drug name</span>' +
+    '<input class="input' + (err ? " is-invalid" : "") + '" type="text" data-in="name" data-i="' + i + '" value="' + esc(it.drug_name_raw) + '" placeholder="Type brand or generic name" autocomplete="off">' +
+    (err ? '<span class="field-error"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V9M8 11.2v.3"/></svg>' + esc(err.msg) + "</span>" : "") +
+    (WF.ctx.state === "offline" ? '<span class="field-help">Autocomplete off while offline — type the full name</span>' : "") +
+    "</label>" +
+    (it.drug_id && it.drug ? '<span class="inline-note">Matched: ' + esc(it.drug.generic_name || "") + " " + esc(it.drug.strength || "") + " · defaults applied</span>" : "") +
+    '<div class="ac-pop" id="acPop" hidden></div></div>';
+
+  /* 최근 약 레일 — 칩 1탭 = 항목 전체 프리필(반복 처방 최속 경로) */
+  h += '<div class="fgroup"><span class="field-label">Recent <span class="t-supporting t-secondary">1 tap fills the whole item</span></span><div class="rail">' +
+    RECENTS.map(function (r, ri) {
+      return '<button class="chip" type="button" data-act="recent" data-r="' + ri + '" data-i="' + i + '">' + esc(r.drug_name_raw) + ' <span class="chip-sub">' + patShort(r) + "</span></button>";
+    }).join("") + "</div></div>";
+
+  /* 패턴 칩 그리드 — GET /api/patterns 대역 = INDORO_FX.meta.patterns, sort_order 순, 칩 탭 = 용량 기본값 채움 */
+  h += '<div class="fgroup"><span class="field-label">Dose pattern</span><div class="chip-row">' +
+    META.pattern_order.map(function (k) {
+      return '<button class="chip" type="button" data-act="pat" data-k="' + k + '" aria-pressed="' + (it.pattern_key === k) + '">' + patternLabel(k) + ' <span class="chip-sub">' + patternSub(k) + "</span></button>";
+    }).join("") + "</div></div>";
+
+  /* 용량 슬롯 M→N→E→H — 스테퍼(±0.5, REAL·½ 표기), 숫자 키보드 미사용 */
+  h += '<div class="fgroup"><span class="field-label">Dose per slot</span>' + doseGrid(it) + "</div>";
+
+  /* 단위 셀렉터 — enum 7종 칩, 기본 tablet이되 항상 노출(숨은 기본값 금지 — 시럽 사고 방지 §3.3) */
+  h += '<div class="fgroup"><span class="field-label">Unit</span><div class="chip-row">' +
+    Object.keys(META.dose_units).map(function (u) {
+      return '<button class="chip" type="button" data-act="unit" data-u="' + u + '" aria-pressed="' + (it.dose_unit === u) + '">' + META.dose_units[u].en + "</button>";
+    }).join("") + "</div></div>";
+
+  /* 식전후 — 패턴과 독립 축(D14), 4종 + Not set(NULL) */
+  h += '<div class="fgroup"><span class="field-label">Food timing</span><div class="chip-row">' +
+    Object.keys(META.timing_food).map(function (t) {
+      return '<button class="chip" type="button" data-act="timing" data-t="' + t + '" aria-pressed="' + (it.timing_food === t) + '">' + META.timing_food[t].en + "</button>";
+    }).join("") +
+    '<button class="chip" type="button" data-act="timing" data-t="" aria-pressed="' + (it.timing_food == null) + '">Not set</button>' +
+    "</div></div>";
+
+  /* 기간 — 프리셋 칩 + 스테퍼. 첫 항목 기본값 없음(오입력 방지 > 탭 1회 절약), 2번째부터 직전 값 승계.
+     STAT_SINGLE은 1회분만 — 기간 비활성 */
+  h += '<div class="fgroup' + (isStat ? "" : "") + '"><span class="field-label">Duration (days)' + (isStat ? ' <span class="t-supporting t-secondary">single dose — off</span>' : "") + "</span>" +
+    '<div class="duration-row' + (isStat ? " dim" : "") + '">' +
+    META.duration_presets.map(function (d) {
+      return '<button class="chip" type="button" data-act="dur" data-d="' + d + '" aria-pressed="' + (it.duration_days === d) + '">' + d + "d</button>";
+    }).join("") +
+    '<div class="stepper"><button class="stepper-btn" type="button" data-act="durstep" data-d="-1" aria-label="decrease days">&minus;</button><output class="stepper-value">' + (it.duration_days != null ? it.duration_days : "—") + '</output><button class="stepper-btn" type="button" data-act="durstep" data-d="1" aria-label="increase days">+</button></div></div>' +
+    (it._inheritFrom && it.duration_days != null ? '<span class="inline-note">Inherited from item ' + it._inheritFrom + " — tap to change</span>" : "") +
+    "</div>";
+
+  /* 총량 배지 — Σ슬롯×일수 자동 산출, 탭 시 수정(서버는 경고만 §3.3) */
+  h += '<div class="fgroup"><span class="field-label">Total quantity</span><div class="qty-row">' +
+    (manualQty
+      ? '<div class="stepper"><button class="stepper-btn" type="button" data-act="qtystep" data-d="-1" aria-label="decrease total">&minus;</button><output class="stepper-value">' + fmtN(it.total_quantity) + '</output><button class="stepper-btn" type="button" data-act="qtystep" data-d="1" aria-label="increase total">+</button></div><span class="t-supporting t-secondary">' + qtyUnit + (it._totalEdited ? " · edited — server warns only" : " · manual") + "</span>"
+      : '<span class="qty-num">' + fmtN(it.total_quantity) + "</span><span>" + qtyUnit + '</span><span class="t-supporting t-secondary">auto Σ slots × days</span><button class="btn btn-ghost" type="button" data-act="qty-edit">Edit</button>') +
+    "</div></div>";
+
+  /* 패턴 가변 영역: WEEKLY 요일 / PRN 파라미터 / CUSTOM 지시문+체크 */
+  h += patternZone(it);
+
+  /* 메모(선택) — 기본 접힘 */
+  h += '<div class="fgroup">' + (it._noteOpen || it.note
+    ? '<label class="field"><span class="field-label">Note (optional)</span><textarea class="input" rows="2" data-in="note">' + esc(it.note || "") + "</textarea></label>"
+    : '<button class="btn btn-ghost" type="button" data-act="note-open" style="justify-content:flex-start;padding-left:0;">+ Note (optional)</button>') + "</div>";
+
+  h += "</section>";
+  return h;
+}
+
+function renderItems() {
+  $("#itemList").innerHTML = M.items.map(function (it, i) {
+    return i === M.expanded ? cardExpanded(it, i) : cardCollapsed(it, i);
+  }).join("");
+}
+
+function renderBottom() {
+  $("#itemCount").textContent = M.items.length + (M.items.length === 1 ? " item" : " items");
+  var full = M.items.length >= 10;                     /* items 1..10 상한(§4.3) */
+  $("#addBtn").disabled = full;
+  $("#addBtn").textContent = "+ Add drug (item " + Math.min(M.items.length + 1, 10) + ")";
+  $("#addNote").textContent = full ? "Max 10 items per prescription" : "";
+  $("#obBadge").innerHTML = '<span class="flag">Outbox ' + FXROOT.outbox.length + "</span>";
+}
+
+function renderAll() { renderHeader(); renderItems(); renderBottom(); }
+/* == 4. 자동완성 목업 (GET /api/drugs?q= 대역 = INDORO_FX.drugs_seed, 디바운스 300ms 생략 데모) == */
+function renderAC(i) {
+  var pop = $("#acPop");
+  if (!pop || M.expanded !== i) return;
+  if (WF.ctx.state === "offline") { pop.hidden = true; return; }   /* 오프라인: 조용히 비활성 */
+  var q = (M.items[i].drug_name_raw || "").trim();
+  if (q.length < 2) { pop.hidden = true; return; }                 /* 2자부터(§4.5) */
+  var ql = q.toLowerCase();
+  var hits = SEED.filter(function (d) {
+    return d.brand_name.toLowerCase().indexOf(ql) >= 0 ||
+      (d.generic_name || "").toLowerCase().indexOf(ql) >= 0 ||
+      (d.aliases || []).some(function (a) { return a.toLowerCase().indexOf(ql) >= 0; });
+  }).slice(0, 8);                                                  /* ≤8건 */
+  var rows = hits.map(function (d) {
+    return '<button class="ac-row" type="button" data-act="adopt" data-di="' + d.id + '" data-i="' + i + '">' +
+      '<span class="ac-main">' + esc(d.brand_name) + "</span>" +
+      '<span class="ac-sub">' + esc(d.generic_name) + " · " + esc(d.strength) + " · " + esc(d.form) + "</span></button>";
+  });
+  /* 후보 유무와 무관하게 자유입력 확정 행 상시 — "등록 안 된 약" 차단 문구 금지(DB-optional §4.5) */
+  rows.push('<button class="ac-row ac-new" type="button" data-act="acnew" data-i="' + i + '">' +
+    '<span class="ac-main">Use &ldquo;' + esc(q) + '&rdquo; as new drug name</span>' +
+    '<span class="ac-sub">' + (hits.length ? "Not the one above?" : "Not in list") + " — issuing works the same</span></button>");
+  pop.innerHTML = rows.join("");
+  pop.hidden = false;
+}
+function closeAC() { var pop = $("#acPop"); if (pop) pop.hidden = true; }
+
+/* == 5. 항목 조작 ======================================================= */
+function applyPattern(it, k) {
+  it.pattern_key = k;
+  var p = META.patterns[k];
+  it.doses = { M: 0, N: 0, E: 0, H: 0 };
+  (p.slots || []).forEach(function (s) { it.doses[s] = 1; });      /* 칩 탭 = 기본값 완성("BD 탭 = 1-0-1") */
+  if (p.schedule_type === "once") it.duration_days = 1;            /* STAT: 1회분만, 기간 비활성 */
+  if (p.schedule_type === "weekly") {
+    if (!(it.extra_params && "day_of_week" in it.extra_params)) it.extra_params = { day_of_week: null };
+  } else if (k === "CUSTOM") {
+    if (!(it.extra_params && "instructions" in it.extra_params)) it.extra_params = { instructions: "", verbal_counseling_given: false };
+  } else {
+    it.extra_params = null;
+  }
+  if (p.schedule_type === "prn") {
+    if (it.prn_max_per_day == null) it.prn_max_per_day = 2;
+    if (it.prn_min_gap_hours == null) it.prn_min_gap_hours = 6;
+  } else { it.prn_reason_key = null; it.prn_max_per_day = null; it.prn_min_gap_hours = null; }
+  recalc(it);
+}
+function adoptSeed(it, d) {
+  it.drug_name_raw = d.brand_name;
+  it.drug_id = d.id;
+  it.drug = { brand_name: d.brand_name, generic_name: d.generic_name, strength: d.strength, form: d.form };
+  if (d.default_pattern_key) applyPattern(it, d.default_pattern_key);
+  it.timing_food = d.default_timing_food || null;
+  if (d.default_dose_unit) it.dose_unit = d.default_dose_unit;
+  recalc(it);
+  MET.auto++;                                                      /* 계측: used_autocomplete_count++ */
+  WF.mark("자동완성 채택 — drug_id 세트 + 패턴·식전후·단위 3필드 프리필 · used_autocomplete_count=" + MET.auto);
+}
+
+/* == 6. P2 확인 시트 ==================================================== */
+function rowLead(it) {
+  var p = patOf(it);
+  if (!p) return "?";
+  if (p.schedule_type === "prn") return "SOS";
+  if (p.schedule_type === "custom") return "Custom";
+  return digits4(it);                                              /* 슬롯 파생 표기 1-0-1-0(4슬롯) */
+}
+function rowMeta(it) {
+  var p = patOf(it) || {};
+  var u = unitEn(it.dose_unit);
+  var parts = [rowLead(it) + " " + u];
+  if (p.schedule_type === "weekly") {
+    var dw = it.extra_params && it.extra_params.day_of_week;
+    parts[0] += " · 1/wk" + (dw ? " (" + META.days_of_week[dw].en.slice(0, 3) + ")" : " (day?)");
+  }
+  if (p.schedule_type === "once") parts[0] += " · single dose";
+  if (p.schedule_type === "prn") {
+    parts[0] = "SOS" + (it.prn_reason_key ? " (" + META.prn_reasons[it.prn_reason_key].en + ")" : "") +
+      (it.prn_max_per_day ? " · max " + fmtN(it.prn_max_per_day) + "/day" : "") +
+      (it.prn_min_gap_hours ? " · gap " + fmtN(it.prn_min_gap_hours) + " h" : "");
+  }
+  parts.push(timingEn(it.timing_food));
+  parts.push(it.duration_days != null ? it.duration_days + " d" : "—");
+  parts.push("Qty " + fmtN(it.total_quantity) + " " + u);
+  return parts.join(" · ");
+}
+function renderSheet() {
+  $("#sheetSub").textContent = "Guide language: " + (M.lang === "hi" ? "हिन्दी" : "English") +
+    (M.alias ? " · Alias: " + M.alias : " · (no alias)");
+  $("#sheetRows").innerHTML = M.items.map(function (it, i) {       /* 순서는 position 고정 — 처방전 대조용 */
+    var xp = it.extra_params || {};
+    var custom = it.pattern_key === "CUSTOM"
+      ? '<span class="sum-quote">' + esc(xp.instructions || "(instructions missing)") + "</span>" +
+        '<span class="t-supporting ' + (xp.verbal_counseling_given ? "t-secondary" : "") + '"' + (xp.verbal_counseling_given ? "" : ' style="color:var(--color-error);"') + ">Verbal counseling: " + (xp.verbal_counseling_given ? "given ✓" : "NOT confirmed") + "</span>"
+      : "";
+    return '<button class="sum-row" type="button" data-act="sheet-row" data-i="' + i + '">' +
+      '<span class="badge-item badge-item--sm hue-' + Math.min(it.position, 10) + '">' + it.position + "</span>" +
+      '<span class="sum-row-body"><b>' + (esc(it.drug_name_raw) || "(no name)") + "</b>" +
+      '<span class="t-supporting t-secondary">' + rowMeta(it) + "</span>" + custom + "</span></button>";
+  }).join("");
+  var warns = [];
+  M.items.forEach(function (it) {
+    if (it.dose_unit === "ml") warns.push("Item " + it.position + " · " + it.drug_name_raw + ": total " + fmtN(it.total_quantity) + " ml — ml, not bottles");
+    var a = autoTotal(it);
+    if (a != null && it._totalEdited && a !== it.total_quantity) warns.push("Item " + it.position + ": total " + fmtN(it.total_quantity) + " differs from auto Σ " + fmtN(a) + " (allowed — server warns only)");
+  });
+  var wz = $("#sheetWarn");
+  wz.hidden = warns.length === 0;
+  wz.innerHTML = warns.length ? "<b>Check units &amp; totals</b>" + warns.map(function (w) { return "<span>" + esc(w) + "</span>"; }).join("") : "";
+}
+function openSheet() { renderSheet(); $("#sheetBack").classList.add("is-open"); }
+function closeSheet(silent) {
+  $("#sheetBack").classList.remove("is-open");
+  if (!silent && WF.ctx.state === "confirm-sheet") WF.set("state", "default");
+}
+
+/* == 7. 상태 전환·이벤트 위임 =========================================== */
+function rebuildForState() {
+  closeSheet(true);
+  initModel();
+  renderAll();
+  if (WF.ctx.state === "confirm-sheet") openSheet();
+  if (WF.ctx.state === "autocomplete-open") renderAC(0);
+}
+
+document.addEventListener("click", function (e) {
+  var btn = e.target.closest("[data-act]");
+  if (!btn) {
+    if (!e.target.closest(".ac-wrap")) closeAC();                  /* 바깥 탭 → 드롭다운 닫기 */
+    return;
+  }
+  var act = btn.getAttribute("data-act");
+  var i = M.expanded;                                              /* 카드 내부 조작 대상 = 펼침 카드 */
+  var it = M.items[i];
+  var v;
+  switch (act) {
+    case "lang": M.lang = btn.getAttribute("data-l"); renderHeader(); break;
+    case "alias-open": M.aliasOpen = true; renderHeader(); break;
+    case "expand":
+      M.expanded = parseInt(btn.getAttribute("data-i"), 10);
+      renderItems();
+      var el = document.querySelector('[data-card="' + M.expanded + '"]');
+      if (el) el.scrollIntoView({ block: "nearest" });
+      break;
+    case "fold": M.expanded = -1; renderItems(); break;
+    case "remove":                                                 /* 삭제 시 position 자동 재부여(배지 hue도 position 기준) */
+      M.items.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+      M.items.forEach(function (x, n) { x.position = n + 1; });
+      M.expanded = Math.min(M.expanded, M.items.length - 1);
+      renderAll();
+      WF.mark("항목 삭제 — position 재부여, P3 번호 나열 재확인이 안전망(§2.1 ③)");
+      break;
+    case "adopt":
+      v = btn.getAttribute("data-di");
+      var seed = null;
+      SEED.forEach(function (d) { if (d.id === v) seed = d; });
+      if (seed && it) { adoptSeed(it, seed); closeAC(); renderItems(); }
+      break;
+    case "acnew":
+      closeAC();
+      WF.mark("자유입력 확정 — drug_id 없음, drug_name_raw가 정본(DB-optional §4.5)");
+      break;
+    case "recent":
+      /* 튜플 6필드만 freshItem 위에 덮어쓰기 — note·drug_id·PRN 사유 등 인스턴스 종속 필드는
+         새 항목 초기값 유지(이전 환자 지시 미승계, docs/02 §3 (b)) */
+      v = RECENTS[parseInt(btn.getAttribute("data-r"), 10)];
+      if (v && it) {
+        var c = freshItem(it.position, null);
+        c.drug_name_raw = v.drug_name_raw;
+        c.pattern_key = v.pattern_key;
+        c.doses = clone(v.doses);
+        c.dose_unit = v.dose_unit;
+        c.timing_food = v.timing_food;
+        c.duration_days = v.duration_days;
+        var rp = META.patterns[c.pattern_key] || null;         /* 패턴 부수 파라미터는 applyPattern과 동일한 신규 기본값 */
+        if (rp && rp.schedule_type === "weekly") c.extra_params = { day_of_week: null };
+        if (rp && rp.schedule_type === "prn") { c.prn_max_per_day = 2; c.prn_min_gap_hours = 6; }
+        recalc(c);
+        M.items[i] = c;
+        renderItems();
+        WF.mark("최근 약 칩 — 튜플 6필드 프리필(로컬 캐시, 서버 변경 없음 · 메모/PRN 사유 등 인스턴스 필드 미승계)");
+      }
+      break;
+    case "pat": if (it) { applyPattern(it, btn.getAttribute("data-k")); renderItems(); } break;
+    case "dose":
+      if (it) {
+        var s = btn.getAttribute("data-slot");
+        it.doses[s] = Math.max(0, Math.min(10, (it.doses[s] || 0) + 0.5 * parseInt(btn.getAttribute("data-d"), 10)));
+        recalc(it); renderItems();
+      }
+      break;
+    case "unit": if (it) { it.dose_unit = btn.getAttribute("data-u"); renderItems(); } break;
+    case "timing": if (it) { it.timing_food = btn.getAttribute("data-t") || null; renderItems(); } break;
+    case "dur":
+      if (it) { it.duration_days = parseInt(btn.getAttribute("data-d"), 10); it._inheritFrom = null; recalc(it); renderItems(); }
+      break;
+    case "durstep":
+      if (it) {
+        it.duration_days = Math.max(1, Math.min(90, (it.duration_days || 0) + parseInt(btn.getAttribute("data-d"), 10)));
+        it._inheritFrom = null; recalc(it); renderItems();
+      }
+      break;
+    case "qty-edit": if (it) { it._totalEdited = true; renderItems(); } break;
+    case "qtystep":
+      if (it) {
+        var step = it.dose_unit === "ml" ? 5 : 1;
+        it.total_quantity = Math.max(0, (it.total_quantity || 0) + step * parseInt(btn.getAttribute("data-d"), 10));
+        renderItems();
+      }
+      break;
+    case "day":
+      if (it) { it.extra_params = it.extra_params || {}; it.extra_params.day_of_week = btn.getAttribute("data-dw"); renderItems(); }
+      break;
+    case "prnmax": if (it) { it.prn_max_per_day = Math.max(0, Math.min(12, (it.prn_max_per_day || 0) + parseInt(btn.getAttribute("data-d"), 10))); renderItems(); } break;
+    case "prngap": if (it) { it.prn_min_gap_hours = Math.max(0, Math.min(24, (it.prn_min_gap_hours || 0) + parseInt(btn.getAttribute("data-d"), 10))); renderItems(); } break;
+    case "note-open": if (it) { it._noteOpen = true; renderItems(); } break;
+    case "add":                                                    /* 새 카드 +1 · 직전 카드 접힘 · duration 승계 */
+      if (M.items.length < 10) {
+        var prev = M.items[M.items.length - 1] || null;
+        M.items.push(freshItem(M.items.length + 1, prev));
+        M.expanded = M.items.length - 1;
+        renderAll();
+        var nc = document.querySelector('[data-card="' + M.expanded + '"]');
+        if (nc) nc.scrollIntoView({ block: "start" });
+      }
+      break;
+    case "review": openSheet(); break;                             /* P1→P2: 시트 오버레이(라우트 아님) */
+    case "sheet-close": closeSheet(false); break;
+    case "sheet-row":                                              /* 행 탭 → 시트 닫고 해당 카드 확장 복귀 */
+      v = parseInt(btn.getAttribute("data-i"), 10);
+      closeSheet(false);
+      M.expanded = v;
+      renderItems();
+      var rc = document.querySelector('[data-card="' + v + '"]');
+      if (rc) rc.scrollIntoView({ block: "start" });
+      break;
+    case "issue":                                                  /* [T1] — client_metrics 확정 (docs/02 §11) */
+      btn.disabled = true;
+      btn.textContent = "Issuing…";                                /* 제출 중 변형: 버튼 잠금(멱등키 D10 + UX 억제) */
+      WF.mark("[T1] 발급 탭 — gross·active 확정 + issued_at_client=" + istNow(), {
+        client_input_id: CID,
+        input_duration_ms: Math.round(performance.now() - MET.t0),
+        active_input_ms: Math.round(MET.active),
+        idle_gaps_count: MET.gaps,
+        used_autocomplete_count: MET.auto,
+        retry_count: MET.retry,
+        app_version: "v0-web"
+      });
+      if (WF.ctx.state === "offline") {
+        WF.mark("오프라인 발급 — crypto.getRandomValues 토큰 생성 + outbox(localStorage) 적재, short_code는 sync 후(§2.3) → P3 QR만 모드");
+      } else {
+        WF.mark("POST /api/prescriptions → 201 · 서버 rx.created(도달률 분모, §6.2) · 타임아웃 시 동일 client_input_id 재전송(retry_count++)");
+      }
+      setTimeout(function () {
+        var q = ["fx=" + (WF.ctx.fx || "a")];
+        if (WF.ctx.state === "offline") q.push("state=offline"); /* P3 오프라인 변형(§10-9)으로 착지 — 이동 맵 P2 -.-> P3 */
+        if (WF.ctx.color === "0") q.push("color=0");             /* 그레이스케일 검증 워크스루 연속성 유지 */
+        location.href = "p3-qr.html?" + q.join("&");
+      }, 900);
+      break;
+  }
+});
+
+/* 백드롭 탭 → 시트 닫기 */
+$("#sheetBack").addEventListener("click", function (e) { if (e.target === this) closeSheet(false); });
+
+/* G2 outbox 배지(자리표시) — P8은 B3에서 */
+$("#obBadge").addEventListener("click", function () {
+  WF.mark("G2 배지 탭 → P8 outbox 시트(B3에서 구현) — 대기 " + FXROOT.outbox.length + "건");
+});
+
+/* 타이핑 필드(약명/별칭/메모/CUSTOM 지시문/PRN 사유) — 입력 중 재렌더 금지(포커스 유지), 모델만 갱신 */
+document.addEventListener("input", function (e) {
+  var el = e.target.closest("[data-in]");
+  if (!el) return;
+  var kind = el.getAttribute("data-in");
+  var it = M.items[M.expanded];
+  if (kind === "alias") { M.alias = el.value.slice(0, 20) || null; return; }
+  if (!it) return;
+  if (kind === "name") {
+    it.drug_name_raw = el.value;
+    it.drug_id = null; it.drug = null;                             /* 타이핑 재개 = 채택 해제, raw가 정본 */
+    renderAC(M.expanded);
+  }
+  if (kind === "note") it.note = el.value || null;
+  if (kind === "custom-ins") { it.extra_params = it.extra_params || {}; it.extra_params.instructions = el.value; }
+});
+document.addEventListener("change", function (e) {
+  var el = e.target.closest("[data-in]");
+  if (!el) return;
+  var it = M.items[M.expanded];
+  if (!it) return;
+  if (el.getAttribute("data-in") === "prnreason") it.prn_reason_key = el.value || null;
+  if (el.getAttribute("data-in") === "custom-verbal") { it.extra_params = it.extra_params || {}; it.extra_params.verbal_counseling_given = el.checked; }
+});
+
+/* == 8. 부팅 ============================================================ */
+rebuildForState();
+WF.mark("[T0] 폼 오픈 — client_input_id=" + CID + " · gross 타이머 시작(performance.now 단조시계) · active 버킷 개시 · 패턴 칩은 ETag 캐시 즉시 렌더(로딩 대기 없음)");
+if (!(window.crypto && window.crypto.getRandomValues)) {
+  WF.mark("경고: crypto.getRandomValues 미지원 — 오프라인 발급 비활성(C안 복구 후 발급 폴백, Math.random 금지 H4)");
+}
+</script>
+</body>
+</html>

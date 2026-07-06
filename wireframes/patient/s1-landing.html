@@ -1,0 +1,1250 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  화면 ID: S1 복약 요약 랜딩 (+ S2 약 카드 · C1 언어 토글 · C2 가족 공유 — 단일 문서, 아코디언 없음)
+  목적: QR 스캔 직후 첫 페인트에서 "누가 준 안내이고, 매일 언제 무엇을 먹는지"를 텍스트 독해 없이 성립시킨다.
+  대응 인벤토리: docs/03-wireframe-patient.md §3(S1) · §4(S2) · §5(C1) · §6(C2) · §11(B1 슬롯) · §12(계측 매트릭스)
+              + docs/03 §2.1(저문해 문법) · §2.2(데바나가리 제약) · §2.3(무게 예산) / 생성 규칙: docs/04 §2.1
+  상태 스위처: ?state=default|edited|soon-expire|offline (S1 상태만 — expired(410)는 별도 화면 s4-expired.html, 여기 아님.
+             offline = "오프라인(b) 로드 후 단절" 모사: 음성/영상 탭 → 실패 토스트 + 버튼 유지. a 최초 스캔/c 재방문은
+             브라우저·HTTP 레이어 동작이라 비렌더 정당화 — docs/03 §3 상태 변형 표)
+             ?lang=hi|en · ?fx=a|b|c · ?color=0|1  — 우상단 개발 툴바(JS 생성, 제품 아님)로도 전환
+  제품 동형 제약(승격 대비 — docs/04 §0 비대칭 원칙):
+    · CSS/JS 전부 인라인, shared/* 링크 0 (wf.css에서 필요한 토큰·클래스만 증류, astryx 변수 원명 유지)
+    · 외부 요청 0 (허용치 ≤1 = 공용 포스터. 와이어프레임은 포스터도 회색 placeholder — 요청 0. favicon은 data: URI)
+    · FX-A를 정적 마크업으로 완전 렌더 — JS를 꺼도 전 정보 열람 성립 (JS는 순수 progressive enhancement)
+    · 앵커 점프 = #item-n + CSS :target (JS 불요) · hi/en 텍스트 노드 이중화(span[lang]) · 숫자 ASCII · 0.5는 ½
+    · gzip ≤80KB (하드 120KB) — FX-B 10항목 인라인 사본 포함 상태로 측정
+  ─────────────────────────────────────────────────────────────────────────────
+  서버 계약(제품, 와이어프레임은 정적 대역): GET /p/{token} → 200 단일 HTML (1 RTT)
+    · Cache-Control: private, no-cache + ETag (재방문 재검증 — 오프라인 재방문은 보유 사본 표시 허용, 보장 아님)
+    · 렌더 순서: RTT 1에 헤더+시간표+카드 텍스트/SVG 완결 → lazy 포스터 → 유휴 beacon → 탭 시 미디어
+    · pull-to-refresh 기본 동작 유지 (no-cache라 수정 반영 — D4와 짝)
+  계측(서버 권위 — 클라 이벤트 아님, docs/03 §12):
+    <!계측: view.first — 최초 열람 1회 원자 선점. src/ua_class/lang/secs_since_issue. is_bot·is_internal은 판정 스킵>
+    <!계측: view.opened — 매 200 렌더. viewer_id=ivid, is_first, src, lang>
+    <!계측: Set-Cookie: ivid (1년, D15) · WhatsApp 링크 프리뷰 봇은 is_bot=1 플래그로 도달률 미오염(§6.3)>
+    <!계측: 랜딩 노출 자체는 클라 이벤트 없음 — 서버가 이미 앎>
+  ─────────────────────────────────────────────────────────────────────────────
+  수용 기준 자가 체크 (docs/04 §3 — 판정 정본. 표기: [자가통과]=구현·자가검증 완료 / [팀검증]=T2 등 팀 프로토콜 필요)
+  공통:
+    [자가통과] 360×640 기준 제작 · 320px 가로 스크롤 0
+    [자가통과] 터치 타깃 ≥48×48px · 주 행동 버튼(음성/영상/공유) 전폭 min-height 56px
+      (각주: C1 언어 토글은 docs/03 C1의 "상단 바 pill" 스펙이 우선 — 링크별 ≥48×48로 충족. 상단 바는 docs 44px
+       명세보다 크게 56px — 전 화면 공통 터치 타깃 규칙을 우선 적용)
+    [자가통과] 인벤토리 요소 누락 0 (S1 표 1~11행 + B1 슬롯 주석) · 상태 변형 전부 스위처 등록
+    [자가통과] 계측 마커 HTML 주석 = docs/03 §12와 1:1 · 이모지 0 · 라이트 고정 · 말줄임 0 · 데바나가리 클리핑 방지
+      (line-height ≥1.6 · 고정 height 금지 · overflow:hidden 텍스트 컨테이너 금지 · 400/700 2단 · letter-spacing 0)
+  S1:
+    [팀검증]  3초 이해 테스트(T2) 4/5인 — docs/04 §2.4 프로토콜, 김나연 진행
+    [자가통과] FX-A에서 신뢰 헤더+하루 시간표가 360×640 첫 화면 내 완결(스크롤 0)
+    [자가통과] 시간표 칩 → #item-n :target 점프+하이라이트 JS 없이 동작
+    [자가통과] M→N→E→H 고정 순서 전 컴포넌트 일치(시간표 행·카드 스트립·숫자열)
+    [자가통과] 언어 토글 시 아이콘·그리드 골격 이동 0 (구조·SVG 단일, 텍스트 노드만 이중화)
+    [자가통과] FX-B 10항목 인라인 사본 포함 gzip ≤80KB · 전부 인라인 · 외부 요청 0(≤1)
+    [자가통과] JS 비활성: 전 정보 열람(FX-A 정적) + 언어(?lang 링크 존재 — 서버 재렌더 대역이 없으므로
+              noscript에서는 hi/en 병기 폴백으로 열람 보장) + 공유(wa.me 정적 링크) 성립
+  S2:
+    [자가통과] 카드 1장에 5요소(무엇을·언제·몇 개·식전후·며칠) 완비 · 수량 숫자 24px+ · 스트립 아래 숫자열 병기 · 0.5→½
+    [자가통과] 음성 버튼이 영상보다 항상 위
+    [자가통과] PRN·CUSTOM·STAT·WEEKLY 변형 카드 각 1+ (?fx=b) — CUSTOM은 영상·음성·스트립 없음 + 경고 카드
+  C1:
+    [자가통과] 1탭 전환 · 자기표기 "हिन्दी | English" · 국기 없음 · 협상 체인 5단계 주석 + 스위처 데모
+  C2:
+    [자가통과] 공유 1탭 → 시트 목업(navigator.share → wa.me 폴백) · 미리보기에 약명+숫자열+기간 포함,
+              patient_label 미포함(대조: 검색해도 "Mr. S" 문자열이 공유 블록에 없음) · JS 없음 경로 = wa.me 정적 링크
+═══════════════════════════════════════════════════════════════════════════ -->
+<html lang="hi" data-lang="hi" data-state="default" data-fx="a" data-color="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- §8.2: title·og는 고정 문구 — patient_label·약명 미포함(프리뷰 봇 노출 방지). favicon은 data: URI로 요청 억제 -->
+<title>दवा की जानकारी · Medicine Guide (indoro)</title>
+<meta property="og:title" content="दवा की जानकारी · Medicine Guide (indoro)">
+<link rel="icon" href="data:,">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   S1 인라인 CSS — shared/wf.css의 증류본(제품 동형: 외부 스타일시트 0)
+   토큰 정본: shared/vendor/astryx-theme-neutral.css → wf.css → 여기. 변수명은 astryx 원명 유지.
+   예외: --font-family-body 값만 환자측 제품 스택으로 교체(docs/03 §2.2 — 웹폰트 0KB,
+        Android 내장 Noto Sans Devanagari 의존. Figtree는 약사측 와이어프레임 전용).
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --font-family-body: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
+  /* 환자측 웨이트 2단만(§2.2 합성 볼드 방지): 400 / 700 */
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --font-size-xs: 0.625rem;    /* 10 — 용량 라벨 */
+  --font-size-sm: 0.75rem;     /* 12 — supporting */
+  --font-size-base: 0.875rem;  /* 14 — 보조행 */
+  --font-size-lg: 1.0625rem;   /* 17 — 환자 본문 */
+  --font-size-xl: 1.25rem;     /* 20 — 약명 20px+ */
+  --font-size-2xl: 1.5rem;     /* 24 — 핵심 수량 24px+ */
+
+  --color-background-body: #f1f1f1;
+  --color-background-surface: #ffffff;
+  --color-background-card: #ffffff;
+  --color-background-muted: #f1f1f1;
+  --color-accent: #262626;
+  --color-accent-muted: #f1f1f1;
+  --color-on-accent: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-text-primary: #171717;
+  --color-text-secondary: #737373;
+  --color-text-disabled: #a3a3a3;
+  --color-text-accent: #262626;
+  --color-icon-primary: #171717;
+  --color-icon-secondary: #737373;
+  --color-icon-disabled: #a3a3a3;
+  --color-border: #ebebeb;
+  --color-border-emphasized: #d4d4d4;
+  --color-skeleton: #ebebeb;
+  --color-overlay-pressed: #0000001A;
+  --color-success: #007004;
+  --color-success-muted: #c5e5c0;
+  --color-error: #a50c25;
+  --color-error-muted: #facecb;
+  --color-warning: #745b00;
+  --color-warning-muted: #f8da9d;
+
+  /* 항목 배지 10 hue — astryx icon 계열(흰 숫자 대비용 진한 값). position n = hue-n 고정 */
+  --color-icon-blue: #00458c;
+  --color-icon-orange: #6e3500;
+  --color-icon-green: #0c5700;
+  --color-icon-purple: #700084;
+  --color-icon-red: #89001a;
+  --color-icon-teal: #005348;
+  --color-icon-pink: #83004b;
+  --color-icon-cyan: #00505f;
+  --color-icon-yellow: #584400;
+  --color-icon-gray: #525252;
+
+  --radius-inner: 0.375rem;
+  --radius-element: 0.625rem;
+  --radius-container: 0.75rem;
+  --radius-full: 9999px;
+  --shadow-low: 0 2px 4px oklch(0 0 0 / 5%), 0 4px 8px oklch(0 0 0 / 10%);
+}
+
+/* 베이스 — 라이트 고정, 다크모드 미대응(직사광·저품질 패널 가독 우선) */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; color-scheme: light only; }
+body {
+  margin: 0 auto;
+  max-width: 480px;                 /* 데스크톱 리뷰: 중앙 폰 프레임 */
+  min-height: 100dvh;
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-lg);   /* 환자 본문 17px */
+  line-height: 1.65;                /* 셰로레카·마트라 클리핑 방지 ≥1.6 */
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
+img, svg, video { max-width: 100%; }
+b, strong { font-weight: var(--font-weight-bold); }
+a { color: var(--color-text-accent); }
+
+/* 언어 토글(D12) — 구조·SVG는 단일, 텍스트 노드만 이중화. 토글 시 골격 리플로우 최소 */
+html[data-lang="hi"] [lang="en"] { display: none; }
+html[data-lang="en"] [lang="hi"] { display: none; }
+.wf-hidden { display: none !important; }
+
+/* 유틸 */
+.screen { padding: 8px 12px 40px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.screen.stack { gap: 8px; }                /* 첫 화면(신뢰 헤더+시간표) 스크롤 0 예산 */
+.hstack { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.min0 { min-width: 0; }
+.t-secondary { color: var(--color-text-secondary); }
+.t-supporting { font-size: var(--font-size-sm); line-height: 1.6; }
+.num-lg { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.ico { width: 20px; height: 20px; flex: none; display: block; }
+.ico24 { width: 24px; height: 24px; flex: none; display: block; }
+.ico-14 { width: 14px; height: 14px; flex: none; display: block; }
+.k-ico { width: 20px; height: 20px; flex: none; color: var(--color-icon-secondary); }
+hr.divider { border: 0; border-top: 1px solid var(--color-border); margin: 0; }
+
+/* 상단 고정 바 (S1 요소 1) — 로고 자리 회색 박스(브랜딩 금지) + C1 토글 */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 52px; padding: 2px 12px;      /* 링크 자체가 48px 터치 타깃 */
+  background: var(--color-background-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.logo-ph {
+  padding: 6px 10px; flex: none;
+  background: var(--color-skeleton);
+  border: 1.5px dashed var(--color-border-emphasized);
+  border-radius: var(--radius-inner);
+  font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.4;
+}
+.lang-toggle {
+  margin-left: auto;
+  display: flex; align-items: stretch;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: var(--radius-full);
+  background: var(--color-background-surface);
+  overflow: hidden;             /* 텍스트 컨테이너 아님(라운드 마스크) — 클리핑 무해 */
+}
+.lang-toggle a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; min-width: 72px; padding: 4px 14px;   /* 터치 타깃 ≥48 */
+  text-decoration: none; color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold); font-size: var(--font-size-base); line-height: 1.6;
+}
+.lang-toggle a + a { border-left: 1px solid var(--color-border); }
+html[data-lang="hi"] .lang-toggle a[data-lang-opt="hi"],
+html[data-lang="en"] .lang-toggle a[data-lang-opt="en"] {
+  background: var(--color-accent); color: var(--color-on-accent);
+}
+
+/* 카드 */
+.card {
+  background: var(--color-background-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-container);
+  padding: 12px;
+}
+.sec-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); line-height: 1.6; }
+
+/* 신뢰 헤더 (S1 요소 2·3·4·5) */
+.trust-cap { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
+.trust-name { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); line-height: 1.4; }
+.trust-line { display: flex; gap: 8px; align-items: flex-start; font-size: var(--font-size-base); line-height: 1.65; }
+.trust-line .k-ico { margin-top: 2px; }
+.trust-flags { display: flex; flex-wrap: wrap; gap: 6px; }
+.flag {
+  display: none;                       /* 상태 배지 자리 — 기본 숨김, 상태/데이터로 표시 */
+  align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-emphasized);
+  font-size: var(--font-size-sm); line-height: 1.6; color: var(--color-text-secondary);
+  background: transparent;
+}
+.flag-expiring { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-muted); }
+/* 표시 조건: 스위처 상태 또는 (스위처 미지정 시) 데이터 파생(.is-on — version>1, D-3) */
+html[data-state="edited"] .s1-flag-edited { display: inline-flex; }
+html[data-state="soon-expire"] .s1-flag-expiring { display: inline-flex; }
+.flag.is-on { display: inline-flex; }
+.note-text { font-size: var(--font-size-base); }
+
+/* 봉투 대조 안내 스트립 (S1 요소 6) */
+.match-strip { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; }
+.match-strip .k-ico { width: 24px; height: 24px; margin-top: 2px; color: var(--color-icon-primary); }
+.match-strip p { font-size: var(--font-size-base); line-height: 1.65; }
+
+/* 하루 시간표 (S1 요소 7·8) — 매일 고정형(오늘 기준 아님: 스크린샷 사본이 낡지 않게) */
+.tt-hint { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 2px; }
+.tt-row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; padding: 4px 0; align-items: start; }
+.tt-row:last-child { padding-bottom: 0; }
+.tt-row + .tt-row { border-top: 1px solid var(--color-border); }
+.tt-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.tt-slot .ico24 { width: 26px; height: 26px; color: var(--color-icon-primary); }
+.tt-slot-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
+.tt-sp-label { font-weight: var(--font-weight-bold); line-height: 1.6; margin-bottom: 6px; font-size: var(--font-size-base); }
+.tt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.tt-chip {                                  /* 칩 = #item-n 앵커(JS 불요 점프) */
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 48px; padding: 4px 10px;      /* 터치 타깃 ≥48 */
+  border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-full);
+  background: var(--color-background-surface);
+  text-decoration: none; color: var(--color-text-primary); line-height: 1.5;
+  touch-action: manipulation;
+}
+.tt-chip:active { background: var(--color-overlay-pressed); }
+.tt-chip b { font-size: var(--font-size-xl); font-variant-numeric: tabular-nums; }
+.tt-chip .u { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+
+/* 항목 색+숫자 배지 — position 1..10 = hue-1..10 고정(재배열 금지). 색은 보조 부호, 숫자가 정본 */
+.badge-item {
+  --badge-bg: var(--color-icon-gray);
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  background: var(--badge-bg); color: var(--color-on-dark);
+  font-size: var(--font-size-lg); font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.badge-item--sm { width: 28px; height: 28px; font-size: var(--font-size-base); }
+.hue-1  { --badge-bg: var(--color-icon-blue); }
+.hue-2  { --badge-bg: var(--color-icon-orange); }
+.hue-3  { --badge-bg: var(--color-icon-green); }
+.hue-4  { --badge-bg: var(--color-icon-purple); }
+.hue-5  { --badge-bg: var(--color-icon-red); }
+.hue-6  { --badge-bg: var(--color-icon-teal); }
+.hue-7  { --badge-bg: var(--color-icon-pink); }
+.hue-8  { --badge-bg: var(--color-icon-cyan); }
+.hue-9  { --badge-bg: var(--color-icon-yellow); }
+.hue-10 { --badge-bg: var(--color-icon-gray); }
+html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?color=0 그레이스케일 검증 */
+
+/* 약 카드 (S2) — 카드=봉투 1개의 멘탈 모델 */
+.item-card { scroll-margin-top: 76px; }     /* sticky 바 아래로 앵커 안착 */
+.item-card:target {                          /* :target 하이라이트 — JS 불요 */
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2.5px var(--color-accent), var(--shadow-low);
+}
+.card-head { display: flex; gap: 10px; align-items: flex-start; }
+.drug-name { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); line-height: 1.5; overflow-wrap: anywhere; }
+.enrich { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
+.pat-line { font-weight: var(--font-weight-bold); line-height: 1.65; }
+.k-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; line-height: 1.65; font-size: var(--font-size-base); }
+.dotsep { color: var(--color-text-secondary); }
+
+/* 버튼 — 주 행동(음성·영상·공유)은 전폭 min-height 56px */
+.btn {
+  appearance: none; -webkit-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 16px;
+  border: 1px solid transparent; border-radius: var(--radius-element);
+  background: var(--color-accent-muted); color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold); font-size: var(--font-size-lg); line-height: 1.5;
+  text-align: center; text-decoration: none;
+  cursor: pointer; touch-action: manipulation;
+}
+.btn:active { filter: brightness(0.94); }
+.btn-primary { display: flex; width: 100%; min-height: 56px; background: var(--color-accent); color: var(--color-on-accent); }
+.btn-block { display: flex; width: 100%; }
+.btn-audio { display: flex; width: 100%; min-height: 56px; border-color: var(--color-border-emphasized); }
+.btn-audio[aria-pressed="true"] { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+.btn-sub { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.75; }
+.btn-audio .lbl-stop { display: none; }
+.btn-audio[aria-pressed="true"] .lbl-listen { display: none; }
+.btn-audio[aria-pressed="true"] .lbl-stop { display: inline-flex; align-items: center; gap: 6px; }
+
+/* 시간 슬롯 스트립 — M→N→E→H 고정 순서(전 컴포넌트 공통, 수기 "1-0-1" 관행과 동형) */
+.slot-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.slot-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 2px; border-radius: var(--radius-inner);
+  background: var(--color-background-muted);
+  text-align: center; min-width: 0;
+}
+.slot-cell.is-off { background: transparent; opacity: 0.35; }
+.slot-ico { width: 28px; height: 28px; color: var(--color-icon-primary); }
+.slot-cell.is-off .slot-ico { color: var(--color-icon-disabled); }
+.slot-qty { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.slot-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
+.dose-digits {
+  margin-top: 4px; text-align: center;
+  font-weight: var(--font-weight-bold); color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums; line-height: 1.6;
+}
+.dd-unit { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); }
+
+/* PRN(필요시)·CUSTOM(특수 지시) 블록 — 경고 톤, 숫자 대자 */
+.prn-block, .custom-block {
+  background: var(--color-warning-muted);
+  border-radius: var(--radius-element);
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.prn-block .k-ico, .custom-block .k-ico { color: var(--color-warning); }
+.custom-instr {
+  background: var(--color-background-surface);
+  border: 1px dashed var(--color-border-emphasized);
+  border-radius: var(--radius-inner);
+  padding: 8px 10px;
+  font-size: var(--font-size-base); line-height: 1.65;
+  user-select: text;                       /* 카드 텍스트 선택·복사 가능(의사·약사 문의용) */
+}
+
+/* placeholder (영상 — 실자산·실재생 없음) */
+.ph {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 64px; padding: 12px;
+  background: var(--color-skeleton);
+  border: 1.5px dashed var(--color-border-emphasized);
+  border-radius: var(--radius-element);
+  color: var(--color-text-secondary); font-size: var(--font-size-base);
+  text-align: center; overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.ph--video { aspect-ratio: 16 / 9; width: 100%; }
+.ph-play { width: 44px; height: 44px; color: var(--color-icon-primary); }
+.ph-size { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.ph--video .lbl-playing { display: none; }
+.ph--video.is-playing .lbl-play { display: none; }
+.ph--video.is-playing .lbl-playing { display: inline; }
+
+/* C2 공유 */
+.share-preview {
+  background: var(--color-background-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-element);
+  padding: 10px 12px;
+  font-size: var(--font-size-base); line-height: 1.7;
+  overflow-wrap: anywhere; user-select: text;
+}
+.lbl-copy { display: inline-flex; align-items: center; gap: 6px; }
+#btn-copy .lbl-done { display: none; align-items: center; gap: 6px; color: var(--color-success); }
+#btn-copy.is-done .lbl-copy { display: none; }
+#btn-copy.is-done .lbl-done { display: inline-flex; }
+
+/* 오프라인(b) 미디어 실패 토스트 (S1·S2 상태 변형 — docs/03 §3·§4) — 정지 표현(docs/04 §6):
+   등장·퇴장 애니메이션/트랜지션 없음, 고정 표시 후 2초 뒤 제거(JS setTimeout). 버튼은 유지(비활성화 금지) */
+.media-toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  z-index: 40;
+  display: flex; align-items: center; gap: 8px;
+  max-width: min(90vw, 432px);
+  padding: 12px 16px;
+  background: var(--color-accent); color: var(--color-on-accent);
+  border-radius: var(--radius-element);
+  box-shadow: var(--shadow-low);
+  font-size: var(--font-size-lg); line-height: 1.6; font-weight: var(--font-weight-bold);
+}
+.media-toast .ico { color: var(--color-on-accent); }
+.media-toast[hidden] { display: none; }
+
+/* 주의 배지 한 줄 (S2 요소: drugs.caution_keys_json → caution.*) — 경고 아이콘 + 한 줄, 매칭 시만 */
+.caution-line .k-ico { color: var(--color-warning); }
+.caution-line b { overflow-wrap: anywhere; }
+
+/* 푸터 */
+.foot { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.7; }
+.foot a { color: inherit; display: inline-block; padding: 14px 4px; }   /* 터치 타깃 ≥48 확보 */
+
+/* 개발 툴바(제품 아님 — 빗금 배경, JS로만 생성). 하드코딩 색상은 툴바만 예외 허용 */
+.wf-toolbar {
+  position: fixed; top: 8px; right: 8px; z-index: 9999;
+  max-width: min(60vw, 260px);
+  padding: 6px 8px;
+  background: repeating-linear-gradient(135deg, #f5efdc 0 8px, #eadfae 8px 16px);
+  border: 1px solid #c9b96a; border-radius: 8px;
+  box-shadow: var(--shadow-low);
+  font-size: 11px; line-height: 1.5; color: #4a3f14;
+}
+.wf-toolbar.is-collapsed { padding: 2px; }
+.wf-toolbar.is-collapsed .wf-tb-body, .wf-toolbar.is-collapsed .wf-tb-note { display: none; }
+.wf-tb-head { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.wf-tb-note { font-weight: 400; font-size: 10px; }
+.wf-tb-group { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.wf-tb-group b { margin-right: 2px; font-weight: 700; }
+.wf-tb-btn {
+  min-height: 26px; padding: 2px 8px;
+  border: 1px solid #b7a75e; border-radius: 6px;
+  background: #fffdf4; color: #4a3f14; font-size: 11px; cursor: pointer;
+  font-family: inherit;
+}
+.wf-tb-btn.is-on { background: #262626; border-color: #262626; color: #ffffff; }
+.wf-tb-toggle { margin-left: auto; min-width: 26px; min-height: 26px; border: 1px solid #b7a75e; border-radius: 6px; background: #fffdf4; cursor: pointer; font-weight: 700; }
+
+@media print { .wf-toolbar { display: none !important; } body { box-shadow: none; } }
+</style>
+<noscript>
+<!-- JS 비활성 폴백: 제품은 서버가 ?lang= 재요청을 재렌더(2번째 RTT, ETag로 저렴)하지만
+     와이어프레임에는 서버가 없으므로 hi/en 병기로 전 정보 열람을 보장한다(S3/S4/S5 병기 문법과 동일) -->
+<style>
+  span[lang="hi"], span[lang="en"] { display: inline !important; }
+  span[lang="hi"] + span[lang="en"]::before { content: " · "; color: #737373; }
+</style>
+</noscript>
+<script>
+/* [와이어프레임 전용 도구 · 제품 아님] URL 파라미터 선적용 — 첫 페인트 전 속성 세팅(FOUC 방지).
+   제품에서는 서버가 이 속성들을 렌더 시점에 굽는다(협상 체인 §3.5). 화이트리스트 밖 값은 기본값 폴백. */
+(function () {
+  "use strict";
+  function pick(v, list, fb) { return list.indexOf(v) >= 0 ? v : fb; }
+  var q = {}, m, re = /[?&]([^=&#]+)=([^&#]*)/g, s = location.search;
+  while ((m = re.exec(s))) q[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+  var de = document.documentElement;
+  var st = pick(q.state, ["default", "edited", "soon-expire", "offline"], null);
+  de.setAttribute("data-state", st || "default");
+  de.setAttribute("data-fx", pick(q.fx, ["a", "b", "c"], "a"));
+  de.setAttribute("data-color", pick(q.color, ["0", "1"], "1"));
+  var lang = pick(q.lang, ["hi", "en"], null);          /* 협상 1순위: URL */
+  if (!lang) { try { lang = pick(sessionStorage.getItem("indoro.s1.lang"), ["hi", "en"], null); } catch (e) {} } /* 2순위: 세션 내 명시 토글 */
+  if (!lang) { try { lang = pick((document.cookie.match(/(?:^|;\s*)indoro_lang=(hi|en)/) || [])[1], ["hi", "en"], null); } catch (e) {} } /* 3순위: 쿠키 */
+  if (lang) { de.setAttribute("lang", lang); de.setAttribute("data-lang", lang); } /* 4·5순위(prescriptions.lang→hi)는 정적 기본값 hi가 대역 */
+  window.__S1 = { q: q, explicitState: st, langFromReq: lang };
+})();
+</script>
+</head>
+<body>
+
+<!-- ═ 상단 고정 바 (S1 요소 1) + C1 언어 토글 ═
+     C1 첫 방문 언어 협상 체인(§3.5 — 5단계, 위에서부터 우선):
+       1. URL ?lang= (hi/en 화이트리스트, 그 외 무시) — 공유 링크 유입: 보낸 사람의 표시 언어 보존(D12)
+       2. 명시 토글(세션 내) — 페이지 안 전환
+       3. 쿠키에 보존된 직전 선택 — 재방문
+       4. prescriptions.lang — 약사가 환자와 확인해 확정한 값(QR 직스캔의 사실상 기본. ?src=code도 여기로 폴백)
+       5. hi — 최후 폴백. Accept-Language 미사용(§3.5)
+     이 와이어프레임의 데모: 1→2→3은 인라인 스크립트가 실제 동작, 4는 픽스처 prescription.lang, 5는 정적 기본값.
+     콘솔에 협상 결과(source)를 출력한다. JS 없음 = <a href="?lang="> 재요청 경로(제품: 서버 재렌더). -->
+<header class="topbar">
+  <span class="logo-ph">logo · indoro</span>
+  <span class="spacer" style="flex:1"></span>
+  <!-- 계측: ux.lang_switched(from, to) — 클라 beacon. JS 없는 전환은 view.opened의 lang 변화로 서버측 근사(각주 고정) -->
+  <nav class="lang-toggle" aria-label="Language">
+    <!-- 자기표기(국기 금지): 각 언어를 그 언어로 표기 — 항상 양쪽 노출, 1탭 전환 -->
+    <a href="?lang=hi" data-lang-opt="hi" data-act="lang">हिन्दी</a>
+    <a href="?lang=en" data-lang-opt="en" data-act="lang">English</a>
+  </nav>
+</header>
+
+<main class="screen stack">
+
+  <!-- ═ 신뢰 헤더 (S1 요소 2 약국 / 3 별칭 / 4 상태 배지 / 5 처방 메모) ═
+       바인딩: pharmacies.name·area, prescriptions.created_at(IST), access_tokens.expires_at(D-day),
+               prescriptions.version>1 → "수정됨" 배지, D-3 → "곧 만료" 배지(스위처: ?state=edited|soon-expire.
+               스위처 미지정 시 데이터 파생 — FX-C는 둘 다 자동 표시), prescriptions.patient_label(있을 때만),
+               prescriptions.note(있을 때만 · 원문 그대로, 번역 없음).
+       문자 밀도가 높은 유일 구역 — 소자 처리(가족 문해자 대상). 날짜는 서버 렌더 대역(ui.month.* — JS Intl 미의존). -->
+  <section class="card stack" style="gap:4px" aria-labelledby="pharm-name">
+    <div id="hd-body" class="stack" style="gap:4px">
+      <p class="trust-cap"><span lang="hi">दवा दुकान से मिली जानकारी</span><span lang="en">From your pharmacy</span></p>
+      <h1 class="trust-name" id="pharm-name">Sharma Medical Store</h1>
+      <p class="t-supporting t-secondary">Karol Bagh, Delhi</p>
+      <p class="trust-line"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><span><span lang="hi">6 जुलाई 2026 को बनी (IST)</span><span lang="en">Issued 6 Jul 2026 (IST)</span></span></p>
+      <!-- 만료 D-day 표시 — access_tokens.expires_at 기준(데모 기준일 2026-07-06) -->
+      <p class="trust-line"><svg class="k-ico" aria-hidden="true"><use href="#i-clock"/></svg><span><span lang="hi">5 अगस्त 2026 तक चलेगी — <b>30</b> दिन</span><span lang="en">Valid till 5 Aug 2026 — <b>30</b> days</span></span></p>
+      <p class="trust-flags">
+        <!-- "수정됨" 배지 자리: version>1 + 최신 prescription_revisions.created_at. fx=a에서 ?state=edited로 강제 시 데모 문구 -->
+        <span class="flag s1-flag s1-flag-edited"><svg class="ico-14" aria-hidden="true"><use href="#i-note"/></svg><span lang="hi">5 जुलाई को बदला गया</span><span lang="en">Changed on 5 Jul</span></span>
+        <!-- "곧 만료" 배지 자리: D-3(§4.6). 만료 자체(410)는 S4 별도 화면 -->
+        <span class="flag flag-expiring s1-flag s1-flag-expiring"><svg class="ico-14" aria-hidden="true"><use href="#i-warn"/></svg><span lang="hi">जल्द ख़त्म — 3 दिन बाक़ी</span><span lang="en">Expires soon — 3 days left</span></span>
+      </p>
+      <p class="t-supporting t-secondary"><span lang="hi">किसके लिए</span><span lang="en">For</span>: Mr. S</p>
+      <!-- 별칭 줄: title·og·공유 문구에는 미노출(§8.1). FX-C는 null → 줄 자체 미렌더 -->
+    </div>
+  </section>
+
+  <!-- ═ 봉투 대조 안내 스트립 (S1 요소 6) — §2.1 유성펜 번호 기입 절차의 화면측 짝. 정적 ui.match_envelope ═ -->
+  <section class="card match-strip">
+    <svg class="k-ico" aria-hidden="true"><use href="#i-envelope"/></svg>
+    <!-- en 문구는 360px에서 2줄 이내 유지(hi와 동일 줄수) — 초과 시 .match-strip 높이가 변해 언어 토글 골격 이동·첫 화면 예산 초과 유발 -->
+    <p><span lang="hi">दवा की पुड़िया पर जो नंबर लिखा है, नीचे उसी नंबर का कार्ड देखें</span><span lang="en">Match the number on your packet with the same card below</span></p>
+  </section>
+
+  <!-- ═ 하루 시간표 (S1 요소 7 매일 고정형 + 요소 8 특수 행) ═
+       daily 패턴만 본체 행(사용 슬롯만 렌더) · WEEKLY_ONCE/STAT_SINGLE/PRN/CUSTOM은 분리 행(daily 매트릭스 미오염).
+       칩 = position 색+숫자 배지 + 수량 + 단위 축약형(unit.*.short — i18n 카탈로그 추가 제안, H10 범위) → #item-n 앵커.
+       "오늘" 기준이 아닌 매일 고정형: 스크린샷 오프라인 사본이 하루 만에 낡지 않게(§7.3-①). 날짜 계산·시계 신뢰 문제 제거.
+       (JS 있으면 현재 시간대 행 배경 하이라이트만 — 순수 장식이라 와이어프레임 미구현, 정보 손실 0) -->
+  <section class="card" aria-labelledby="tt-title">
+    <h2 class="sec-title" id="tt-title"><span lang="hi">हर दिन कब-कितनी</span><span lang="en">Every day — when &amp; how many</span></h2>
+    <p class="tt-hint"><span lang="hi">नंबर दबाएं — उस दवा का कार्ड खुलेगा</span><span lang="en">Tap a number to open that medicine card</span></p>
+    <div id="tt-body">
+      <!-- 슬롯 순서 M→N→E→H 고정 — 사용 슬롯만(FX-A: M·N·E). 칩 탭 = 앵커 점프(JS 불요) -->
+      <div class="tt-row">
+        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="tt-slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="tt-chips">
+          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
+          <a class="tt-chip" href="#item-2"><span class="badge-item badge-item--sm hue-2">2</span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
+          <a class="tt-chip" href="#item-3"><span class="badge-item badge-item--sm hue-3">3</span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
+        </div>
+      </div>
+      <div class="tt-row">
+        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="tt-slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
+        <div class="tt-chips">
+          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
+        </div>
+      </div>
+      <div class="tt-row">
+        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="tt-slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
+        <div class="tt-chips">
+          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═ 약 카드 리스트 (S1 요소 9 = S2 카드 × items, position 오름차순, 전부 펼침 — 아코디언 금지) ═
+       카드 5요소: 무엇을(약명) · 언제(패턴+스트립) · 몇 개(수량 24px+) · 식전후 · 며칠(기간·총량).
+       음성 버튼은 항상 영상보다 위(§7.2). 영상·음성은 탭 전 0바이트. -->
+  <div id="cards-wrap" class="stack">
+    <h2 class="sec-title"><span lang="hi">दवाएं</span><span lang="en">Medicines</span> · 3</h2>
+
+    <!-- 카드 1 · Dolo 650 · TDS 1-1-1-0 -->
+    <article class="card item-card stack" style="gap:10px" id="item-1">
+      <!-- 계측: 카드 노출 자체는 이벤트 없음(스크롤 계측 미도입 — YAGNI §6.1) -->
+      <header class="card-head">
+        <span class="badge-item hue-1">1</span>
+        <div class="min0">
+          <h3 class="drug-name">Dolo 650</h3>
+          <!-- drug_name_raw 라틴 원문 그대로(정본 §3.3 — 번역·음차 금지). 아래는 drug_id 매칭 시만 붙는 장식(enrichment) -->
+          <p class="enrich">Paracetamol · 650 mg</p>
+        </div>
+      </header>
+      <!-- beacon: media.audio_play(pattern, lang) — 저문해 가설 검증. 자산 폴백 체인: 요청 lang→std→any→hi(§3.4), 결측 시 버튼 비렌더(H11). 포함 여부 §10-6 미결정 -->
+      <button class="btn btn-audio" type="button" data-act="audio" data-pattern="TDS" aria-pressed="false">
+        <svg class="ico" aria-hidden="true"><use href="#i-speaker"/></svg>
+        <span class="lbl-listen"><span lang="hi">सुनें</span><span lang="en">Listen</span></span>
+        <span class="lbl-stop"><span lang="hi">रोकें</span><span lang="en">Stop</span></span>
+        <span class="btn-sub">~120KB</span>
+      </button>
+      <p class="pat-line"><span lang="hi">दिन में 3 बार</span><span lang="en">3 times a day</span></p>
+      <div class="slot-strip">
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
+      </div>
+      <p class="dose-digits">1-1-1-0</p><!-- 숫자열 병기 — 약사 구두 설명·봉투 기입 관행 브리지. 숫자 ASCII, 0.5는 ½ -->
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-after"/></svg><span lang="hi">खाने के बाद</span><span lang="en">After food</span></p>
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">5</b><span lang="hi">दिन</span><span lang="en">days</span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">15</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
+      <!-- beacon: media.video_play(pattern, lang) · media.video_complete(ended 시, watched_pct) — 완주율 -->
+      <!-- 영상: 탭 전 0바이트(§7.2). 제품: 공용 포스터 WebP 1장(≤20KB·lazy·전 카드 동일 URL → 외부 요청 1회)이 두 번째 요청.
+           JS가 data-src를 <video controls playsinline>로 승격, JS 없으면 mp4 직링크 <a>로 네이티브 플레이어(전 미디어 JS 없이 성립).
+           와이어프레임: 회색 placeholder(요청 0) + 용량 라벨 사전 고지 → 확인 다이얼로그 없이 1탭 재생 -->
+      <a class="ph ph--video" href="#" data-act="video" data-pattern="TDS">
+        <svg class="ph-play" aria-hidden="true"><use href="#i-play"/></svg>
+        <span class="lbl-play"><span lang="hi">वीडियो देखें</span><span lang="en">Watch video</span></span>
+        <span class="lbl-playing"><span lang="hi">चल रहा है (डेमो)</span><span lang="en">Playing (demo)</span></span>
+        <span class="ph-size">~3MB · 30s</span>
+      </a>
+      <!-- 주의 배지 자리: drugs.caution_keys_json → caution.* (FX 전체 빈 배열 — 매칭 시만 렌더.
+           JS 빌더 buildCard()에 .caution-line 렌더 경로 구비 — 시연은 fixtures에 caution 예시 추가 후 ?fx=로 가능) -->
+    </article>
+
+    <!-- 카드 2 · Azithral 500 · OD_MORNING 1-0-0-0 -->
+    <article class="card item-card stack" style="gap:10px" id="item-2">
+      <header class="card-head">
+        <span class="badge-item hue-2">2</span>
+        <div class="min0">
+          <h3 class="drug-name">Azithral 500</h3>
+          <p class="enrich">Azithromycin · 500 mg</p>
+        </div>
+      </header>
+      <!-- beacon: media.audio_play(pattern, lang) -->
+      <button class="btn btn-audio" type="button" data-act="audio" data-pattern="OD_MORNING" aria-pressed="false">
+        <svg class="ico" aria-hidden="true"><use href="#i-speaker"/></svg>
+        <span class="lbl-listen"><span lang="hi">सुनें</span><span lang="en">Listen</span></span>
+        <span class="lbl-stop"><span lang="hi">रोकें</span><span lang="en">Stop</span></span>
+        <span class="btn-sub">~120KB</span>
+      </button>
+      <p class="pat-line"><span lang="hi">दिन में 1 बार — सुबह</span><span lang="en">Once a day — morning</span></p>
+      <div class="slot-strip">
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
+      </div>
+      <p class="dose-digits">1-0-0-0</p>
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-after"/></svg><span lang="hi">खाने के बाद</span><span lang="en">After food</span></p>
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">3</b><span lang="hi">दिन</span><span lang="en">days</span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">3</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
+      <!-- beacon: media.video_play(pattern, lang) · media.video_complete -->
+      <a class="ph ph--video" href="#" data-act="video" data-pattern="OD_MORNING">
+        <svg class="ph-play" aria-hidden="true"><use href="#i-play"/></svg>
+        <span class="lbl-play"><span lang="hi">वीडियो देखें</span><span lang="en">Watch video</span></span>
+        <span class="lbl-playing"><span lang="hi">चल रहा है (डेमो)</span><span lang="en">Playing (demo)</span></span>
+        <span class="ph-size">~3MB · 30s</span>
+      </a>
+    </article>
+
+    <!-- 카드 3 · Pantocid 40 · OD_MORNING 1-0-0-0 · 빈속 -->
+    <article class="card item-card stack" style="gap:10px" id="item-3">
+      <header class="card-head">
+        <span class="badge-item hue-3">3</span>
+        <div class="min0">
+          <h3 class="drug-name">Pantocid 40</h3>
+          <p class="enrich">Pantoprazole · 40 mg</p>
+        </div>
+      </header>
+      <!-- beacon: media.audio_play(pattern, lang) -->
+      <button class="btn btn-audio" type="button" data-act="audio" data-pattern="OD_MORNING" aria-pressed="false">
+        <svg class="ico" aria-hidden="true"><use href="#i-speaker"/></svg>
+        <span class="lbl-listen"><span lang="hi">सुनें</span><span lang="en">Listen</span></span>
+        <span class="lbl-stop"><span lang="hi">रोकें</span><span lang="en">Stop</span></span>
+        <span class="btn-sub">~120KB</span>
+      </button>
+      <p class="pat-line"><span lang="hi">दिन में 1 बार — सुबह</span><span lang="en">Once a day — morning</span></p>
+      <div class="slot-strip">
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
+        <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
+      </div>
+      <p class="dose-digits">1-0-0-0</p>
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-empty"/></svg><span lang="hi">खाली पेट</span><span lang="en">Empty stomach</span></p><!-- fixtures META.timing_food.empty_stomach와 글리프 단위 동일(ख nukta 없음 — 정적 마크업 = 빌더 출력 동형) -->
+      <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">10</b><span lang="hi">दिन</span><span lang="en">days</span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">10</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
+      <!-- beacon: media.video_play(pattern, lang) · media.video_complete -->
+      <a class="ph ph--video" href="#" data-act="video" data-pattern="OD_MORNING">
+        <svg class="ph-play" aria-hidden="true"><use href="#i-play"/></svg>
+        <span class="lbl-play"><span lang="hi">वीडियो देखें</span><span lang="en">Watch video</span></span>
+        <span class="lbl-playing"><span lang="hi">चल रहा है (डेमो)</span><span lang="en">Playing (demo)</span></span>
+        <span class="ph-size">~3MB · 30s</span>
+      </a>
+    </article>
+  </div>
+
+  <!-- ═ C2 가족 공유 + 스크린샷 보관 (S1 요소 10) ═
+       공유 URL = /p/{token}?lang={현재 표시 언어}&src=share (D12 언어 보존 · §6.4 src 추적).
+       메시지 자체가 오프라인 사본(§7.3-②): 약명 + 숫자열 + 기간. patient_label 미포함(§8.1 — 대조 확인).
+       ① navigator.share OS 시트(method=webshare) ② wa.me 링크 — JS 없이도 성립(method=whatsapp) ③ 링크 복사(method=copy, JS).
+       wa.me는 환자 페이지의 유일한 외부 링크 예외(의도된 공유 행동) — rel=noreferrer로 Referer 경유 토큰 유출 없음(§5.1). -->
+  <section class="card stack" id="share-sec" aria-labelledby="share-title">
+    <div id="share-body" class="stack">
+      <h2 class="sec-title" id="share-title"><span lang="hi">घरवालों को भेजें</span><span lang="en">Share with family</span></h2>
+      <!-- beacon: share.clicked(method) · 서버측 도달 검증: src=share 유입의 view.opened(+새 ivid)(§6.4).
+           한계 각주: WhatsApp 인앱 웹뷰 쿠키 분리(과대), URL 직접 복사 시 src 소실(하한선) -->
+      <a class="btn btn-primary" id="btn-share" data-act="share" target="_blank" rel="noopener noreferrer"
+         href="https://wa.me/?text=%E0%A4%A6%E0%A4%B5%E0%A4%BE%20%E0%A4%95%E0%A5%80%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E2%80%94%20Sharma%20Medical%20Store%0A1.%20Dolo%20650%20%E2%80%94%201-1-1-0%20%E2%80%94%205%20%E0%A4%A6%E0%A4%BF%E0%A4%A8%0A2.%20Azithral%20500%20%E2%80%94%201-0-0-0%20%E2%80%94%203%20%E0%A4%A6%E0%A4%BF%E0%A4%A8%0A3.%20Pantocid%2040%20%E2%80%94%201-0-0-0%20%E2%80%94%2010%20%E0%A4%A6%E0%A4%BF%E0%A4%A8%0Ahttps%3A%2F%2Findoro.example%2Fp%2FhV8s3kQxWnA9cLd3Ye7Rk2%3Flang%3Dhi%26src%3Dshare">
+        <svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>
+        <span lang="hi">WhatsApp पर भेजें</span><span lang="en">Send on WhatsApp</span>
+      </a>
+      <!-- 복사는 JS 전용(method=copy) — JS 없으면 wa.me 경로가 공유를 담당 -->
+      <button class="btn btn-block" type="button" id="btn-copy" data-act="copy">
+        <span class="lbl-copy"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span lang="hi">लिंक कॉपी करें</span><span lang="en">Copy link</span></span>
+        <span class="lbl-done"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span lang="hi">कॉपी हो गया</span><span lang="en">Copied</span></span>
+      </button>
+      <p class="t-supporting t-secondary"><span lang="hi">यह मैसेज जाएगा:</span><span lang="en">This message will be sent:</span></p>
+      <div class="share-preview" id="share-preview">
+        <p><span lang="hi">दवा की जानकारी</span><span lang="en">Medicine guide</span> — Sharma Medical Store</p>
+        <p>1. Dolo 650 — 1-1-1-0 — 5 <span lang="hi">दिन</span><span lang="en">days</span></p>
+        <p>2. Azithral 500 — 1-0-0-0 — 3 <span lang="hi">दिन</span><span lang="en">days</span></p>
+        <p>3. Pantocid 40 — 1-0-0-0 — 10 <span lang="hi">दिन</span><span lang="en">days</span></p>
+        <p>https://indoro.example/p/hV8s3kQxWnA9cLd3Ye7Rk2?lang=<span lang="hi">hi</span><span lang="en">en</span>&amp;src=share</p>
+      </div>
+    </div>
+    <hr class="divider">
+    <!-- 스크린샷 보관 카드 — 저사양 환경의 사실상 표준 오프라인 사본(§7.3-①). 계측 불가(감수) -->
+    <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-camera"/></svg><b><span lang="hi">स्क्रीनशॉट लेकर रखें</span><span lang="en">Take a screenshot and keep it</span></b></p>
+    <p class="t-supporting t-secondary"><span lang="hi">बिना इंटरनेट भी दिखेगा</span><span lang="en">Works without internet too</span></p>
+  </section>
+
+  <!-- [B1 슬롯 — 환자 앱 설치 배너 · 후순위 v1+ · v0 비렌더(docs/03 §11)]
+       위치: C2(공유·스크린샷) 아래, 푸터 위 — 도달률·공유 퍼널 어떤 요소보다 아래(첫 화면 단순성 불침해).
+       v0 예약분: Jinja 템플릿 슬롯 + i18n 키 네임스페이스 ui.app_banner.* + 이벤트 후보명 ux.app_banner_tap
+       (§4.7 화이트리스트 미등재 — 등재 전 전송분은 자동 폐기되므로 안전).
+       v1 노출 조건 후보: 첫 방문 미노출, 재방문 2회+(ivid 기준) 또는 자가 열람 발생 후.
+       CTA 시맨틱은 "토큰 소지 = 클레임 자격"(§9.1) — 현재 URL 딥링크 전달 설계는 v1 몫. -->
+
+  <!-- ═ 푸터 (S1 요소 11): DPDP 한 줄 고지(§8.4) + /privacy + 약국명 재표기 ═ -->
+  <footer class="foot">
+    <p><span lang="hi">यह जानकारी सिर्फ़ दवा समझाने के लिए है — नाम-पता नहीं लिया जाता</span><span lang="en">This page only explains your medicines — no name or address is collected</span></p>
+    <!-- 제품: 동일 origin /privacy (S6) — 외부 링크 0 원칙과 정합. 와이어프레임: B2에서 생성될 파일로 링크 -->
+    <p><a href="./s6-privacy.html"><span lang="hi">गोपनीयता — और जानें</span><span lang="en">Privacy — learn more</span></a></p>
+    <p><span lang="hi">सवाल हो तो दुकान से पूछें:</span><span lang="en">Questions? Ask your pharmacy:</span> <b id="ft-pharm">Sharma Medical Store</b></p>
+  </footer>
+
+</main>
+
+<!-- ═ 오프라인(b) 미디어 실패 토스트 (S1·S2 상태 변형 "로드 후 단절" — docs/03 §3·§4) ═
+     ?state=offline에서 음성/영상 탭 시 표시: 아이콘 + "फिर बाद में / Try again later" · 버튼 유지(재시도 가능).
+     문서 본문은 자족적이라 열람은 계속 성립(§1.2-4) — 실패하는 것은 탭 시 미디어 요청뿐.
+     제품: fetch/재생 onerror 콜백에서 동일 토스트. 와이어프레임: 스위처 상태로 실패를 모사(실요청 없음).
+     정지 표현(docs/04 §6): 애니메이션 0 — 고정 표시, 2초 후 제거. beacon은 오프라인이라 유실(허용 §6.1). -->
+<div class="media-toast" id="media-toast" role="status" hidden>
+  <svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>
+  <span><span lang="hi">फिर बाद में</span><span lang="en">Try again later</span></span>
+</div>
+
+<!-- ═ SVG 심볼셋 — 인라인 <symbol> + <use> 재사용(항목 수와 무관하게 증분 0, §2.3 ≤15KB 예산의 대역).
+     전부 단색 스트로크 단순 도형(러프) — 아이콘 파이널은 Figma 단계(T1·T2 통과 후). 이모지 미사용. ═ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <!-- 슬롯 4종: M 뜨는 해(빛살 위) · N 중천 해 · E 지는 해(채움, 명도 차) · H 초승달+별. 순서 부호는 항상 M→N→E→H -->
+    <symbol id="i-slot-m" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17h17"/><path d="M8 17a4 4 0 0 1 8 0"/><path d="M12 10.5V7.5M6.6 12.2 4.8 10.8M17.4 12.2l1.8-1.4"/></g></symbol>
+    <symbol id="i-slot-n" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 4.5V6M12 18v1.5M4.5 12H6M18 12h1.5M6.9 6.9l1.1 1.1M16 16l1.1 1.1M17.1 6.9 16 8M8 16l-1.1 1.1"/></g></symbol>
+    <symbol id="i-slot-e" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 15.5h17"/><path d="M8 15.5a4 4 0 0 1 8 0z" fill="currentColor"/><path d="M12 20.5V19"/></g></symbol>
+    <symbol id="i-slot-h" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.6 13.2A6.4 6.4 0 1 1 10.8 4.5a7.2 7.2 0 0 0 4.8 8.7z"/><path d="m17.8 5.2.4 1.2 1.2.4-1.2.4-.4 1.2-.4-1.2-1.2-.4 1.2-.4z" fill="currentColor" stroke="none"/></g></symbol>
+    <!-- 식전후 4종(D14 독립 축): 알약→접시 / 접시→알약 / 접시 위 알약 / 빈 접시+알약 -->
+    <symbol id="i-tf-before" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.2" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M5.4 9.7v4.6"/><path d="M10.6 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><circle cx="18.4" cy="12" r="3.4"/><circle cx="18.4" cy="12" r="1.2"/></g></symbol>
+    <symbol id="i-tf-after" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.6" cy="12" r="3.4"/><circle cx="5.6" cy="12" r="1.2"/><path d="M10.8 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><rect x="15.4" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M18.6 9.7v4.6"/></g></symbol>
+    <symbol id="i-tf-with" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="4.6"/><circle cx="12" cy="14" r="1.6"/><rect x="9" y="3.4" width="6" height="4" rx="2"/><path d="M12 3.4v4"/></g></symbol>
+    <symbol id="i-tf-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14.5" r="4.6"/><rect x="14.8" y="4.2" width="6" height="4" rx="2"/><path d="M17.8 4.2v4"/></g></symbol>
+    <!-- 기능 아이콘 -->
+    <symbol id="i-speaker" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9.8v4.4h3l4.2 3.2V6.6L7.5 9.8h-3z"/><path d="M14.8 9.6a3.6 3.6 0 0 1 0 4.8M17.2 7.4a6.8 6.8 0 0 1 0 9.2"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M10 8.6v6.8l5.8-3.4z" fill="currentColor" stroke="none"/></g></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.8" r="2.6"/><circle cx="17.5" cy="18.2" r="2.6"/><path d="m8.3 10.7 6.9-3.7M8.3 13.3l6.9 3.7"/></g></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M4.5 15.5v-9a2 2 0 0 1 2-2h9"/></g></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4.5h4L15.5 7"/></g></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 21.2 19.6H2.8z"/><path d="M12 9.5v4.5M12 16.8v.3"/></g></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.6" y="6" width="10" height="5" rx="2.5"/><path d="M7.6 6v5"/><circle cx="16.4" cy="15.4" r="4.2"/><path d="m13.4 12.4 6 6"/></g></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4.5c3.2 3.9 5.4 6.7 5.4 9.5a5.4 5.4 0 1 1-10.8 0C6.6 11.2 8.8 8.4 12 4.5z"/></g></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10.5H10.5L6 19.5v-3.5H4z"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.7 4.6 4.6L19 8"/></g></symbol>
+    <symbol id="i-envelope" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0 1 12-4.9M19 12a7 7 0 0 1-12 4.9"/><path d="M17 4v3.2h-3.2M7 20v-3.2h3.2"/></g></symbol>
+  </defs>
+</svg>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   [와이어프레임 전용 도구 스크립트 — 제품 코드 아님]
+   역할: ?fx=a|b|c 전환(픽스처 인라인 사본으로 재렌더 — 제품에선 서버 렌더),
+        ?state= 스위처, ?lang= 협상 데모, ?color= 배지 토글, 우상단 개발 툴바, 계측 콘솔 데모.
+   제품 S1의 실제 클라 JS(≤5KB 인라인 바닐라)가 담당하는 것은 아래 "제품 동형 인터랙션" 절만:
+        C1 즉시 토글(+replaceState·쿠키·beacon) · 영상 data-src 승격 · 음성 재생 · 공유 시트 · beacon 전송.
+   픽스처: shared/fixtures.js의 INDORO_FX.a/b/c + meta 부분 사본(값 동일 — 필드 추가·변경 없음).
+        S1만 예외적으로 인라인 사본 허용(제품 동형: 외부 스크립트 0 — 공용 규칙 문서 참조).
+   ════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+
+  /* ── 픽스처 인라인 사본 (shared/fixtures.js와 값 동일) ─────────────── */
+  var FX = {
+    a: {
+      fx: "a", label: "FX-A 일상 3항목 (자동완성 히트)",
+      pharmacy: { name: "Sharma Medical Store", area: "Karol Bagh, Delhi", pincode: "110005", has_printer: 1, ui_lang: "en", default_patient_lang: "hi" },
+      prescription: { id: "01981fa0-5b2c-7c3e-8a11-4d9f2b7c6e10", client_input_id: "9f1c6b2e-8a44-4c1f-b1d2-3e5a7c90d412", patient_label: "Mr. S", lang: "hi", note: null, status: "active", version: 1, entry_method: "manual", origin: "online", created_at: "2026-07-06T09:12:40Z" },
+      access: { token: "hV8s3kQxWnA9cLd3Ye7Rk2", url: "https://indoro.example/p/hV8s3kQxWnA9cLd3Ye7Rk2", short_code: "K7F39Q2M", short_code_display: "K7F3-9Q2M", expires_at: "2026-08-05T09:12:40Z", first_viewed_at: "2026-07-06T09:41:05Z", scan_count: 2, revoked_at: null },
+      items: [
+        { position: 1, drug_name_raw: "Dolo 650", drug_id: "drug-seed-01", drug: { brand_name: "Dolo 650", generic_name: "Paracetamol", strength: "650 mg", form: "tablet", caution_keys: [] }, pattern_key: "TDS", doses: { M: 1, N: 1, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 5, total_quantity: 15, extra_params: null, note: null },
+        { position: 2, drug_name_raw: "Azithral 500", drug_id: "drug-seed-02", drug: { brand_name: "Azithral 500", generic_name: "Azithromycin", strength: "500 mg", form: "tablet", caution_keys: [] }, pattern_key: "OD_MORNING", doses: { M: 1, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 3, total_quantity: 3, extra_params: null, note: null },
+        { position: 3, drug_name_raw: "Pantocid 40", drug_id: "drug-seed-03", drug: { brand_name: "Pantocid 40", generic_name: "Pantoprazole", strength: "40 mg", form: "tablet", caution_keys: [] }, pattern_key: "OD_MORNING", doses: { M: 1, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: "empty_stomach", duration_days: 10, total_quantity: 10, extra_params: null, note: null }
+      ]
+    },
+    b: {
+      fx: "b", label: "FX-B 전 패턴 10항목 (코어 8 + CUSTOM + daily 1)",
+      pharmacy: { name: "Sharma Medical Store", area: "Karol Bagh, Delhi", pincode: "110005", has_printer: 1, ui_lang: "en", default_patient_lang: "hi" },
+      prescription: { id: "01981fb2-7d0a-7e41-9c22-5e0a3c8d7f21", client_input_id: "b3d90a1c-2f57-4e8b-a6c4-7d1e5f92ab30", patient_label: "R.K.", lang: "hi", note: null, status: "active", version: 1, entry_method: "manual", origin: "online", created_at: "2026-07-06T11:02:10Z" },
+      access: { token: "Tg5vB2mNqXr7Jd4Wcy9KpL", url: "https://indoro.example/p/Tg5vB2mNqXr7Jd4Wcy9KpL", short_code: "M2ZD71XQ", short_code_display: "M2ZD-71XQ", expires_at: "2026-09-07T11:02:10Z", first_viewed_at: null, scan_count: 0, revoked_at: null },
+      items: [
+        { position: 1, drug_name_raw: "Amlokind 5", drug_id: "drug-seed-04", drug: { brand_name: "Amlokind 5", generic_name: "Amlodipine", strength: "5 mg", form: "tablet", caution_keys: [] }, pattern_key: "OD_MORNING", doses: { M: 1, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: null, duration_days: 30, total_quantity: 30, extra_params: null, note: null },
+        { position: 2, drug_name_raw: "Atorva 10", drug_id: "drug-seed-05", drug: { brand_name: "Atorva 10", generic_name: "Atorvastatin", strength: "10 mg", form: "tablet", caution_keys: [] }, pattern_key: "OD_NIGHT", doses: { M: 0, N: 0, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 30, total_quantity: 30, extra_params: null, note: null },
+        { position: 3, drug_name_raw: "Augmentin 625", drug_id: "drug-seed-06", drug: { brand_name: "Augmentin 625 Duo", generic_name: "Amoxicillin + Clavulanic acid", strength: "500/125 mg", form: "tablet", caution_keys: [] }, pattern_key: "BD", doses: { M: 1, N: 0, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 5, total_quantity: 10, extra_params: null, note: null },
+        { position: 4, drug_name_raw: "Dolo 650", drug_id: "drug-seed-01", drug: { brand_name: "Dolo 650", generic_name: "Paracetamol", strength: "650 mg", form: "tablet", caution_keys: [] }, pattern_key: "TDS", doses: { M: 1, N: 1, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 5, total_quantity: 15, extra_params: null, note: null },
+        { position: 5, drug_name_raw: "Ascoril LS Syrup", drug_id: "drug-seed-07", drug: { brand_name: "Ascoril LS", generic_name: "Levosalbutamol + Ambroxol + Guaifenesin", strength: "per 5 ml", form: "syrup", caution_keys: [] }, pattern_key: "QID", doses: { M: 5, N: 5, E: 5, H: 5 }, dose_unit: "ml", timing_food: null, duration_days: 4, total_quantity: 80, extra_params: null, note: null },
+        { position: 6, drug_name_raw: "Uprise-D3 60K", drug_id: "drug-seed-08", drug: { brand_name: "Uprise-D3 60K", generic_name: "Cholecalciferol", strength: "60000 IU", form: "capsule", caution_keys: [] }, pattern_key: "WEEKLY_ONCE", doses: { M: 1, N: 0, E: 0, H: 0 }, dose_unit: "capsule", timing_food: "with_food", duration_days: 56, total_quantity: 8, extra_params: { day_of_week: "sun" }, note: null },
+        { position: 7, drug_name_raw: "Zentel 400", drug_id: "drug-seed-09", drug: { brand_name: "Zentel 400", generic_name: "Albendazole", strength: "400 mg", form: "tablet", caution_keys: [] }, pattern_key: "STAT_SINGLE", doses: { M: 1, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: "with_food", duration_days: 1, total_quantity: 1, extra_params: null, note: null },
+        { position: 8, drug_name_raw: "Cyclopam", drug_id: "drug-seed-10", drug: { brand_name: "Cyclopam", generic_name: "Dicyclomine + Paracetamol", strength: "20/500 mg", form: "tablet", caution_keys: [] }, pattern_key: "PRN", doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 5, total_quantity: 10, prn_reason_key: "pain", prn_max_per_day: 3, prn_min_gap_hours: 6, extra_params: null, note: null },
+        { position: 9, drug_name_raw: "Wysolone 10", drug_id: null, drug: null, pattern_key: "CUSTOM", doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 9, total_quantity: 11, extra_params: { instructions: "2 tab for 3 days, then 1 tab for 3 days, then ½ tab for 3 days (taper)", verbal_counseling_given: true }, note: null },
+        { position: 10, drug_name_raw: "Glycomet 500", drug_id: "drug-seed-11", drug: { brand_name: "Glycomet 500", generic_name: "Metformin", strength: "500 mg", form: "tablet", caution_keys: [] }, pattern_key: "BD", doses: { M: 1, N: 0, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "with_food", duration_days: 30, total_quantity: 60, extra_params: null, note: null }
+      ]
+    },
+    c: {
+      fx: "c", label: "FX-C 엣지 (시드 밖 · ml · ½정 · PRN · v2 수정됨 · D-3 만료임박)",
+      pharmacy: { name: "Sharma Medical Store", area: "Karol Bagh, Delhi", pincode: "110005", has_printer: 1, ui_lang: "en", default_patient_lang: "hi" },
+      prescription: { id: "01981c44-1a9e-7b02-8d33-6f1b4d9e8a55", client_input_id: "e7a21f04-6c3d-4b9a-91d5-0c8f2e6a7b18", patient_label: null, lang: "hi", note: "3 दिन बाद डॉक्टर को दिखाएं", status: "active", version: 2, entry_method: "manual", origin: "online", created_at: "2026-06-10T09:00:00Z", revised_at: "2026-07-05T10:20:00Z" },
+      access: { token: "pQ3wLx8ZnR5tYv1KfHs6Ua", url: "https://indoro.example/p/pQ3wLx8ZnR5tYv1KfHs6Ua", short_code: "9XW4KT2H", short_code_display: "9XW4-KT2H", expires_at: "2026-07-09T09:00:00Z", first_viewed_at: "2026-06-10T09:25:00Z", scan_count: 5, revoked_at: null },
+      items: [
+        { position: 1, drug_name_raw: "Zerodol-SP", drug_id: null, drug: null, pattern_key: "TDS", doses: { M: 1, N: 1, E: 1, H: 0 }, dose_unit: "tablet", timing_food: "after_food", duration_days: 3, total_quantity: 9, extra_params: null, note: "Take with warm water" },
+        { position: 2, drug_name_raw: "Cremaffin Plus Syrup", drug_id: "drug-seed-12", drug: { brand_name: "Cremaffin Plus", generic_name: "Liquid Paraffin + Milk of Magnesia", strength: "per 10 ml", form: "syrup", aliases: ["Cremaffin"], caution_keys: [] }, pattern_key: "OD_NIGHT", doses: { M: 0, N: 0, E: 10, H: 0 }, dose_unit: "ml", timing_food: null, duration_days: 10, total_quantity: 100, extra_params: null, note: null },
+        { position: 3, drug_name_raw: "Nebicard 2.5", drug_id: "drug-seed-13", drug: { brand_name: "Nebicard 2.5", generic_name: "Nebivolol", strength: "2.5 mg", form: "tablet", aliases: [], caution_keys: [] }, pattern_key: "OD_MORNING", doses: { M: 0.5, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: null, duration_days: 30, total_quantity: 15, extra_params: null, note: null },
+        { position: 4, drug_name_raw: "Ondem 4", drug_id: "drug-seed-14", drug: { brand_name: "Ondem 4", generic_name: "Ondansetron", strength: "4 mg", form: "tablet", aliases: [], caution_keys: [] }, pattern_key: "PRN", doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: null, duration_days: 3, total_quantity: 5, prn_reason_key: "vomiting", prn_max_per_day: 3, prn_min_gap_hours: 8, extra_params: null, note: null }
+      ]
+    }
+  };
+  /* meta 부분 사본 — patterns·slots·timing_food·dose_units·prn_reasons·days_of_week (fixtures.js와 값 동일) */
+  var META = {
+    demo_today: "2026-07-06",
+    patterns: {
+      OD_MORNING: { schedule_type: "daily", name_hi: "दिन में 1 बार — सुबह", name_en: "Once a day — morning" },
+      OD_NIGHT: { schedule_type: "daily", name_hi: "दिन में 1 बार — रात", name_en: "Once a day — night" },
+      BD: { schedule_type: "daily", name_hi: "दिन में 2 बार", name_en: "Twice a day" },
+      TDS: { schedule_type: "daily", name_hi: "दिन में 3 बार", name_en: "3 times a day" },
+      QID: { schedule_type: "daily", name_hi: "दिन में 4 बार", name_en: "4 times a day" },
+      WEEKLY_ONCE: { schedule_type: "weekly", name_hi: "हफ़्ते में 1 बार", name_en: "Once a week" },
+      STAT_SINGLE: { schedule_type: "once", name_hi: "सिर्फ़ 1 बार", name_en: "One time only" },
+      PRN: { schedule_type: "prn", name_hi: "ज़रूरत पड़ने पर", name_en: "Only when needed" },
+      CUSTOM: { schedule_type: "custom", name_hi: "विशेष निर्देश", name_en: "Special instructions" }
+    },
+    slot_order: ["M", "N", "E", "H"],
+    slots: { M: { hi: "सुबह", en: "Morning" }, N: { hi: "दोपहर", en: "Noon" }, E: { hi: "शाम", en: "Evening" }, H: { hi: "रात", en: "Night" } },
+    timing_food: { before_food: { hi: "खाने से पहले", en: "Before food" }, after_food: { hi: "खाने के बाद", en: "After food" }, with_food: { hi: "खाने के साथ", en: "With food" }, empty_stomach: { hi: "खाली पेट", en: "Empty stomach" } },
+    dose_units: { tablet: { hi: "गोली", en: "tablet" }, capsule: { hi: "कैप्सूल", en: "capsule" }, ml: { hi: "ml", en: "ml" }, drop: { hi: "बूंद", en: "drop" }, puff: { hi: "पफ़", en: "puff" }, sachet: { hi: "पाउच", en: "sachet" }, application: { hi: "लगाएं", en: "apply" } },
+    prn_reasons: { fever: { hi: "बुख़ार", en: "Fever" }, pain: { hi: "दर्द", en: "Pain" }, vomiting: { hi: "उल्टी", en: "Vomiting" }, acidity: { hi: "एसिडिटी", en: "Acidity" } },
+    days_of_week: { sun: { hi: "रविवार", en: "Sunday" }, mon: { hi: "सोमवार", en: "Monday" }, tue: { hi: "मंगलवार", en: "Tuesday" }, wed: { hi: "बुधवार", en: "Wednesday" }, thu: { hi: "गुरुवार", en: "Thursday" }, fri: { hi: "शुक्रवार", en: "Friday" }, sat: { hi: "शनिवार", en: "Saturday" } }
+  };
+  /* 단위 축약형 — unit.*.short i18n 키 신설 제안(H10 범위, docs/03 S1 요소 7 각주). 와이어프레임 전용 상수 */
+  var USHORT = { tablet: { hi: "गोली", en: "tab" }, capsule: { hi: "कैप्सूल", en: "cap" }, ml: { hi: "ml", en: "ml" }, drop: { hi: "बूंद", en: "drop" }, puff: { hi: "पफ़", en: "puff" }, sachet: { hi: "पाउच", en: "sach" }, application: { hi: "लगाएं", en: "apply" } };
+  var MON_HI = ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
+  var MON_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var SLOTICO = { M: "i-slot-m", N: "i-slot-n", E: "i-slot-e", H: "i-slot-h" };
+  var TFICO = { before_food: "i-tf-before", after_food: "i-tf-after", with_food: "i-tf-with", empty_stomach: "i-tf-empty" };
+
+  /* ── 공용 헬퍼 ── */
+  var de = document.documentElement;
+  var S1 = window.__S1 || { q: {}, explicitState: null, langFromReq: null };
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function hiEn(hi, en) { return '<span lang="hi">' + hi + '</span><span lang="en">' + en + "</span>"; }
+  function ico(id, cls) { return '<svg class="' + (cls || "ico") + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+  function qf(n) { /* 수량 표기: ASCII, 0.5는 ½ 단일 글리프 */
+    var i = Math.floor(n);
+    if (n - i === 0.5) return i ? String(i) + "½" : "½";
+    return String(n);
+  }
+  function istDate(iso) { /* 서버 날짜 렌더 대역(ui.month.* i18n) — JS Intl 미의존 원칙의 데모 구현 */
+    var d = new Date(Date.parse(iso) + 5.5 * 3600 * 1000);
+    return { d: d.getUTCDate(), m: d.getUTCMonth(), y: d.getUTCFullYear() };
+  }
+  function fmtD(iso) { var p = istDate(iso); return { hi: p.d + " " + MON_HI[p.m] + " " + p.y, en: p.d + " " + MON_EN[p.m] + " " + p.y }; }
+  function daysLeft(expIso) {
+    var e = istDate(expIso), t = META.demo_today.split("-");
+    var ms = Date.UTC(e.y, e.m, e.d) - Date.UTC(+t[0], +t[1] - 1, +t[2]);
+    return Math.round(ms / 86400000);
+  }
+  function beacon(name, params) { /* 계측 데모 — 제품: sendBeacon POST(비차단·유실 허용 §6.1) */
+    console.info("[beacon 데모] " + name, params || {});
+  }
+  function mark(msg) { console.info("[계측 데모] " + msg); }
+  function stype(key) { return (META.patterns[key] || {}).schedule_type || "daily"; }
+
+  /* ── 빌더(제품 Jinja 템플릿의 JS 대역 — DOM 구조는 정적 FX-A 마크업과 동일) ── */
+  function digitsOf(it) {
+    var s = ["M", "N", "E", "H"].map(function (k) { return qf(it.doses[k] || 0); }).join("-");
+    return s + (it.dose_unit === "ml" ? ' <span class="dd-unit">(ml)</span>' : "");
+  }
+  function unitPair(u, short) { var t = (short ? USHORT : META.dose_units)[u] || { hi: u, en: u }; return hiEn(t.hi, t.en); }
+  function chipHtml(it, inner) {
+    return '<a class="tt-chip" href="#item-' + it.position + '"><span class="badge-item badge-item--sm hue-' + it.position + '">' + it.position + "</span>" + inner + "</a>";
+  }
+  function qtyChip(it, q) { return chipHtml(it, "<b>" + qf(q) + '</b><span class="u">' + unitPair(it.dose_unit, true) + "</span>"); }
+
+  function buildTrust(f) {
+    var p = f.prescription, a = f.access;
+    var iss = fmtD(p.created_at), exp = fmtD(a.expires_at), dl = daysLeft(a.expires_at);
+    var rev = p.revised_at ? fmtD(p.revised_at) : { hi: "5 जुलाई", en: "5 Jul" }; /* 미수정 픽스처에 상태 강제 시 데모 문구 */
+    var ddemo = dl <= 3 ? dl : 3; /* "곧 만료" 배지 문구 — 실데이터 D-3 이내면 실값, 아니면 데모 강제값 3 */
+    var h = "";
+    h += '<p class="trust-cap">' + hiEn("दवा दुकान से मिली जानकारी", "From your pharmacy") + "</p>";
+    h += '<h1 class="trust-name" id="pharm-name">' + esc(f.pharmacy.name) + "</h1>";
+    h += '<p class="t-supporting t-secondary">' + esc(f.pharmacy.area) + "</p>";
+    h += '<p class="trust-line">' + ico("i-cal", "k-ico") + "<span>" + hiEn(iss.hi + " को बनी (IST)", "Issued " + iss.en + " (IST)") + "</span></p>";
+    h += '<p class="trust-line">' + ico("i-clock", "k-ico") + "<span>" + hiEn(exp.hi + " तक चलेगी — <b>" + dl + "</b> दिन", "Valid till " + exp.en + " — <b>" + dl + "</b> days") + "</span></p>";
+    h += '<p class="trust-flags">';
+    h += '<span class="flag s1-flag s1-flag-edited">' + ico("i-note", "ico-14") + hiEn(rev.hi + " को बदला गया", "Changed on " + rev.en) + "</span> ";
+    h += '<span class="flag flag-expiring s1-flag s1-flag-expiring">' + ico("i-warn", "ico-14") + hiEn("जल्द ख़त्म — " + ddemo + " दिन बाक़ी", "Expires soon — " + ddemo + " days left") + "</span>";
+    h += "</p>";
+    if (p.patient_label) h += '<p class="t-supporting t-secondary">' + hiEn("किसके लिए", "For") + ": " + esc(p.patient_label) + "</p>";
+    if (p.note) h += '<p class="trust-line">' + ico("i-note", "k-ico") + '<span class="note-text">' + esc(p.note) + "</span></p>"; /* 메모 원문 그대로(번역 없음) */
+    return h;
+  }
+
+  function buildTT(f) {
+    var h = "", s, i, it, chips;
+    var daily = f.items.filter(function (x) { return stype(x.pattern_key) === "daily"; });
+    for (s = 0; s < META.slot_order.length; s++) {
+      var slot = META.slot_order[s];
+      chips = "";
+      for (i = 0; i < daily.length; i++) { it = daily[i]; if ((it.doses[slot] || 0) > 0) chips += qtyChip(it, it.doses[slot]); }
+      if (!chips) continue; /* 사용 슬롯만 렌더 */
+      h += '<div class="tt-row"><div class="tt-slot">' + ico(SLOTICO[slot], "ico24") + '<span class="tt-slot-label">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></div>" + '<div class="tt-chips">' + chips + "</div></div>";
+    }
+    for (i = 0; i < f.items.length; i++) {
+      it = f.items[i];
+      var t = stype(it.pattern_key);
+      if (t === "daily") continue;
+      var icon = t === "weekly" ? "i-repeat" : t === "once" ? "i-pill" : t === "prn" ? "i-clock" : "i-warn";
+      var label, chip;
+      if (t === "weekly") {
+        var dw = META.days_of_week[(it.extra_params || {}).day_of_week] || { hi: "", en: "" };
+        label = hiEn("हफ़्ते में 1 बार — " + dw.hi, "Once a week — " + dw.en);
+        chip = qtyChip(it, it.doses.M || 1);
+      } else if (t === "once") {
+        label = hiEn("सिर्फ़ 1 बार", "One time only");
+        chip = qtyChip(it, it.doses.M || 1);
+      } else if (t === "prn") {
+        label = hiEn("ज़रूरत पड़ने पर", "Only when needed");
+        chip = chipHtml(it, "<b>SOS</b>");
+      } else {
+        label = hiEn("विशेष निर्देश — कार्ड देखें", "Special — see card");
+        chip = chipHtml(it, ico("i-warn", "ico-14"));
+      }
+      h += '<div class="tt-row is-special"><div class="tt-slot">' + ico(icon, "ico24") + "</div><div>" + '<p class="tt-sp-label">' + label + "</p>" + '<div class="tt-chips">' + chip + "</div></div></div>";
+    }
+    return h;
+  }
+
+  function buildStrip(it) {
+    var h = '<div class="slot-strip">';
+    for (var s = 0; s < META.slot_order.length; s++) {
+      var slot = META.slot_order[s], d = it.doses[slot] || 0, on = d > 0;
+      h += '<div class="slot-cell' + (on ? "" : " is-off") + '">' + ico(SLOTICO[slot], "slot-ico") + '<span class="slot-qty">' + qf(d) + "</span>" + '<span class="slot-label">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></div>";
+    }
+    return h + "</div>";
+  }
+
+  function buildCard(it) {
+    var t = stype(it.pattern_key), pt = META.patterns[it.pattern_key];
+    var h = '<article class="card item-card stack" style="gap:10px" id="item-' + it.position + '">';
+    h += "<!-- 계측: 카드 노출 자체는 이벤트 없음 -->";
+    h += '<header class="card-head"><span class="badge-item hue-' + it.position + '">' + it.position + "</span>" + '<div class="min0"><h3 class="drug-name">' + esc(it.drug_name_raw) + "</h3>" + (it.drug ? '<p class="enrich">' + esc(it.drug.generic_name + " · " + it.drug.strength) + "</p>" : "") + "</div></header>";
+    if (t !== "custom") { /* 음성 버튼 — 항상 영상보다 위(§7.2). CUSTOM은 미디어 전체 비렌더(§3.4) */
+      h += "<!-- beacon: media.audio_play(pattern, lang) -->";
+      h += '<button class="btn btn-audio" type="button" data-act="audio" data-pattern="' + it.pattern_key + '" aria-pressed="false">' + ico("i-speaker") + '<span class="lbl-listen">' + hiEn("सुनें", "Listen") + "</span>" + '<span class="lbl-stop">' + hiEn("रोकें", "Stop") + "</span>" + '<span class="btn-sub">~120KB</span></button>';
+    }
+    h += '<p class="pat-line">' + hiEn(pt.name_hi, pt.name_en) + "</p>";
+    if (t === "daily" || t === "weekly" || t === "once") h += buildStrip(it);
+    if (t === "daily") h += '<p class="dose-digits">' + digitsOf(it) + "</p>";
+    if (t === "weekly") {
+      var dw = META.days_of_week[(it.extra_params || {}).day_of_week] || { hi: "", en: "" };
+      h += '<p class="k-row">' + ico("i-repeat", "k-ico") + "<b>" + hiEn("हर हफ़्ते — " + dw.hi, "Every week — " + dw.en) + "</b></p>";
+    }
+    if (t === "prn") {
+      var r = META.prn_reasons[it.prn_reason_key];
+      h += '<div class="prn-block">';
+      h += '<p class="k-row">' + ico("i-warn", "k-ico") + "<b>" + hiEn("ज़रूरत पड़ने पर ही", "Only when needed") + (r ? " — " + hiEn(r.hi, r.en) : "") + "</b></p>";
+      h += "<p>" + hiEn("दिन में ज़्यादा से ज़्यादा", "At most") + ' <b class="num-lg">' + it.prn_max_per_day + "</b> " + hiEn("बार", "times a day") + "</p>";
+      h += "<p>" + hiEn("दो बार के बीच कम से कम", "Gap of at least") + ' <b class="num-lg">' + it.prn_min_gap_hours + "</b> " + hiEn("घंटे", "hours") + "</p>";
+      h += "</div>";
+    }
+    if (t === "custom") { /* 영상·음성·스트립 없음 — 잘못된 패턴 영상이 무영상보다 위험(§3.4) */
+      h += '<div class="custom-block">';
+      h += '<p class="k-row">' + ico("i-warn", "k-ico") + "<b>" + hiEn("ख़ास तरीक़ा — दुकानदार की बताई विधि से ही लें", "Special directions — take exactly as the pharmacist explained") + "</b></p>";
+      h += '<p class="custom-instr">' + esc((it.extra_params || {}).instructions || "") + "</p>"; /* 원문 그대로 — 선택·복사 가능 */
+      h += "</div>";
+    }
+    if (it.timing_food) h += '<p class="k-row">' + ico(TFICO[it.timing_food], "k-ico") + hiEn(META.timing_food[it.timing_food].hi, META.timing_food[it.timing_food].en) + "</p>";
+    if (it.dose_unit === "ml") { /* 단위 사고 방지(§3.3): ml는 회당·총량 모두 ml로 — गोली 렌더 금지 */
+      var per = 0; for (var k in it.doses) if (it.doses[k] > per) per = it.doses[k];
+      h += '<p class="k-row">' + ico("i-drop", "k-ico") + hiEn("हर बार", "Each time") + ' <b class="num-lg">' + qf(per) + "</b> ml</p>";
+    }
+    h += '<p class="k-row">' + ico("i-cal", "k-ico") + '<b class="num-lg">' + it.duration_days + "</b>" + hiEn("दिन", "days") + '<span class="dotsep">·</span>' + ico("i-pill", "k-ico") + hiEn("कुल", "Total") + ' <b class="num-lg">' + qf(it.total_quantity) + "</b>" + (it.dose_unit === "ml" ? " ml" : unitPair(it.dose_unit, false)) + "</p>";
+    if (t !== "custom") {
+      h += "<!-- beacon: media.video_play(pattern, lang) · media.video_complete(watched_pct) · 탭 전 0바이트 -->";
+      h += '<a class="ph ph--video" href="#" data-act="video" data-pattern="' + it.pattern_key + '">' + ico("i-play", "ph-play") + '<span class="lbl-play">' + hiEn("वीडियो देखें", "Watch video") + "</span>" + '<span class="lbl-playing">' + hiEn("चल रहा है (डेमो)", "Playing (demo)") + "</span>" + '<span class="ph-size">~3MB · 30s</span></a>';
+    }
+    /* 주의 배지(S2 요소): drugs.caution_keys_json → caution.* — 경고 아이콘 + 한 줄, drug_id 매칭 시만(drug=null → 미렌더).
+       현행 픽스처는 전부 caution_keys=[] → 미렌더(정적 FX-A 카드 1의 주석 슬롯과 동형). 라벨 카탈로그(META.caution)와
+       caution 예시 항목 추가는 shared/fixtures.js 몫 — 본 수정 범위(이 파일 한정) 밖이라 빌더 경로만 선구비(Jinja 승격 뼈대).
+       카탈로그 결측 라벨은 키 노출 폴백(§3.4: 요청 언어→hi→en→키). */
+    var ck = (it.drug && it.drug.caution_keys) || [];
+    for (var ci = 0; ci < ck.length; ci++) {
+      var cl = (META.caution || {})[ck[ci]];
+      h += '<p class="k-row caution-line">' + ico("i-warn", "k-ico") + "<b>" + (cl ? hiEn(cl.hi, cl.en) : esc("caution." + ck[ci])) + "</b></p>";
+    }
+    if (it.note) h += '<p class="k-row t-supporting t-secondary">' + ico("i-note", "k-ico") + esc(it.note) + "</p>";
+    return h + "</article>";
+  }
+
+  function buildCards(f) {
+    var h = '<h2 class="sec-title">' + hiEn("दवाएं", "Medicines") + " · " + f.items.length + "</h2>";
+    for (var i = 0; i < f.items.length; i++) h += buildCard(f.items[i]);
+    return h;
+  }
+
+  function shareDigits(it) {
+    var t = stype(it.pattern_key);
+    if (t === "daily") return ["M", "N", "E", "H"].map(function (k) { return qf(it.doses[k] || 0); }).join("-") + (it.dose_unit === "ml" ? " ml" : "");
+    if (t === "weekly") return { hi: "हफ़्ते में 1", en: "1/week" };
+    if (t === "once") return "1×";
+    if (t === "prn") return "SOS";
+    return { hi: "विशेष", en: "special" };
+  }
+  function shareText(f, lang) { /* 공유 메시지 = 오프라인 사본(§7.3-②). patient_label 미포함(§8.1) */
+    var L = [];
+    L.push((lang === "en" ? "Medicine guide" : "दवा की जानकारी") + " — " + f.pharmacy.name);
+    for (var i = 0; i < f.items.length; i++) {
+      var it = f.items[i], d = shareDigits(it);
+      if (typeof d !== "string") d = d[lang === "en" ? "en" : "hi"];
+      L.push(it.position + ". " + it.drug_name_raw + " — " + d + " — " + it.duration_days + " " + (lang === "en" ? "days" : "दिन"));
+    }
+    L.push(f.access.url + "?lang=" + lang + "&src=share");
+    return L.join("\n");
+  }
+  function buildShare(f) {
+    var h = "";
+    h += '<h2 class="sec-title" id="share-title">' + hiEn("घरवालों को भेजें", "Share with family") + "</h2>";
+    h += "<!-- beacon: share.clicked(method) · 서버: src=share 유입의 view.opened(+새 ivid) -->";
+    h += '<a class="btn btn-primary" id="btn-share" data-act="share" target="_blank" rel="noopener noreferrer" href="#">' + ico("i-share") + hiEn("WhatsApp पर भेजें", "Send on WhatsApp") + "</a>";
+    h += '<button class="btn btn-block" type="button" id="btn-copy" data-act="copy">' + '<span class="lbl-copy">' + ico("i-copy") + hiEn("लिंक कॉपी करें", "Copy link") + "</span>" + '<span class="lbl-done">' + ico("i-check") + hiEn("कॉपी हो गया", "Copied") + "</span></button>";
+    h += '<p class="t-supporting t-secondary">' + hiEn("यह मैसेज जाएगा:", "This message will be sent:") + "</p>";
+    h += '<div class="share-preview" id="share-preview">';
+    h += "<p>" + hiEn("दवा की जानकारी", "Medicine guide") + " — " + esc(f.pharmacy.name) + "</p>";
+    for (var i = 0; i < f.items.length; i++) {
+      var it = f.items[i], d = shareDigits(it);
+      var ds = typeof d === "string" ? esc(d) : hiEn(d.hi, d.en);
+      h += "<p>" + it.position + ". " + esc(it.drug_name_raw) + " — " + ds + " — " + it.duration_days + " " + hiEn("दिन", "days") + "</p>";
+    }
+    h += "<p>" + esc(f.access.url) + "?lang=" + hiEn("hi", "en") + "&amp;src=share</p>";
+    return h + "</div>";
+  }
+
+  /* ── 상태 관리 (와이어프레임 스위처) ── */
+  var cur = {
+    fx: de.getAttribute("data-fx") || "a",
+    state: S1.explicitState,                       /* null = 미지정(데이터 파생 배지) */
+    lang: de.getAttribute("data-lang") || "hi",
+    color: de.getAttribute("data-color") || "1"
+  };
+  var staticCache = null; /* fx=a 복원용 — 정적 마크업 = FX-A 정본 보존 */
+  function regions() { return { hd: $("hd-body"), tt: $("tt-body"), cards: $("cards-wrap"), share: $("share-body") }; }
+
+  function langSource() { /* C1 협상 체인 데모 로깅(5단계) */
+    if (S1.q.lang === "hi" || S1.q.lang === "en") return "1:URL ?lang";
+    try { if (sessionStorage.getItem("indoro.s1.lang")) return "2:세션 토글"; } catch (e) {}
+    try { if (/(?:^|;\s*)indoro_lang=(hi|en)/.test(document.cookie)) return "3:쿠키"; } catch (e) {}
+    return "4:prescriptions.lang(=hi)"; /* 5순위 hi 폴백은 4와 동일값이라 여기선 구분 불가 */
+  }
+
+  function applyFlags() {
+    var f = FX[cur.fx];
+    var ed = document.querySelector(".s1-flag-edited"), xp = document.querySelector(".s1-flag-expiring");
+    if (!ed || !xp) return;
+    ed.classList.remove("is-on"); xp.classList.remove("is-on");
+    if (cur.state === null) { /* 스위처 미지정 → 데이터 파생(제품 동작): version>1, D-3 */
+      if (f.prescription.version > 1) ed.classList.add("is-on");
+      if (daysLeft(f.access.expires_at) <= 3) xp.classList.add("is-on");
+    }
+    de.setAttribute("data-state", cur.state || "default");
+  }
+  function applyColor() { de.setAttribute("data-color", cur.color); }
+  function applyLang() {
+    de.setAttribute("lang", cur.lang); de.setAttribute("data-lang", cur.lang);
+    var f = FX[cur.fx];
+    var sh = $("btn-share");
+    if (sh) sh.setAttribute("href", "https://wa.me/?text=" + encodeURIComponent(shareText(f, cur.lang)));
+    var links = document.querySelectorAll(".lang-toggle a");
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i].getAttribute("data-lang-opt");
+      links[i].setAttribute("aria-current", l === cur.lang ? "true" : "false");
+    }
+  }
+  function pushUrl() {
+    var qs = "?fx=" + cur.fx + "&lang=" + cur.lang + (cur.state ? "&state=" + cur.state : "") + (cur.color === "0" ? "&color=0" : "");
+    try { history.replaceState(null, "", qs + location.hash); } catch (e) {}
+  }
+  function render() {
+    var r = regions(), f = FX[cur.fx];
+    if (!staticCache) staticCache = { hd: r.hd.innerHTML, tt: r.tt.innerHTML, cards: r.cards.innerHTML, share: r.share.innerHTML };
+    if (cur.fx === "a") { /* FX-A = 정적 마크업 복원(제품 동형의 정본) */
+      r.hd.innerHTML = staticCache.hd; r.tt.innerHTML = staticCache.tt;
+      r.cards.innerHTML = staticCache.cards; r.share.innerHTML = staticCache.share;
+    } else {
+      r.hd.innerHTML = buildTrust(f); r.tt.innerHTML = buildTT(f);
+      r.cards.innerHTML = buildCards(f); r.share.innerHTML = buildShare(f);
+    }
+    $("ft-pharm").textContent = f.pharmacy.name;
+    de.setAttribute("data-fx", cur.fx);
+    applyFlags(); applyColor(); applyLang();
+  }
+
+  /* ── 개발 툴바(제품 아님 — JS로만 생성, noscript면 미노출) ── */
+  function toolbar() {
+    var tb = document.createElement("aside");
+    tb.className = "wf-toolbar";
+    var collapsed = false;
+    try { collapsed = sessionStorage.getItem("wf.s1.collapsed") === "1"; } catch (e) {}
+    if (collapsed) tb.classList.add("is-collapsed");
+    function group(label, btns) {
+      var g = '<span class="wf-tb-group"><b>' + label + "</b>";
+      for (var i = 0; i < btns.length; i++) g += '<button type="button" class="wf-tb-btn" data-tb="' + btns[i][0] + '" data-v="' + btns[i][1] + '">' + btns[i][2] + "</button>";
+      return g + "</span>";
+    }
+    tb.innerHTML =
+      '<div class="wf-tb-head">WF · S1 환자 랜딩<button type="button" class="wf-tb-toggle" data-tb="fold" data-v="">×</button></div>' +
+      '<div class="wf-tb-note">제품 아님 · 개발 도구 · 기준일 2026-07-06</div>' +
+      '<div class="wf-tb-body">' +
+      group("상태", [["state", "default", "기본"], ["state", "edited", "수정됨"], ["state", "soon-expire", "곧만료"], ["state", "offline", "오프라인"]]) +
+      group("언어", [["lang", "hi", "hi"], ["lang", "en", "en"]]) +
+      group("FX", [["fx", "a", "A"], ["fx", "b", "B"], ["fx", "c", "C"]]) +
+      group("배지색", [["color", "1", "컬러"], ["color", "0", "회색"]]) +
+      '<div class="wf-tb-note">만료(410)는 s4-expired.html 별도 화면</div>' +
+      "</div>";
+    document.body.appendChild(tb);
+    function sync() {
+      var bs = tb.querySelectorAll(".wf-tb-btn");
+      for (var i = 0; i < bs.length; i++) {
+        var k = bs[i].getAttribute("data-tb"), v = bs[i].getAttribute("data-v"), on = false;
+        if (k === "state") on = (cur.state || "default") === v;
+        if (k === "lang") on = cur.lang === v;
+        if (k === "fx") on = cur.fx === v;
+        if (k === "color") on = cur.color === v;
+        bs[i].classList.toggle("is-on", on);
+      }
+    }
+    tb.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-tb]");
+      if (!b) return;
+      var k = b.getAttribute("data-tb"), v = b.getAttribute("data-v");
+      if (k === "fold") {
+        tb.classList.toggle("is-collapsed");
+        b.textContent = tb.classList.contains("is-collapsed") ? "WF" : "×";
+        try { sessionStorage.setItem("wf.s1.collapsed", tb.classList.contains("is-collapsed") ? "1" : "0"); } catch (err) {}
+        return;
+      }
+      if (k === "state") { cur.state = v === "default" ? "default" : v; applyFlags(); mark("상태 전환: " + v); }
+      if (k === "lang") { cur.lang = v; applyLang(); mark("언어 전환(툴바): " + v); }
+      if (k === "fx") { cur.fx = v; render(); mark("FX 전환: " + FX[v].label); }
+      if (k === "color") { cur.color = v; applyColor(); mark("배지색: " + (v === "0" ? "그레이(숫자 정본 검증)" : "10 hue")); }
+      pushUrl(); sync();
+    });
+    sync();
+    if (tb.classList.contains("is-collapsed")) tb.querySelector(".wf-tb-toggle").textContent = "WF";
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     제품 동형 인터랙션 절 — 제품 S1의 실제 인라인 JS(≤5KB)에 해당하는 부분.
+     전부 progressive enhancement: 없어도 열람·공유·언어(서버 재렌더)가 성립.
+     ════════════════════════════════════════════════════════════════ */
+  /* 오프라인(b) 토스트 — 미디어 탭 실패 모사(?state=offline). 정지 표현: 애니메이션 없이 표시, 2초 후 제거 */
+  var toastTimer = null;
+  function showMediaToast() {
+    var t = $("media-toast");
+    if (!t) return;
+    t.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; toastTimer = null; }, 2000);
+  }
+
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-act], [data-beacon]");
+    if (!el) return;
+    var act = el.getAttribute("data-act");
+    if (!act && el.getAttribute("data-beacon")) { beacon(el.getAttribute("data-beacon"), {}); return; }
+    if (act === "lang") { /* C1: JS 있음 — 즉시 전환 + replaceState + 쿠키 + beacon (JS 없음 — ?lang= 재요청 = 서버 재렌더) */
+      e.preventDefault();
+      var to = el.getAttribute("data-lang-opt"), from = cur.lang;
+      if (to === from) return;
+      cur.lang = to; applyLang(); pushUrl();
+      try { sessionStorage.setItem("indoro.s1.lang", to); } catch (err) {}
+      try { document.cookie = "indoro_lang=" + to + "; path=/; max-age=31536000"; } catch (err) {}
+      beacon("ux.lang_switched", { from: from, to: to });
+      return;
+    }
+    if (act === "audio") { /* S2 음성: 1탭 재생, 재탭 정지(실재생 없음 — placeholder) */
+      if (cur.state === "offline") { /* 오프라인(b): 로드 실패 → 토스트 + 버튼 유지(재생 상태 미진입, beacon 유실) */
+        showMediaToast(); mark("오프라인(b) 데모: 음성 로드 실패 — 토스트 표시, 버튼 유지");
+        return;
+      }
+      var on = el.getAttribute("aria-pressed") === "true";
+      el.setAttribute("aria-pressed", on ? "false" : "true");
+      if (!on) beacon("media.audio_play", { pattern: el.getAttribute("data-pattern"), lang: cur.lang });
+      return;
+    }
+    if (act === "video") { /* S2 영상: 용량 사전 고지로 다이얼로그 없이 1탭. 제품: data-src → <video controls playsinline> 승격 */
+      e.preventDefault();
+      if (cur.state === "offline") { /* 오프라인(b): 로드 실패 → 토스트 + 버튼 유지(재생 상태 미진입, beacon 유실) */
+        showMediaToast(); mark("오프라인(b) 데모: 영상 로드 실패 — 토스트 표시, 버튼 유지");
+        return;
+      }
+      if (!el.classList.contains("is-playing")) {
+        el.classList.add("is-playing");
+        beacon("media.video_play", { pattern: el.getAttribute("data-pattern"), lang: cur.lang });
+        setTimeout(function () { beacon("media.video_complete", { pattern: el.getAttribute("data-pattern"), watched_pct: 100, demo: true }); }, 3000);
+      } else { el.classList.remove("is-playing"); }
+      return;
+    }
+    if (act === "share") { /* C2: ① navigator.share ② wa.me(링크 기본 동작 — JS 없이 성립) */
+      var txt = shareText(FX[cur.fx], cur.lang);
+      if (navigator.share) {
+        e.preventDefault();
+        navigator.share({ text: txt }).then(function () { beacon("share.clicked", { method: "webshare" }); }).catch(function () {});
+      } else {
+        beacon("share.clicked", { method: "whatsapp" });
+      }
+      return;
+    }
+    if (act === "copy") { /* C2: 링크 복사(JS 전용) — 체크 아이콘 2초 피드백 */
+      var url = FX[cur.fx].access.url + "?lang=" + cur.lang + "&src=share";
+      var done = function () {
+        var b = $("btn-copy");
+        if (!b) return;
+        b.classList.add("is-done");
+        setTimeout(function () { b.classList.remove("is-done"); }, 2000);
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+        else done();
+      } catch (err) { done(); }
+      beacon("share.clicked", { method: "copy" });
+      return;
+    }
+  });
+
+  /* ── 부팅 ── */
+  render();       /* fx=a면 정적 마크업 유지(캐시만 채움), b/c면 인라인 사본으로 재렌더 */
+  toolbar();      /* 부팅 시 URL은 건드리지 않는다(제품 URL 동형) — 스위처 조작 시에만 replaceState */
+  mark("S1 부팅 · fx=" + cur.fx + " · 언어 협상 체인 결과: " + langSource() + " → " + cur.lang);
+  mark("제품 계측은 서버 권위: view.first / view.opened / Set-Cookie ivid — 클라 이벤트 없음(문서 상단 주석)");
+})();
+</script>
+</body>
+</html>

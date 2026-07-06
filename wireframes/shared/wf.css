@@ -1,0 +1,380 @@
+/* ============================================================
+   indoro 와이어프레임 공용 CSS (wf.css)
+   - 토큰 정본: shared/vendor/astryx-theme-neutral.css (@scope + light-dark 기반이라 직접 링크하지 않음)
+   - 이 파일은 astryx neutral의 "라이트 모드 값만" :root에 증류. 변수명은 astryx 원명 유지.
+   - 라이트 고정(다크모드 없음), 웹폰트 로드 없음(폴백 체인 그대로).
+   - 모바일 360×640 기준, 320px 가로 스크롤 0, 데스크톱은 max-width 480px 중앙 리뷰용.
+   - 상태/언어/색 전환은 wf.js가 <html>에 심는 속성으로 구동:
+       html[data-lang="hi|en"] · html[data-state="..."] · html[data-color="0|1"]
+   ============================================================ */
+
+/* ---------- 1. 토큰 (astryx neutral 라이트 증류) ---------- */
+:root {
+  /* 폰트 패밀리 — astryx 원명·원값. Figtree는 미로드(폴백으로 시스템 폰트).
+     데바나가리는 스택 소진 후 OS 폴백(Android 내장 Noto Sans Devanagari)이 담당. */
+  --font-family-body: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-heading: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-code: ui-monospace, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* 웨이트 — vendor 파일이 상위 베이스에서 참조만 하는 값의 통상 정의 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 폰트 사이즈 스케일 */
+  --font-size-xs: 0.625rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.875rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.8125rem;
+  --font-size-4xl: 2.1875rem;
+  --font-size-5xl: 2.625rem;
+
+  /* 타이포 롤 */
+  --text-display-1-size: var(--font-size-5xl); --text-display-1-weight: var(--font-weight-normal); --text-display-1-leading: 1.2381;
+  --text-display-2-size: var(--font-size-4xl); --text-display-2-weight: var(--font-weight-normal); --text-display-2-leading: 1.2571;
+  --text-display-3-size: var(--font-size-3xl); --text-display-3-weight: var(--font-weight-normal); --text-display-3-leading: 1.3793;
+  --text-heading-1-size: var(--font-size-2xl); --text-heading-1-weight: var(--font-weight-semibold); --text-heading-1-leading: 1.3333;
+  --text-heading-2-size: var(--font-size-xl);  --text-heading-2-weight: var(--font-weight-semibold); --text-heading-2-leading: 1.4;
+  --text-heading-3-size: var(--font-size-lg);  --text-heading-3-weight: var(--font-weight-bold);     --text-heading-3-leading: 1.4118;
+  --text-heading-4-size: var(--font-size-base);--text-heading-4-weight: var(--font-weight-bold);     --text-heading-4-leading: 1.4286;
+  --text-heading-5-size: var(--font-size-sm);  --text-heading-5-weight: var(--font-weight-semibold); --text-heading-5-leading: 1.6667;
+  --text-heading-6-size: var(--font-size-xs);  --text-heading-6-weight: var(--font-weight-semibold); --text-heading-6-leading: 1.6;
+  --text-body-size: var(--font-size-base);   --text-body-weight: var(--font-weight-normal);   --text-body-leading: 1.4286;
+  --text-large-size: var(--font-size-lg);    --text-large-weight: var(--font-weight-semibold);--text-large-leading: 1.4118;
+  --text-label-size: var(--font-size-base);  --text-label-weight: var(--font-weight-medium);  --text-label-leading: 1.4286;
+  --text-supporting-size: var(--font-size-sm); --text-supporting-weight: var(--font-weight-normal); --text-supporting-leading: 1.6667;
+  --text-code-size: var(--font-size-base);   --text-code-weight: var(--font-weight-normal);   --text-code-leading: 1.4286;
+
+  /* 배경·시맨틱 */
+  --color-background-surface: #ffffff;
+  --color-background-body: #f1f1f1;
+  --color-background-card: #ffffff;
+  --color-background-popover: #ffffff;
+  --color-background-muted: #f1f1f1;
+  --color-accent: #262626;
+  --color-accent-muted: #f1f1f1;
+  --color-neutral: #0000000F;
+  --color-overlay: #00000080;
+  --color-overlay-hover: #0000000D;
+  --color-overlay-pressed: #0000001A;
+  --color-text-primary: #171717;
+  --color-text-secondary: #737373;
+  --color-text-disabled: #a3a3a3;
+  --color-text-accent: #262626;
+  --color-on-dark: #ffffff;
+  --color-on-light: #171717;
+  --color-on-accent: #ffffff;
+  --color-on-success: #ffffff;
+  --color-on-error: #ffffff;
+  --color-on-warning: #171717;
+  --color-icon-accent: #262626;
+  --color-icon-primary: #171717;
+  --color-icon-secondary: #737373;
+  --color-icon-disabled: #a3a3a3;
+  --color-success: #007004;
+  --color-error: #a50c25;
+  --color-warning: #745b00;
+  --color-success-muted: #c5e5c0;
+  --color-error-muted: #facecb;
+  --color-warning-muted: #f8da9d;
+  --color-border: #ebebeb;
+  --color-border-emphasized: #d4d4d4;
+  --color-skeleton: #ebebeb;
+  --color-shadow: #0000001A;
+
+  /* 10 hue 계열 (항목 배지·보조 표기용) — background(파스텔)/border/icon(진함)/text(진함) */
+  --color-background-red: #facecb;    --color-border-red: #e6bab8;    --color-icon-red: #89001a;    --color-text-red: #89001a;
+  --color-background-orange: #fad0b5; --color-border-orange: #e6bda2; --color-icon-orange: #6e3500; --color-text-orange: #6e3500;
+  --color-background-yellow: #f8da9d; --color-border-yellow: #e4c279; --color-icon-yellow: #584400; --color-text-yellow: #584400;
+  --color-background-green: #c5e5c0;  --color-border-green: #b2d1ac;  --color-icon-green: #0c5700;  --color-text-green: #0c5700;
+  --color-background-teal: #a5e3d6;   --color-border-teal: #94d6c8;   --color-icon-teal: #005348;   --color-text-teal: #005348;
+  --color-background-cyan: #a3e0ef;   --color-border-cyan: #91d3e3;   --color-icon-cyan: #00505f;   --color-text-cyan: #00505f;
+  --color-background-blue: #c4ddfb;   --color-border-blue: #b1c9e7;   --color-icon-blue: #00458c;   --color-text-blue: #00458c;
+  --color-background-purple: #eccef3; --color-border-purple: #d8bbdf; --color-icon-purple: #700084; --color-text-purple: #700084;
+  --color-background-pink: #fccadc;   --color-border-pink: #e7b7c8;   --color-icon-pink: #83004b;   --color-text-pink: #83004b;
+  --color-background-gray: #e5e5e5;   --color-border-gray: #d4d4d4;   --color-icon-gray: #525252;   --color-text-gray: #262626;
+
+  /* 반경·그림자 */
+  --radius-none: 0.25rem;
+  --radius-inner: 0.375rem;
+  --radius-element: 0.625rem;
+  --radius-container: 0.75rem;
+  --radius-page: 1.75rem;
+  --radius-full: 9999px;
+  --shadow-low: 0 2px 4px oklch(0 0 0 / 5%), 0 4px 8px oklch(0 0 0 / 10%);
+  --shadow-med: 0 2px 4px oklch(0 0 0 / 5%), 0 4px 12px oklch(0 0 0 / 10%);
+  --shadow-high: 0 4px 6px oklch(0 0 0 / 10%), 0 12px 24px oklch(0 0 0 / 15%);
+}
+
+/* ---------- 2. 베이스 (모바일 집중 · 라이트 고정) ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; color-scheme: light only; }
+body {
+  margin: 0 auto;
+  max-width: 480px;              /* 데스크톱 리뷰: 중앙 폰 프레임 */
+  min-height: 100dvh;
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+/* 환자측 저문해 스케일: <body class="patient"> — 본문 17px·행간 1.65·400/700 2단만 사용 권장 */
+body.patient { font-size: var(--font-size-lg); line-height: 1.65; }
+body.patient b, body.patient strong { font-weight: var(--font-weight-bold); }
+
+h1, h2, h3, h4, h5, h6 { margin: 0; color: var(--color-text-primary); font-family: var(--font-family-heading); overflow-wrap: break-word; }
+h1 { font-size: var(--text-heading-1-size); font-weight: var(--text-heading-1-weight); line-height: var(--text-heading-1-leading); }
+h2 { font-size: var(--text-heading-2-size); font-weight: var(--text-heading-2-weight); line-height: var(--text-heading-2-leading); }
+h3 { font-size: var(--text-heading-3-size); font-weight: var(--text-heading-3-weight); line-height: var(--text-heading-3-leading); }
+h4 { font-size: var(--text-heading-4-size); font-weight: var(--text-heading-4-weight); line-height: var(--text-heading-4-leading); }
+p { margin: 0; overflow-wrap: break-word; }
+small { font-size: var(--text-supporting-size); line-height: var(--text-supporting-leading); color: var(--color-text-secondary); }
+img, svg, video { max-width: 100%; display: block; }
+button, input, select, textarea, output { font: inherit; color: inherit; }
+a { color: var(--color-text-accent); }
+hr.divider { border: 0; border-top: 1px solid var(--color-border); margin: 12px 0; }
+
+/* 언어 토글(D12) — wf.js가 html[data-lang]을 세팅. 미세팅 화면(S3/S4/S5 등)은 hi/en 병기 그대로 노출 */
+html[data-lang="hi"] [lang="en"] { display: none; }
+html[data-lang="en"] [lang="hi"] { display: none; }
+
+/* 상태 스위처 보조: data-wf-show/hide는 wf.js가 .wf-hidden 토글로 구동 */
+.wf-hidden { display: none !important; }
+
+/* 레이아웃 유틸 */
+.screen { padding: 12px 16px 120px; }              /* 하단 고정 바 여백 포함 */
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.hstack { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.spacer { flex: 1; }
+.t-secondary { color: var(--color-text-secondary); }
+.t-supporting { font-size: var(--text-supporting-size); line-height: var(--text-supporting-leading); }
+.t-center { text-align: center; }
+.num-lg { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; } /* 핵심 수량 24px+ */
+
+/* ---------- 3. 앱바 ---------- */
+.appbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 56px; padding: 8px 16px;
+  background: var(--color-background-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.appbar-title { font-size: var(--text-large-size); font-weight: var(--text-large-weight); line-height: var(--text-large-leading); min-width: 0; }
+.appbar-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 48px; min-height: 48px; padding: 0 8px;
+  border: 0; background: transparent; border-radius: var(--radius-element); cursor: pointer;
+}
+.appbar-btn:active { background: var(--color-overlay-pressed); }
+
+/* ---------- 4. 카드 ---------- */
+.card {
+  background: var(--color-background-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-container);
+  padding: 16px;
+}
+.card-title { font-size: var(--text-heading-4-size); font-weight: var(--text-heading-4-weight); line-height: var(--text-heading-4-leading); margin-bottom: 8px; }
+.card--emphasized { border-color: var(--color-border-emphasized); box-shadow: var(--shadow-low); }
+
+/* ---------- 5. 버튼 ---------- */
+.btn {
+  appearance: none; -webkit-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 16px;
+  border: 1px solid transparent; border-radius: var(--radius-element);
+  background: var(--color-accent-muted); color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold); text-align: center; text-decoration: none;
+  cursor: pointer; touch-action: manipulation;
+}
+.btn:active { filter: brightness(0.94); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
+.btn-primary { display: flex; width: 100%; min-height: 56px; background: var(--color-accent); color: var(--color-on-accent); }
+.btn-secondary { background: var(--color-accent-muted); color: var(--color-text-primary); border-color: var(--color-border-emphasized); }
+.btn-ghost { background: transparent; color: var(--color-text-accent); }
+.btn-danger { background: var(--color-error-muted); color: var(--color-error); }
+.btn-inline { display: inline-flex; width: auto; min-height: 48px; } /* .btn-primary와 조합해 비전폭 주 버튼 */
+
+/* ---------- 6. 칩 (패턴/기간/단위/식전후 선택형) ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  appearance: none; -webkit-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 48px; padding: 6px 14px;
+  border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-full);
+  background: var(--color-background-surface); color: var(--color-text-primary);
+  cursor: pointer; touch-action: manipulation; text-align: center;
+}
+.chip .chip-sub { font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+.chip.is-selected, .chip[aria-pressed="true"] {
+  background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent);
+}
+.chip.is-selected .chip-sub, .chip[aria-pressed="true"] .chip-sub { color: inherit; }
+.chip:disabled { opacity: 0.45; pointer-events: none; }
+
+/* ---------- 7. 텍스트 입력 + 라벨 + 인라인 에러 ---------- */
+.field { display: block; min-width: 0; }
+.field-label { display: block; margin-bottom: 6px; font-size: var(--text-label-size); font-weight: var(--text-label-weight); }
+.input {
+  width: 100%; min-height: 48px; padding: 10px 12px;
+  border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-element);
+  background: var(--color-background-surface);
+}
+.input:focus { outline: 2px solid var(--color-accent); outline-offset: -1px; }
+textarea.input { min-height: 96px; resize: vertical; }
+.field-help { display: block; margin-top: 4px; font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+.input.is-invalid { border-color: var(--color-error); }
+.field-error {
+  display: flex; align-items: flex-start; gap: 6px; margin-top: 6px;
+  font-size: var(--text-supporting-size); font-weight: var(--font-weight-medium); color: var(--color-error);
+}
+.field-error svg { width: 16px; height: 16px; flex: none; }
+
+/* ---------- 8. 수량 스테퍼 (48px 터치) ---------- */
+.stepper {
+  display: inline-flex; align-items: stretch;
+  border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-element);
+  background: var(--color-background-surface); overflow: hidden;
+}
+.stepper-btn {
+  width: 48px; min-height: 48px; border: 0; background: transparent;
+  font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); cursor: pointer;
+  touch-action: manipulation;
+}
+.stepper-btn:active { background: var(--color-overlay-pressed); }
+.stepper-btn:disabled { color: var(--color-text-disabled); }
+.stepper-value {
+  min-width: 48px; display: flex; align-items: center; justify-content: center;
+  border-left: 1px solid var(--color-border); border-right: 1px solid var(--color-border);
+  font-size: var(--font-size-lg); font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.stepper.is-off { opacity: 0.4; }                 /* 패턴 slots 밖 슬롯 = 0 강제 비활성 */
+.stepper.is-off .stepper-btn { pointer-events: none; }
+
+/* ---------- 9. 항목 색+숫자 배지 (position 1..10 = hue-1..hue-10 고정) ---------- */
+.badge-item {
+  --badge-bg: var(--color-icon-gray);
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  background: var(--badge-bg); color: var(--color-on-dark);
+  font-size: var(--font-size-lg); font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.badge-item--sm { width: 28px; height: 28px; font-size: var(--font-size-base); }
+.hue-1  { --badge-bg: var(--color-icon-blue); }    /* 1 파랑 */
+.hue-2  { --badge-bg: var(--color-icon-orange); }  /* 2 주황 */
+.hue-3  { --badge-bg: var(--color-icon-green); }   /* 3 초록 */
+.hue-4  { --badge-bg: var(--color-icon-purple); }  /* 4 보라 */
+.hue-5  { --badge-bg: var(--color-icon-red); }     /* 5 적갈 */
+.hue-6  { --badge-bg: var(--color-icon-teal); }    /* 6 청록 */
+.hue-7  { --badge-bg: var(--color-icon-pink); }    /* 7 마젠타 */
+.hue-8  { --badge-bg: var(--color-icon-cyan); }    /* 8 심청 */
+.hue-9  { --badge-bg: var(--color-icon-yellow); }  /* 9 올리브 */
+.hue-10 { --badge-bg: var(--color-icon-gray); }    /* 10 암회 */
+/* ?color=0 — 배지 hue 오프(그레이스케일 검증 모드): 색은 보조 부호, 숫자가 정본 */
+html[data-color="0"] .badge-item { background: var(--color-icon-gray); }
+
+/* ---------- 10. 시간 슬롯 스트립 (M→N→E→H 고정 순서) ---------- */
+.slot-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.slot-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 2px; border-radius: var(--radius-inner);
+  background: var(--color-background-muted);
+  text-align: center; min-width: 0;
+}
+.slot-cell.is-off { background: transparent; opacity: 0.35; }
+.slot-ico { width: 28px; height: 28px; color: var(--color-icon-primary); }
+.slot-cell.is-off .slot-ico { color: var(--color-icon-disabled); }
+.slot-qty { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.slot-label { font-size: var(--text-supporting-size); color: var(--color-text-secondary); line-height: 1.6; }
+.dose-digits {  /* 스트립 아래 "1-0-1" 숫자열 병기 — 수기 관행 브리지 */
+  margin-top: 4px; text-align: center;
+  font-weight: var(--font-weight-semibold); color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 11. 상태 칩 5종 (계산 status) + 소형 플래그 ---------- */
+.status-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 24px; padding: 2px 10px; border-radius: var(--radius-full);
+  font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); line-height: 1.4;
+  background: var(--color-accent-muted); color: var(--color-text-primary);
+}
+.status-chip.st-active  { background: var(--color-accent-muted);  color: var(--color-text-primary); } /* 발급됨 */
+.status-chip.st-viewed  { background: var(--color-success-muted); color: var(--color-success); }      /* 환자 열람 */
+.status-chip.st-pending { background: var(--color-background-orange); color: var(--color-text-orange); } /* 동기화 대기(오프라인 미전송) */
+.status-chip.st-expired { background: var(--color-warning-muted); color: var(--color-warning); }      /* 만료 */
+.status-chip.st-revoked { background: var(--color-error-muted);   color: var(--color-error); }        /* 폐기됨 */
+.flag { /* 보조 배지: 수정됨 · 곧 만료 등 — 상태 칩과 병기 */
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 8px; border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-emphasized);
+  font-size: var(--text-supporting-size); color: var(--color-text-secondary); background: transparent;
+}
+.flag-edited { }                                            /* "수정됨 · 7월 6일" */
+.flag-expiring { border-color: var(--color-warning); color: var(--color-warning); } /* "곧 만료 D-3" */
+
+/* 연결 상태 점 (G2) */
+.conn-dot { display: inline-block; width: 10px; height: 10px; border-radius: var(--radius-full); background: var(--color-success); flex: none; }
+.conn-dot.is-off { background: var(--color-text-disabled); }
+
+/* ---------- 12. 하단 고정 바 (주 행동 엄지 존) ---------- */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; z-index: 20;
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--color-background-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- 13. placeholder 박스 (QR/영상/음성/포스터 — 실자산 없음) ---------- */
+.ph {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 64px; padding: 12px;
+  background: var(--color-skeleton);
+  border: 1.5px dashed var(--color-border-emphasized); border-radius: var(--radius-element);
+  color: var(--color-text-secondary); font-size: var(--text-supporting-size);
+  text-align: center; overflow-wrap: anywhere;
+}
+.ph--qr { aspect-ratio: 1; width: min(240px, 70%); margin-inline: auto; }
+.ph--video, .ph--poster { aspect-ratio: 16 / 9; width: 100%; }
+.ph--audio { flex-direction: row; min-height: 56px; }
+.ph-size { font-size: var(--font-size-xs); color: var(--color-text-secondary); } /* 용량 라벨 "약 3MB · 30초" */
+
+/* ---------- 14. 개발 툴바 (빗금 배경 — 제품 아님) ---------- */
+.wf-toolbar {
+  position: fixed; top: 8px; right: 8px; z-index: 9999;
+  max-width: min(60vw, 260px);
+  padding: 6px 8px;
+  background: repeating-linear-gradient(135deg, #f5efdc 0 8px, #eadfae 8px 16px);
+  border: 1px solid #c9b96a; border-radius: 8px;
+  box-shadow: var(--shadow-low);
+  font-size: 11px; line-height: 1.5; color: #4a3f14;
+}
+.wf-toolbar.is-collapsed { padding: 0; }
+.wf-toolbar.is-collapsed .wf-tb-body, .wf-toolbar.is-collapsed .wf-tb-note { display: none; }
+.wf-tb-head { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.wf-tb-note { font-weight: 400; font-size: 10px; }
+.wf-tb-group { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.wf-tb-group b { margin-right: 2px; font-weight: 700; }
+.wf-tb-btn {
+  min-height: 26px; padding: 2px 8px;
+  border: 1px solid #b7a75e; border-radius: 6px;
+  background: #fffdf4; color: #4a3f14; font-size: 11px; cursor: pointer;
+}
+.wf-tb-btn.is-on { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent); }
+.wf-tb-toggle { margin-left: auto; min-width: 26px; min-height: 26px; border: 1px solid #b7a75e; border-radius: 6px; background: #fffdf4; cursor: pointer; font-weight: 700; }
+
+/* ---------- 15. 인쇄(P3 인쇄 뷰) — 개발 요소 숨김 ---------- */
+@media print {
+  .wf-toolbar, .bottom-bar, .appbar { display: none !important; }
+  body { box-shadow: none; max-width: none; }
+}
