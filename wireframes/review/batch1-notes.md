@@ -65,6 +65,7 @@
 
 *라운드 상한을 넘긴 쟁점은 여기 기록하고 배치는 확정한다. Figma 고충실도 단계(정영민)로 인계.*
 
+- [ ] S1·fixtures/주의 배지 시연 데이터: buildCard()의 caution 렌더 경로는 구현돼 있으나 FX 전체가 caution_keys 빈 배열이라 시연 불가 — shared/fixtures.js와 S1 인라인 사본 양쪽에 caution 예시 1건(+META caution.* hi/en 라벨) 추가 필요 (검증 에이전트 low 지적, 워크플로우 중단으로 미반영)
 - [ ]
 
 ---
