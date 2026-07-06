@@ -164,7 +164,9 @@
         tb.setAttribute("aria-label", "개발 툴바 (제품 아님)");
         document.body.appendChild(tb);
       }
-      var collapsed = window.sessionStorage && window.sessionStorage.getItem("wfTbCollapsed") === "1";
+      /* ?tb=0 — 스크린샷·데모용 강제 접힘 (세션 저장값보다 우선) */
+      var collapsed = this.params.tb === "0" ||
+        (window.sessionStorage && window.sessionStorage.getItem("wfTbCollapsed") === "1");
       tb.classList.toggle("is-collapsed", !!collapsed);
 
       var htmlStr = "";

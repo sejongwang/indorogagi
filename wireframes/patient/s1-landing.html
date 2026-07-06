@@ -1110,8 +1110,8 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
   function toolbar() {
     var tb = document.createElement("aside");
     tb.className = "wf-toolbar";
-    var collapsed = false;
-    try { collapsed = sessionStorage.getItem("wf.s1.collapsed") === "1"; } catch (e) {}
+    var collapsed = /[?&]tb=0/.test(location.search); /* ?tb=0 — 스크린샷·데모용 강제 접힘 */
+    try { collapsed = collapsed || sessionStorage.getItem("wf.s1.collapsed") === "1"; } catch (e) {}
     if (collapsed) tb.classList.add("is-collapsed");
     function group(label, btns) {
       var g = '<span class="wf-tb-group"><b>' + label + "</b>";
