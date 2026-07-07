@@ -1,2 +1,16 @@
-wireframes/review/gallery-preview.html
+# macOS
 .DS_Store
+
+# 생성물
+wireframes/review/gallery-preview.html
+
+# Python / uv (server)
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+server/var/
+
+# 에디터/OS 잡파일
+*.swp
+Thumbs.db
