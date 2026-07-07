@@ -1,0 +1,5161 @@
+{
+  "source_sweep": "nlem",
+  "collected_at": "2026-07-07",
+  "entries": [
+    {
+      "id": "nlem-001",
+      "brand_name": "Paracetamol",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Acetaminophen"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-002",
+      "brand_name": "Paracetamol",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "650 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Acetaminophen"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-003",
+      "brand_name": "Paracetamol",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "125 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Acetaminophen"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-004",
+      "brand_name": "Paracetamol",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "250 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Acetaminophen"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-005",
+      "brand_name": "Ibuprofen",
+      "generic_name": "Ibuprofen",
+      "molecules": [
+        "Ibuprofen"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-006",
+      "brand_name": "Ibuprofen",
+      "generic_name": "Ibuprofen",
+      "molecules": [
+        "Ibuprofen"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-007",
+      "brand_name": "Ibuprofen",
+      "generic_name": "Ibuprofen",
+      "molecules": [
+        "Ibuprofen"
+      ],
+      "strength": "100 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-008",
+      "brand_name": "Diclofenac",
+      "generic_name": "Diclofenac",
+      "molecules": [
+        "Diclofenac"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-009",
+      "brand_name": "Mefenamic acid",
+      "generic_name": "Mefenamic acid",
+      "molecules": [
+        "Mefenamic acid"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-010",
+      "brand_name": "Mefenamic acid",
+      "generic_name": "Mefenamic acid",
+      "molecules": [
+        "Mefenamic acid"
+      ],
+      "strength": "100 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-011",
+      "brand_name": "Acetylsalicylic acid",
+      "generic_name": "Acetylsalicylic acid",
+      "molecules": [
+        "Acetylsalicylic acid"
+      ],
+      "strength": "325 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Aspirin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-012",
+      "brand_name": "Tramadol",
+      "generic_name": "Tramadol",
+      "molecules": [
+        "Tramadol"
+      ],
+      "strength": "50 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-013",
+      "brand_name": "Allopurinol",
+      "generic_name": "Allopurinol",
+      "molecules": [
+        "Allopurinol"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-014",
+      "brand_name": "Allopurinol",
+      "generic_name": "Allopurinol",
+      "molecules": [
+        "Allopurinol"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-015",
+      "brand_name": "Colchicine",
+      "generic_name": "Colchicine",
+      "molecules": [
+        "Colchicine"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-016",
+      "brand_name": "Hydroxychloroquine",
+      "generic_name": "Hydroxychloroquine",
+      "molecules": [
+        "Hydroxychloroquine"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-017",
+      "brand_name": "Methotrexate",
+      "generic_name": "Methotrexate",
+      "molecules": [
+        "Methotrexate"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-018",
+      "brand_name": "Methotrexate",
+      "generic_name": "Methotrexate",
+      "molecules": [
+        "Methotrexate"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-019",
+      "brand_name": "Sulfasalazine",
+      "generic_name": "Sulfasalazine",
+      "molecules": [
+        "Sulfasalazine"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Sulphasalazine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-020",
+      "brand_name": "Azathioprine",
+      "generic_name": "Azathioprine",
+      "molecules": [
+        "Azathioprine"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-021",
+      "brand_name": "Cetirizine",
+      "generic_name": "Cetirizine",
+      "molecules": [
+        "Cetirizine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-022",
+      "brand_name": "Cetirizine",
+      "generic_name": "Cetirizine",
+      "molecules": [
+        "Cetirizine"
+      ],
+      "strength": "5 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-023",
+      "brand_name": "Dexamethasone",
+      "generic_name": "Dexamethasone",
+      "molecules": [
+        "Dexamethasone"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-024",
+      "brand_name": "Dexamethasone",
+      "generic_name": "Dexamethasone",
+      "molecules": [
+        "Dexamethasone"
+      ],
+      "strength": "4 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-025",
+      "brand_name": "Hydrocortisone",
+      "generic_name": "Hydrocortisone",
+      "molecules": [
+        "Hydrocortisone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-026",
+      "brand_name": "Prednisolone",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-027",
+      "brand_name": "Prednisolone",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-028",
+      "brand_name": "Prednisolone",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-029",
+      "brand_name": "Prednisolone",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "5 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-030",
+      "brand_name": "Carbamazepine",
+      "generic_name": "Carbamazepine",
+      "molecules": [
+        "Carbamazepine"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-031",
+      "brand_name": "Carbamazepine",
+      "generic_name": "Carbamazepine",
+      "molecules": [
+        "Carbamazepine"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-032",
+      "brand_name": "Clobazam",
+      "generic_name": "Clobazam",
+      "molecules": [
+        "Clobazam"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-033",
+      "brand_name": "Clobazam",
+      "generic_name": "Clobazam",
+      "molecules": [
+        "Clobazam"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-034",
+      "brand_name": "Levetiracetam",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-035",
+      "brand_name": "Levetiracetam",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-036",
+      "brand_name": "Lorazepam",
+      "generic_name": "Lorazepam",
+      "molecules": [
+        "Lorazepam"
+      ],
+      "strength": "1 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-037",
+      "brand_name": "Lorazepam",
+      "generic_name": "Lorazepam",
+      "molecules": [
+        "Lorazepam"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-038",
+      "brand_name": "Phenobarbitone",
+      "generic_name": "Phenobarbitone",
+      "molecules": [
+        "Phenobarbitone"
+      ],
+      "strength": "30 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Phenobarbital"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-039",
+      "brand_name": "Phenobarbitone",
+      "generic_name": "Phenobarbitone",
+      "molecules": [
+        "Phenobarbitone"
+      ],
+      "strength": "60 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Phenobarbital"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-040",
+      "brand_name": "Phenytoin",
+      "generic_name": "Phenytoin",
+      "molecules": [
+        "Phenytoin"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-041",
+      "brand_name": "Phenytoin",
+      "generic_name": "Phenytoin",
+      "molecules": [
+        "Phenytoin"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-042",
+      "brand_name": "Sodium Valproate",
+      "generic_name": "Sodium Valproate",
+      "molecules": [
+        "Sodium Valproate"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Valproate"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-043",
+      "brand_name": "Sodium Valproate",
+      "generic_name": "Sodium Valproate",
+      "molecules": [
+        "Sodium Valproate"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Valproate"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-044",
+      "brand_name": "Sumatriptan",
+      "generic_name": "Sumatriptan",
+      "molecules": [
+        "Sumatriptan"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-045",
+      "brand_name": "Sumatriptan",
+      "generic_name": "Sumatriptan",
+      "molecules": [
+        "Sumatriptan"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-046",
+      "brand_name": "Flunarizine",
+      "generic_name": "Flunarizine",
+      "molecules": [
+        "Flunarizine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-047",
+      "brand_name": "Propranolol",
+      "generic_name": "Propranolol",
+      "molecules": [
+        "Propranolol"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-048",
+      "brand_name": "Propranolol",
+      "generic_name": "Propranolol",
+      "molecules": [
+        "Propranolol"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-049",
+      "brand_name": "Amitriptyline",
+      "generic_name": "Amitriptyline",
+      "molecules": [
+        "Amitriptyline"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-050",
+      "brand_name": "Amitriptyline",
+      "generic_name": "Amitriptyline",
+      "molecules": [
+        "Amitriptyline"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-051",
+      "brand_name": "Levodopa + Carbidopa",
+      "generic_name": "Levodopa + Carbidopa",
+      "molecules": [
+        "Levodopa",
+        "Carbidopa"
+      ],
+      "strength": "100/25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-052",
+      "brand_name": "Levodopa + Carbidopa",
+      "generic_name": "Levodopa + Carbidopa",
+      "molecules": [
+        "Levodopa",
+        "Carbidopa"
+      ],
+      "strength": "250/25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-053",
+      "brand_name": "Trihexyphenidyl",
+      "generic_name": "Trihexyphenidyl",
+      "molecules": [
+        "Trihexyphenidyl"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Benzhexol"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-054",
+      "brand_name": "Donepezil",
+      "generic_name": "Donepezil",
+      "molecules": [
+        "Donepezil"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-055",
+      "brand_name": "Donepezil",
+      "generic_name": "Donepezil",
+      "molecules": [
+        "Donepezil"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-056",
+      "brand_name": "Albendazole",
+      "generic_name": "Albendazole",
+      "molecules": [
+        "Albendazole"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-057",
+      "brand_name": "Albendazole",
+      "generic_name": "Albendazole",
+      "molecules": [
+        "Albendazole"
+      ],
+      "strength": "200 mg/5 ml",
+      "form": "suspension",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-058",
+      "brand_name": "Mebendazole",
+      "generic_name": "Mebendazole",
+      "molecules": [
+        "Mebendazole"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-059",
+      "brand_name": "Ivermectin",
+      "generic_name": "Ivermectin",
+      "molecules": [
+        "Ivermectin"
+      ],
+      "strength": "6 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-060",
+      "brand_name": "Ivermectin",
+      "generic_name": "Ivermectin",
+      "molecules": [
+        "Ivermectin"
+      ],
+      "strength": "12 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-061",
+      "brand_name": "Diethylcarbamazine",
+      "generic_name": "Diethylcarbamazine",
+      "molecules": [
+        "Diethylcarbamazine"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [
+        "DEC"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-062",
+      "brand_name": "Praziquantel",
+      "generic_name": "Praziquantel",
+      "molecules": [
+        "Praziquantel"
+      ],
+      "strength": "600 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-063",
+      "brand_name": "Amoxicillin",
+      "generic_name": "Amoxicillin",
+      "molecules": [
+        "Amoxicillin"
+      ],
+      "strength": "250 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Amoxycillin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-064",
+      "brand_name": "Amoxicillin",
+      "generic_name": "Amoxicillin",
+      "molecules": [
+        "Amoxicillin"
+      ],
+      "strength": "500 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Amoxycillin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-065",
+      "brand_name": "Amoxicillin",
+      "generic_name": "Amoxicillin",
+      "molecules": [
+        "Amoxicillin"
+      ],
+      "strength": "125 mg/5 ml",
+      "form": "suspension",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Amoxycillin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-066",
+      "brand_name": "Amoxicillin + Clavulanic acid",
+      "generic_name": "Amoxicillin + Clavulanic acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic acid"
+      ],
+      "strength": "500/125 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Co-amoxiclav"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-067",
+      "brand_name": "Cefadroxil",
+      "generic_name": "Cefadroxil",
+      "molecules": [
+        "Cefadroxil"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-068",
+      "brand_name": "Cefixime",
+      "generic_name": "Cefixime",
+      "molecules": [
+        "Cefixime"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-069",
+      "brand_name": "Cefixime",
+      "generic_name": "Cefixime",
+      "molecules": [
+        "Cefixime"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-070",
+      "brand_name": "Cefixime",
+      "generic_name": "Cefixime",
+      "molecules": [
+        "Cefixime"
+      ],
+      "strength": "50 mg/5 ml",
+      "form": "suspension",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-071",
+      "brand_name": "Cefuroxime",
+      "generic_name": "Cefuroxime",
+      "molecules": [
+        "Cefuroxime"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Cefuroxime axetil"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-072",
+      "brand_name": "Cloxacillin",
+      "generic_name": "Cloxacillin",
+      "molecules": [
+        "Cloxacillin"
+      ],
+      "strength": "250 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-073",
+      "brand_name": "Cloxacillin",
+      "generic_name": "Cloxacillin",
+      "molecules": [
+        "Cloxacillin"
+      ],
+      "strength": "500 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-074",
+      "brand_name": "Phenoxymethyl penicillin",
+      "generic_name": "Phenoxymethyl penicillin",
+      "molecules": [
+        "Phenoxymethyl penicillin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Penicillin V"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-075",
+      "brand_name": "Azithromycin",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-076",
+      "brand_name": "Azithromycin",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-077",
+      "brand_name": "Azithromycin",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "200 mg/5 ml",
+      "form": "suspension",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-078",
+      "brand_name": "Ciprofloxacin",
+      "generic_name": "Ciprofloxacin",
+      "molecules": [
+        "Ciprofloxacin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-079",
+      "brand_name": "Ciprofloxacin",
+      "generic_name": "Ciprofloxacin",
+      "molecules": [
+        "Ciprofloxacin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-080",
+      "brand_name": "Clarithromycin",
+      "generic_name": "Clarithromycin",
+      "molecules": [
+        "Clarithromycin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-081",
+      "brand_name": "Clarithromycin",
+      "generic_name": "Clarithromycin",
+      "molecules": [
+        "Clarithromycin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-082",
+      "brand_name": "Clindamycin",
+      "generic_name": "Clindamycin",
+      "molecules": [
+        "Clindamycin"
+      ],
+      "strength": "150 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-083",
+      "brand_name": "Clindamycin",
+      "generic_name": "Clindamycin",
+      "molecules": [
+        "Clindamycin"
+      ],
+      "strength": "300 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-084",
+      "brand_name": "Co-trimoxazole",
+      "generic_name": "Sulphamethoxazole + Trimethoprim",
+      "molecules": [
+        "Sulphamethoxazole",
+        "Trimethoprim"
+      ],
+      "strength": "400/80 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Cotrimoxazole",
+        "Sulfamethoxazole + Trimethoprim"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-085",
+      "brand_name": "Co-trimoxazole",
+      "generic_name": "Sulphamethoxazole + Trimethoprim",
+      "molecules": [
+        "Sulphamethoxazole",
+        "Trimethoprim"
+      ],
+      "strength": "800/160 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Cotrimoxazole",
+        "Sulfamethoxazole + Trimethoprim"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-086",
+      "brand_name": "Doxycycline",
+      "generic_name": "Doxycycline",
+      "molecules": [
+        "Doxycycline"
+      ],
+      "strength": "100 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-087",
+      "brand_name": "Metronidazole",
+      "generic_name": "Metronidazole",
+      "molecules": [
+        "Metronidazole"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-088",
+      "brand_name": "Metronidazole",
+      "generic_name": "Metronidazole",
+      "molecules": [
+        "Metronidazole"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-089",
+      "brand_name": "Nitrofurantoin",
+      "generic_name": "Nitrofurantoin",
+      "molecules": [
+        "Nitrofurantoin"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-090",
+      "brand_name": "Dapsone",
+      "generic_name": "Dapsone",
+      "molecules": [
+        "Dapsone"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-091",
+      "brand_name": "Clofazimine",
+      "generic_name": "Clofazimine",
+      "molecules": [
+        "Clofazimine"
+      ],
+      "strength": "100 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-092",
+      "brand_name": "Rifampicin",
+      "generic_name": "Rifampicin",
+      "molecules": [
+        "Rifampicin"
+      ],
+      "strength": "450 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Rifampin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-093",
+      "brand_name": "Isoniazid",
+      "generic_name": "Isoniazid",
+      "molecules": [
+        "Isoniazid"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "INH"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-094",
+      "brand_name": "Ethambutol",
+      "generic_name": "Ethambutol",
+      "molecules": [
+        "Ethambutol"
+      ],
+      "strength": "800 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-095",
+      "brand_name": "Pyrazinamide",
+      "generic_name": "Pyrazinamide",
+      "molecules": [
+        "Pyrazinamide"
+      ],
+      "strength": "750 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-096",
+      "brand_name": "Levofloxacin",
+      "generic_name": "Levofloxacin",
+      "molecules": [
+        "Levofloxacin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-097",
+      "brand_name": "Levofloxacin",
+      "generic_name": "Levofloxacin",
+      "molecules": [
+        "Levofloxacin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-098",
+      "brand_name": "Moxifloxacin",
+      "generic_name": "Moxifloxacin",
+      "molecules": [
+        "Moxifloxacin"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-099",
+      "brand_name": "Linezolid",
+      "generic_name": "Linezolid",
+      "molecules": [
+        "Linezolid"
+      ],
+      "strength": "600 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-100",
+      "brand_name": "Fluconazole",
+      "generic_name": "Fluconazole",
+      "molecules": [
+        "Fluconazole"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-101",
+      "brand_name": "Fluconazole",
+      "generic_name": "Fluconazole",
+      "molecules": [
+        "Fluconazole"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-102",
+      "brand_name": "Griseofulvin",
+      "generic_name": "Griseofulvin",
+      "molecules": [
+        "Griseofulvin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-103",
+      "brand_name": "Itraconazole",
+      "generic_name": "Itraconazole",
+      "molecules": [
+        "Itraconazole"
+      ],
+      "strength": "100 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-104",
+      "brand_name": "Itraconazole",
+      "generic_name": "Itraconazole",
+      "molecules": [
+        "Itraconazole"
+      ],
+      "strength": "200 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-105",
+      "brand_name": "Nystatin",
+      "generic_name": "Nystatin",
+      "molecules": [
+        "Nystatin"
+      ],
+      "strength": "100000 IU/ml",
+      "form": "suspension",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-106",
+      "brand_name": "Clotrimazole",
+      "generic_name": "Clotrimazole",
+      "molecules": [
+        "Clotrimazole"
+      ],
+      "strength": "100 mg",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-107",
+      "brand_name": "Terbinafine",
+      "generic_name": "Terbinafine",
+      "molecules": [
+        "Terbinafine"
+      ],
+      "strength": "1%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-108",
+      "brand_name": "Mupirocin",
+      "generic_name": "Mupirocin",
+      "molecules": [
+        "Mupirocin"
+      ],
+      "strength": "2%",
+      "form": "ointment",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-109",
+      "brand_name": "Acyclovir",
+      "generic_name": "Acyclovir",
+      "molecules": [
+        "Acyclovir"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Aciclovir"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-110",
+      "brand_name": "Acyclovir",
+      "generic_name": "Acyclovir",
+      "molecules": [
+        "Acyclovir"
+      ],
+      "strength": "800 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Aciclovir"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-111",
+      "brand_name": "Entecavir",
+      "generic_name": "Entecavir",
+      "molecules": [
+        "Entecavir"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-112",
+      "brand_name": "Tenofovir Disoproxil Fumarate",
+      "generic_name": "Tenofovir Disoproxil Fumarate",
+      "molecules": [
+        "Tenofovir Disoproxil Fumarate"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "TDF",
+        "Tenofovir"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-113",
+      "brand_name": "Sofosbuvir",
+      "generic_name": "Sofosbuvir",
+      "molecules": [
+        "Sofosbuvir"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-114",
+      "brand_name": "Daclatasvir",
+      "generic_name": "Daclatasvir",
+      "molecules": [
+        "Daclatasvir"
+      ],
+      "strength": "60 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-115",
+      "brand_name": "Artemether + Lumefantrine",
+      "generic_name": "Artemether + Lumefantrine",
+      "molecules": [
+        "Artemether",
+        "Lumefantrine"
+      ],
+      "strength": "20/120 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-116",
+      "brand_name": "Artemether + Lumefantrine",
+      "generic_name": "Artemether + Lumefantrine",
+      "molecules": [
+        "Artemether",
+        "Lumefantrine"
+      ],
+      "strength": "80/480 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-117",
+      "brand_name": "Chloroquine",
+      "generic_name": "Chloroquine",
+      "molecules": [
+        "Chloroquine"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-118",
+      "brand_name": "Primaquine",
+      "generic_name": "Primaquine",
+      "molecules": [
+        "Primaquine"
+      ],
+      "strength": "7.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-119",
+      "brand_name": "Primaquine",
+      "generic_name": "Primaquine",
+      "molecules": [
+        "Primaquine"
+      ],
+      "strength": "15 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-120",
+      "brand_name": "Quinine",
+      "generic_name": "Quinine",
+      "molecules": [
+        "Quinine"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-121",
+      "brand_name": "Ferrous salts",
+      "generic_name": "Ferrous salts",
+      "molecules": [
+        "Ferrous salts"
+      ],
+      "strength": "60 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Iron"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-122",
+      "brand_name": "Ferrous salt + Folic acid",
+      "generic_name": "Ferrous salt + Folic acid",
+      "molecules": [
+        "Ferrous salt",
+        "Folic acid"
+      ],
+      "strength": "100 mg + 500 mcg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "IFA"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-123",
+      "brand_name": "Folic acid",
+      "generic_name": "Folic acid",
+      "molecules": [
+        "Folic acid"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-124",
+      "brand_name": "Phytomenadione",
+      "generic_name": "Phytomenadione",
+      "molecules": [
+        "Phytomenadione"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin K1",
+        "Phytonadione"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-125",
+      "brand_name": "Tranexamic acid",
+      "generic_name": "Tranexamic acid",
+      "molecules": [
+        "Tranexamic acid"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-126",
+      "brand_name": "Warfarin",
+      "generic_name": "Warfarin",
+      "molecules": [
+        "Warfarin"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-127",
+      "brand_name": "Warfarin",
+      "generic_name": "Warfarin",
+      "molecules": [
+        "Warfarin"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-128",
+      "brand_name": "Diltiazem",
+      "generic_name": "Diltiazem",
+      "molecules": [
+        "Diltiazem"
+      ],
+      "strength": "30 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-129",
+      "brand_name": "Diltiazem",
+      "generic_name": "Diltiazem",
+      "molecules": [
+        "Diltiazem"
+      ],
+      "strength": "60 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-130",
+      "brand_name": "Glyceryl trinitrate",
+      "generic_name": "Glyceryl trinitrate",
+      "molecules": [
+        "Glyceryl trinitrate"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Nitroglycerin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-131",
+      "brand_name": "Isosorbide dinitrate",
+      "generic_name": "Isosorbide dinitrate",
+      "molecules": [
+        "Isosorbide dinitrate"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-132",
+      "brand_name": "Isosorbide dinitrate",
+      "generic_name": "Isosorbide dinitrate",
+      "molecules": [
+        "Isosorbide dinitrate"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-133",
+      "brand_name": "Metoprolol",
+      "generic_name": "Metoprolol",
+      "molecules": [
+        "Metoprolol"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-134",
+      "brand_name": "Metoprolol",
+      "generic_name": "Metoprolol",
+      "molecules": [
+        "Metoprolol"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-135",
+      "brand_name": "Amiodarone",
+      "generic_name": "Amiodarone",
+      "molecules": [
+        "Amiodarone"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-136",
+      "brand_name": "Verapamil",
+      "generic_name": "Verapamil",
+      "molecules": [
+        "Verapamil"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-137",
+      "brand_name": "Verapamil",
+      "generic_name": "Verapamil",
+      "molecules": [
+        "Verapamil"
+      ],
+      "strength": "80 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-138",
+      "brand_name": "Digoxin",
+      "generic_name": "Digoxin",
+      "molecules": [
+        "Digoxin"
+      ],
+      "strength": "0.25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-139",
+      "brand_name": "Amlodipine",
+      "generic_name": "Amlodipine",
+      "molecules": [
+        "Amlodipine"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-140",
+      "brand_name": "Amlodipine",
+      "generic_name": "Amlodipine",
+      "molecules": [
+        "Amlodipine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-141",
+      "brand_name": "Enalapril",
+      "generic_name": "Enalapril",
+      "molecules": [
+        "Enalapril"
+      ],
+      "strength": "2.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-142",
+      "brand_name": "Enalapril",
+      "generic_name": "Enalapril",
+      "molecules": [
+        "Enalapril"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-143",
+      "brand_name": "Ramipril",
+      "generic_name": "Ramipril",
+      "molecules": [
+        "Ramipril"
+      ],
+      "strength": "2.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-144",
+      "brand_name": "Ramipril",
+      "generic_name": "Ramipril",
+      "molecules": [
+        "Ramipril"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-145",
+      "brand_name": "Telmisartan",
+      "generic_name": "Telmisartan",
+      "molecules": [
+        "Telmisartan"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-146",
+      "brand_name": "Telmisartan",
+      "generic_name": "Telmisartan",
+      "molecules": [
+        "Telmisartan"
+      ],
+      "strength": "80 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-147",
+      "brand_name": "Labetalol",
+      "generic_name": "Labetalol",
+      "molecules": [
+        "Labetalol"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-148",
+      "brand_name": "Hydrochlorothiazide",
+      "generic_name": "Hydrochlorothiazide",
+      "molecules": [
+        "Hydrochlorothiazide"
+      ],
+      "strength": "12.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "HCTZ"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-149",
+      "brand_name": "Hydrochlorothiazide",
+      "generic_name": "Hydrochlorothiazide",
+      "molecules": [
+        "Hydrochlorothiazide"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "HCTZ"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-150",
+      "brand_name": "Furosemide",
+      "generic_name": "Furosemide",
+      "molecules": [
+        "Furosemide"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Frusemide"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-151",
+      "brand_name": "Spironolactone",
+      "generic_name": "Spironolactone",
+      "molecules": [
+        "Spironolactone"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-152",
+      "brand_name": "Spironolactone",
+      "generic_name": "Spironolactone",
+      "molecules": [
+        "Spironolactone"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-153",
+      "brand_name": "Nifedipine",
+      "generic_name": "Nifedipine",
+      "molecules": [
+        "Nifedipine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-154",
+      "brand_name": "Acetylsalicylic acid",
+      "generic_name": "Acetylsalicylic acid",
+      "molecules": [
+        "Acetylsalicylic acid"
+      ],
+      "strength": "75 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Aspirin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-155",
+      "brand_name": "Acetylsalicylic acid",
+      "generic_name": "Acetylsalicylic acid",
+      "molecules": [
+        "Acetylsalicylic acid"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Aspirin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-156",
+      "brand_name": "Clopidogrel",
+      "generic_name": "Clopidogrel",
+      "molecules": [
+        "Clopidogrel"
+      ],
+      "strength": "75 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-157",
+      "brand_name": "Clopidogrel",
+      "generic_name": "Clopidogrel",
+      "molecules": [
+        "Clopidogrel"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-158",
+      "brand_name": "Dabigatran",
+      "generic_name": "Dabigatran",
+      "molecules": [
+        "Dabigatran"
+      ],
+      "strength": "150 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Dabigatran etexilate"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-159",
+      "brand_name": "Atorvastatin",
+      "generic_name": "Atorvastatin",
+      "molecules": [
+        "Atorvastatin"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-160",
+      "brand_name": "Atorvastatin",
+      "generic_name": "Atorvastatin",
+      "molecules": [
+        "Atorvastatin"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-161",
+      "brand_name": "Atorvastatin",
+      "generic_name": "Atorvastatin",
+      "molecules": [
+        "Atorvastatin"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-162",
+      "brand_name": "Clotrimazole",
+      "generic_name": "Clotrimazole",
+      "molecules": [
+        "Clotrimazole"
+      ],
+      "strength": "1%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-163",
+      "brand_name": "Framycetin",
+      "generic_name": "Framycetin",
+      "molecules": [
+        "Framycetin"
+      ],
+      "strength": "1%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-164",
+      "brand_name": "Fusidic acid",
+      "generic_name": "Fusidic acid",
+      "molecules": [
+        "Fusidic acid"
+      ],
+      "strength": "2%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-165",
+      "brand_name": "Silver sulphadiazine",
+      "generic_name": "Silver sulphadiazine",
+      "molecules": [
+        "Silver sulphadiazine"
+      ],
+      "strength": "1%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Silver sulfadiazine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-166",
+      "brand_name": "Betamethasone valerate",
+      "generic_name": "Betamethasone valerate",
+      "molecules": [
+        "Betamethasone valerate"
+      ],
+      "strength": "0.1%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Betamethasone"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-167",
+      "brand_name": "Benzoyl peroxide",
+      "generic_name": "Benzoyl peroxide",
+      "molecules": [
+        "Benzoyl peroxide"
+      ],
+      "strength": "2.5%",
+      "form": "gel",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-168",
+      "brand_name": "Salicylic acid",
+      "generic_name": "Salicylic acid",
+      "molecules": [
+        "Salicylic acid"
+      ],
+      "strength": "3-6%",
+      "form": "ointment",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-169",
+      "brand_name": "Coal tar + Salicylic acid",
+      "generic_name": "Coal tar + Salicylic acid",
+      "molecules": [
+        "Coal tar",
+        "Salicylic acid"
+      ],
+      "strength": "1% + 3%",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-170",
+      "brand_name": "Permethrin",
+      "generic_name": "Permethrin",
+      "molecules": [
+        "Permethrin"
+      ],
+      "strength": "5%",
+      "form": "cream",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-171",
+      "brand_name": "Permethrin",
+      "generic_name": "Permethrin",
+      "molecules": [
+        "Permethrin"
+      ],
+      "strength": "1%",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-172",
+      "brand_name": "Povidone iodine",
+      "generic_name": "Povidone iodine",
+      "molecules": [
+        "Povidone iodine"
+      ],
+      "strength": "10%",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Povidone-iodine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-173",
+      "brand_name": "Xylometazoline",
+      "generic_name": "Xylometazoline",
+      "molecules": [
+        "Xylometazoline"
+      ],
+      "strength": "0.05%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-174",
+      "brand_name": "Xylometazoline",
+      "generic_name": "Xylometazoline",
+      "molecules": [
+        "Xylometazoline"
+      ],
+      "strength": "0.1%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-175",
+      "brand_name": "Budesonide",
+      "generic_name": "Budesonide",
+      "molecules": [
+        "Budesonide"
+      ],
+      "strength": "100 mcg/dose",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-176",
+      "brand_name": "Omeprazole",
+      "generic_name": "Omeprazole",
+      "molecules": [
+        "Omeprazole"
+      ],
+      "strength": "20 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-177",
+      "brand_name": "Omeprazole",
+      "generic_name": "Omeprazole",
+      "molecules": [
+        "Omeprazole"
+      ],
+      "strength": "40 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-178",
+      "brand_name": "Pantoprazole",
+      "generic_name": "Pantoprazole",
+      "molecules": [
+        "Pantoprazole"
+      ],
+      "strength": "40 mg",
+      "form": "injection",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-179",
+      "brand_name": "Domperidone",
+      "generic_name": "Domperidone",
+      "molecules": [
+        "Domperidone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-180",
+      "brand_name": "Metoclopramide",
+      "generic_name": "Metoclopramide",
+      "molecules": [
+        "Metoclopramide"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-181",
+      "brand_name": "Ondansetron",
+      "generic_name": "Ondansetron",
+      "molecules": [
+        "Ondansetron"
+      ],
+      "strength": "4 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-182",
+      "brand_name": "Ondansetron",
+      "generic_name": "Ondansetron",
+      "molecules": [
+        "Ondansetron"
+      ],
+      "strength": "2 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-183",
+      "brand_name": "Dicyclomine",
+      "generic_name": "Dicyclomine",
+      "molecules": [
+        "Dicyclomine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Dicycloverine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-184",
+      "brand_name": "Mesalazine",
+      "generic_name": "Mesalazine",
+      "molecules": [
+        "Mesalazine"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Mesalamine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-185",
+      "brand_name": "Bisacodyl",
+      "generic_name": "Bisacodyl",
+      "molecules": [
+        "Bisacodyl"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-186",
+      "brand_name": "Lactulose",
+      "generic_name": "Lactulose",
+      "molecules": [
+        "Lactulose"
+      ],
+      "strength": "10 g/15 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-187",
+      "brand_name": "Oral rehydration salts",
+      "generic_name": "Oral rehydration salts",
+      "molecules": [
+        "Oral rehydration salts"
+      ],
+      "strength": "per sachet",
+      "form": "sachet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "ORS"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-188",
+      "brand_name": "Zinc sulphate",
+      "generic_name": "Zinc sulphate",
+      "molecules": [
+        "Zinc sulphate"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Zinc sulfate"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-189",
+      "brand_name": "Fludrocortisone",
+      "generic_name": "Fludrocortisone",
+      "molecules": [
+        "Fludrocortisone"
+      ],
+      "strength": "0.1 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-190",
+      "brand_name": "Ethinylestradiol + Levonorgestrel",
+      "generic_name": "Ethinylestradiol + Levonorgestrel",
+      "molecules": [
+        "Ethinylestradiol",
+        "Levonorgestrel"
+      ],
+      "strength": "0.03/0.15 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-191",
+      "brand_name": "Levonorgestrel",
+      "generic_name": "Levonorgestrel",
+      "molecules": [
+        "Levonorgestrel"
+      ],
+      "strength": "1.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-192",
+      "brand_name": "Medroxyprogesterone acetate",
+      "generic_name": "Medroxyprogesterone acetate",
+      "molecules": [
+        "Medroxyprogesterone acetate"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Medroxyprogesterone"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-193",
+      "brand_name": "Norethisterone",
+      "generic_name": "Norethisterone",
+      "molecules": [
+        "Norethisterone"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Norethindrone"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-194",
+      "brand_name": "Clomiphene citrate",
+      "generic_name": "Clomiphene citrate",
+      "molecules": [
+        "Clomiphene citrate"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Clomifene"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-195",
+      "brand_name": "Mifepristone",
+      "generic_name": "Mifepristone",
+      "molecules": [
+        "Mifepristone"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-196",
+      "brand_name": "Misoprostol",
+      "generic_name": "Misoprostol",
+      "molecules": [
+        "Misoprostol"
+      ],
+      "strength": "200 mcg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-197",
+      "brand_name": "Glimepiride",
+      "generic_name": "Glimepiride",
+      "molecules": [
+        "Glimepiride"
+      ],
+      "strength": "1 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-198",
+      "brand_name": "Glimepiride",
+      "generic_name": "Glimepiride",
+      "molecules": [
+        "Glimepiride"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-199",
+      "brand_name": "Metformin",
+      "generic_name": "Metformin",
+      "molecules": [
+        "Metformin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-200",
+      "brand_name": "Metformin",
+      "generic_name": "Metformin",
+      "molecules": [
+        "Metformin"
+      ],
+      "strength": "1000 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-201",
+      "brand_name": "Teneligliptin",
+      "generic_name": "Teneligliptin",
+      "molecules": [
+        "Teneligliptin"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-202",
+      "brand_name": "Insulin (Soluble)",
+      "generic_name": "Insulin",
+      "molecules": [
+        "Insulin"
+      ],
+      "strength": "40 IU/ml",
+      "form": "injection",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Regular insulin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-203",
+      "brand_name": "Insulin (NPH)",
+      "generic_name": "Insulin",
+      "molecules": [
+        "Insulin"
+      ],
+      "strength": "40 IU/ml",
+      "form": "injection",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Isophane insulin"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-204",
+      "brand_name": "Insulin Premix 30:70",
+      "generic_name": "Insulin",
+      "molecules": [
+        "Insulin"
+      ],
+      "strength": "40 IU/ml",
+      "form": "injection",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-205",
+      "brand_name": "Insulin Glargine",
+      "generic_name": "Insulin Glargine",
+      "molecules": [
+        "Insulin Glargine"
+      ],
+      "strength": "100 IU/ml",
+      "form": "injection",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glargine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-206",
+      "brand_name": "Carbimazole",
+      "generic_name": "Carbimazole",
+      "molecules": [
+        "Carbimazole"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-207",
+      "brand_name": "Carbimazole",
+      "generic_name": "Carbimazole",
+      "molecules": [
+        "Carbimazole"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-208",
+      "brand_name": "Levothyroxine",
+      "generic_name": "Levothyroxine",
+      "molecules": [
+        "Levothyroxine"
+      ],
+      "strength": "25 mcg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-209",
+      "brand_name": "Levothyroxine",
+      "generic_name": "Levothyroxine",
+      "molecules": [
+        "Levothyroxine"
+      ],
+      "strength": "50 mcg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-210",
+      "brand_name": "Levothyroxine",
+      "generic_name": "Levothyroxine",
+      "molecules": [
+        "Levothyroxine"
+      ],
+      "strength": "100 mcg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-211",
+      "brand_name": "Timolol",
+      "generic_name": "Timolol",
+      "molecules": [
+        "Timolol"
+      ],
+      "strength": "0.5%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-212",
+      "brand_name": "Latanoprost",
+      "generic_name": "Latanoprost",
+      "molecules": [
+        "Latanoprost"
+      ],
+      "strength": "0.005%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-213",
+      "brand_name": "Pilocarpine",
+      "generic_name": "Pilocarpine",
+      "molecules": [
+        "Pilocarpine"
+      ],
+      "strength": "2%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-214",
+      "brand_name": "Acetazolamide",
+      "generic_name": "Acetazolamide",
+      "molecules": [
+        "Acetazolamide"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-215",
+      "brand_name": "Ciprofloxacin",
+      "generic_name": "Ciprofloxacin",
+      "molecules": [
+        "Ciprofloxacin"
+      ],
+      "strength": "0.3%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-216",
+      "brand_name": "Natamycin",
+      "generic_name": "Natamycin",
+      "molecules": [
+        "Natamycin"
+      ],
+      "strength": "5%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-217",
+      "brand_name": "Prednisolone",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "1%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-218",
+      "brand_name": "Acyclovir",
+      "generic_name": "Acyclovir",
+      "molecules": [
+        "Acyclovir"
+      ],
+      "strength": "3%",
+      "form": "ointment",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [
+        "Aciclovir"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-219",
+      "brand_name": "Carboxymethylcellulose",
+      "generic_name": "Carboxymethylcellulose",
+      "molecules": [
+        "Carboxymethylcellulose"
+      ],
+      "strength": "0.5%",
+      "form": "drops",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "ophthalmic",
+      "aliases": [
+        "Carmellose sodium"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-220",
+      "brand_name": "Clozapine",
+      "generic_name": "Clozapine",
+      "molecules": [
+        "Clozapine"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-221",
+      "brand_name": "Risperidone",
+      "generic_name": "Risperidone",
+      "molecules": [
+        "Risperidone"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-222",
+      "brand_name": "Haloperidol",
+      "generic_name": "Haloperidol",
+      "molecules": [
+        "Haloperidol"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-223",
+      "brand_name": "Escitalopram",
+      "generic_name": "Escitalopram",
+      "molecules": [
+        "Escitalopram"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-224",
+      "brand_name": "Escitalopram",
+      "generic_name": "Escitalopram",
+      "molecules": [
+        "Escitalopram"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-225",
+      "brand_name": "Fluoxetine",
+      "generic_name": "Fluoxetine",
+      "molecules": [
+        "Fluoxetine"
+      ],
+      "strength": "20 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-226",
+      "brand_name": "Lithium",
+      "generic_name": "Lithium",
+      "molecules": [
+        "Lithium"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Lithium carbonate"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-227",
+      "brand_name": "Clonazepam",
+      "generic_name": "Clonazepam",
+      "molecules": [
+        "Clonazepam"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-228",
+      "brand_name": "Zolpidem",
+      "generic_name": "Zolpidem",
+      "molecules": [
+        "Zolpidem"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-229",
+      "brand_name": "Clomipramine",
+      "generic_name": "Clomipramine",
+      "molecules": [
+        "Clomipramine"
+      ],
+      "strength": "25 mg",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-230",
+      "brand_name": "Nicotine",
+      "generic_name": "Nicotine",
+      "molecules": [
+        "Nicotine"
+      ],
+      "strength": "2 mg",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Nicotine gum",
+        "NRT"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-231",
+      "brand_name": "Nicotine",
+      "generic_name": "Nicotine",
+      "molecules": [
+        "Nicotine"
+      ],
+      "strength": "4 mg",
+      "form": "other",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Nicotine gum",
+        "NRT"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-232",
+      "brand_name": "Salbutamol",
+      "generic_name": "Salbutamol",
+      "molecules": [
+        "Salbutamol"
+      ],
+      "strength": "4 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Albuterol"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-233",
+      "brand_name": "Salbutamol",
+      "generic_name": "Salbutamol",
+      "molecules": [
+        "Salbutamol"
+      ],
+      "strength": "2 mg/5 ml",
+      "form": "syrup",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Albuterol"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-234",
+      "brand_name": "Salbutamol",
+      "generic_name": "Salbutamol",
+      "molecules": [
+        "Salbutamol"
+      ],
+      "strength": "100 mcg/dose",
+      "form": "inhaler",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Albuterol"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-235",
+      "brand_name": "Budesonide",
+      "generic_name": "Budesonide",
+      "molecules": [
+        "Budesonide"
+      ],
+      "strength": "200 mcg/dose",
+      "form": "inhaler",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-236",
+      "brand_name": "Budesonide + Formoterol",
+      "generic_name": "Budesonide + Formoterol",
+      "molecules": [
+        "Budesonide",
+        "Formoterol"
+      ],
+      "strength": "200/6 mcg",
+      "form": "inhaler",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-237",
+      "brand_name": "Ipratropium",
+      "generic_name": "Ipratropium",
+      "molecules": [
+        "Ipratropium"
+      ],
+      "strength": "20 mcg/dose",
+      "form": "inhaler",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Ipratropium bromide"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-238",
+      "brand_name": "Tiotropium",
+      "generic_name": "Tiotropium",
+      "molecules": [
+        "Tiotropium"
+      ],
+      "strength": "18 mcg/dose",
+      "form": "inhaler",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Tiotropium bromide"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-239",
+      "brand_name": "Montelukast",
+      "generic_name": "Montelukast",
+      "molecules": [
+        "Montelukast"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-240",
+      "brand_name": "Montelukast",
+      "generic_name": "Montelukast",
+      "molecules": [
+        "Montelukast"
+      ],
+      "strength": "4 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-241",
+      "brand_name": "Ascorbic acid",
+      "generic_name": "Ascorbic acid",
+      "molecules": [
+        "Ascorbic acid"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin C"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-242",
+      "brand_name": "Calcium carbonate",
+      "generic_name": "Calcium carbonate",
+      "molecules": [
+        "Calcium carbonate"
+      ],
+      "strength": "625 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-243",
+      "brand_name": "Calcium carbonate",
+      "generic_name": "Calcium carbonate",
+      "molecules": [
+        "Calcium carbonate"
+      ],
+      "strength": "1250 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-244",
+      "brand_name": "Cholecalciferol",
+      "generic_name": "Cholecalciferol",
+      "molecules": [
+        "Cholecalciferol"
+      ],
+      "strength": "60000 IU",
+      "form": "capsule",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin D3"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-245",
+      "brand_name": "Cholecalciferol",
+      "generic_name": "Cholecalciferol",
+      "molecules": [
+        "Cholecalciferol"
+      ],
+      "strength": "1000 IU",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin D3"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-246",
+      "brand_name": "Pyridoxine",
+      "generic_name": "Pyridoxine",
+      "molecules": [
+        "Pyridoxine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin B6"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-247",
+      "brand_name": "Pyridoxine",
+      "generic_name": "Pyridoxine",
+      "molecules": [
+        "Pyridoxine"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin B6"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-248",
+      "brand_name": "Riboflavin",
+      "generic_name": "Riboflavin",
+      "molecules": [
+        "Riboflavin"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin B2"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-249",
+      "brand_name": "Thiamine",
+      "generic_name": "Thiamine",
+      "molecules": [
+        "Thiamine"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Vitamin B1"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    },
+    {
+      "id": "nlem-250",
+      "brand_name": "Vitamin A",
+      "generic_name": "Vitamin A",
+      "molecules": [
+        "Vitamin A"
+      ],
+      "strength": "50000 IU",
+      "form": "tablet",
+      "is_generic": true,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Retinol"
+      ],
+      "source": [
+        {
+          "label": "NLEM 2022 (CDSCO)",
+          "url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf"
+        }
+      ]
+    }
+  ]
+}

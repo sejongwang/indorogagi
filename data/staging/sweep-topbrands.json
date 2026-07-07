@@ -1,0 +1,4183 @@
+{
+  "source_sweep": "topbrands",
+  "collected_at": "2026-07-07",
+  "entries": [
+    {
+      "id": "topbrands-001",
+      "brand_name": "Mounjaro",
+      "generic_name": "Tirzepatide",
+      "molecules": [
+        "Tirzepatide"
+      ],
+      "strength": "2.5 mg",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 1,
+      "category": "antidiabetic",
+      "aliases": [
+        "Tirzepatide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "Apollo Pharmacy (Mounjaro 2.5 mg vial)",
+          "url": "https://www.apollopharmacy.in/medicine/mounjaro-2-5-mg-pfp-injection-0-5-ml"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-002",
+      "brand_name": "Mounjaro",
+      "generic_name": "Tirzepatide",
+      "molecules": [
+        "Tirzepatide"
+      ],
+      "strength": "5 mg",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 1,
+      "category": "antidiabetic",
+      "aliases": [
+        "Tirzepatide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "Apollo Pharmacy (Mounjaro 2.5 mg vial)",
+          "url": "https://www.apollopharmacy.in/medicine/mounjaro-2-5-mg-pfp-injection-0-5-ml"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-003",
+      "brand_name": "Augmentin 625 Duo",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic Acid"
+      ],
+      "strength": "500/125 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 2,
+      "category": "antibiotic",
+      "aliases": [
+        "Augmentin",
+        "Augmentin 625",
+        "Amoxicillin-Clavulanate"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Business Standard Oct 2025 (Pharmarack monthly)",
+          "url": "https://www.business-standard.com/companies/quarterly-results/mounjaro-crosses-rs-100-cr-sales-india-top-selling-drug-october-2025-125110701830_1.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Augmentin%20625%20Duo"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-004",
+      "brand_name": "Augmentin 1000 Duo",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic Acid"
+      ],
+      "strength": "875/125 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 2,
+      "category": "antibiotic",
+      "aliases": [
+        "Augmentin",
+        "Augmentin 1g",
+        "Amoxicillin-Clavulanate"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Augmentin%201000%20Duo"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-005",
+      "brand_name": "Augmentin DDS",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic Acid"
+      ],
+      "strength": "200/28.5 mg per 5 ml",
+      "form": "suspension",
+      "is_generic": false,
+      "priority_rank": 2,
+      "category": "antibiotic",
+      "aliases": [
+        "Augmentin",
+        "Augmentin DDS Suspension"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Augmentin%20DDS"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-006",
+      "brand_name": "Glycomet-GP 1",
+      "generic_name": "Glimepiride + Metformin",
+      "molecules": [
+        "Glimepiride",
+        "Metformin"
+      ],
+      "strength": "1/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 3,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glycomet GP1",
+        "Glycomet GP",
+        "Glimepiride + Metformin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Glycomet-GP%201"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-007",
+      "brand_name": "Glycomet-GP 2",
+      "generic_name": "Glimepiride + Metformin",
+      "molecules": [
+        "Glimepiride",
+        "Metformin"
+      ],
+      "strength": "2/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 3,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glycomet GP2",
+        "Glycomet GP"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Glycomet-GP%202"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-008",
+      "brand_name": "Glycomet-GP 0.5",
+      "generic_name": "Glimepiride + Metformin",
+      "molecules": [
+        "Glimepiride",
+        "Metformin"
+      ],
+      "strength": "0.5/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 3,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glycomet GP 0.5",
+        "Glycomet GP"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Glycomet-GP%200.5"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-009",
+      "brand_name": "Foracort 200",
+      "generic_name": "Budesonide + Formoterol",
+      "molecules": [
+        "Budesonide",
+        "Formoterol"
+      ],
+      "strength": "200/6 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": 4,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Foracort",
+        "Foracort Inhaler"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Foracort%20200%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-010",
+      "brand_name": "Foracort 400",
+      "generic_name": "Budesonide + Formoterol",
+      "molecules": [
+        "Budesonide",
+        "Formoterol"
+      ],
+      "strength": "400/6 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": 4,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Foracort"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Foracort%20400%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-011",
+      "brand_name": "Pan 40",
+      "generic_name": "Pantoprazole",
+      "molecules": [
+        "Pantoprazole"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 5,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pan",
+        "Pan-40",
+        "Pantoprazole"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pan%2040"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-012",
+      "brand_name": "Pan 20",
+      "generic_name": "Pantoprazole",
+      "molecules": [
+        "Pantoprazole"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 5,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pan",
+        "Pan-20",
+        "Pantoprazole"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pan%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-013",
+      "brand_name": "Mixtard 30 HM",
+      "generic_name": "Human Insulin (30/70 Biphasic)",
+      "molecules": [
+        "Human Insulin"
+      ],
+      "strength": "40 IU/ml",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 6,
+      "category": "antidiabetic",
+      "aliases": [
+        "Human Mixtard",
+        "Mixtard",
+        "Human Mixtard 30/70"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Netmeds (Human Mixtard 30/70 40 IU vial)",
+          "url": "https://www.netmeds.com/prescriptions/human-mixtard-30-70-40iu-injection-1x10ml"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-014",
+      "brand_name": "Liv.52",
+      "generic_name": "Herbal hepatoprotective combination (Ayurvedic)",
+      "molecules": [
+        "Herbal hepatoprotective combination"
+      ],
+      "strength": "per tablet",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 7,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Liv 52",
+        "Liv-52"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Liv.52"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-015",
+      "brand_name": "Liv.52 DS",
+      "generic_name": "Herbal hepatoprotective combination (Ayurvedic)",
+      "molecules": [
+        "Herbal hepatoprotective combination"
+      ],
+      "strength": "per tablet",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 7,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Liv 52 DS"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Liv.52%20DS"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-016",
+      "brand_name": "Zerodol-SP",
+      "generic_name": "Aceclofenac + Paracetamol + Serratiopeptidase",
+      "molecules": [
+        "Aceclofenac",
+        "Paracetamol",
+        "Serratiopeptidase"
+      ],
+      "strength": "100/325/15 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 8,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Zerodol SP",
+        "Aceclofenac"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zerodol%20SP"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-017",
+      "brand_name": "Clavam 625",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic Acid"
+      ],
+      "strength": "500/125 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 9,
+      "category": "antibiotic",
+      "aliases": [
+        "Clavam",
+        "Amoxicillin-Clavulanate"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Clavam%20625"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-018",
+      "brand_name": "Clavam 375",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "molecules": [
+        "Amoxicillin",
+        "Clavulanic Acid"
+      ],
+      "strength": "250/125 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 9,
+      "category": "antibiotic",
+      "aliases": [
+        "Clavam"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Clavam%20375"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-019",
+      "brand_name": "Pan-D",
+      "generic_name": "Pantoprazole + Domperidone",
+      "molecules": [
+        "Pantoprazole",
+        "Domperidone"
+      ],
+      "strength": "40/30 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": 10,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pan D",
+        "Pantoprazole + Domperidone"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pan%20D"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-020",
+      "brand_name": "Monocef",
+      "generic_name": "Ceftriaxone",
+      "molecules": [
+        "Ceftriaxone"
+      ],
+      "strength": "1 g",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 11,
+      "category": "antibiotic",
+      "aliases": [
+        "Ceftriaxone",
+        "Monocef Injection"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Monocef%201gm%20Injection"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-021",
+      "brand_name": "Udiliv 300",
+      "generic_name": "Ursodeoxycholic Acid",
+      "molecules": [
+        "Ursodeoxycholic Acid"
+      ],
+      "strength": "300 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 12,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Udiliv",
+        "UDCA",
+        "Ursodeoxycholic Acid"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Udiliv%20300"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-022",
+      "brand_name": "Udiliv 150",
+      "generic_name": "Ursodeoxycholic Acid",
+      "molecules": [
+        "Ursodeoxycholic Acid"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 12,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Udiliv"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Udiliv%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-023",
+      "brand_name": "Thyronorm",
+      "generic_name": "Thyroxine Sodium",
+      "molecules": [
+        "Thyroxine Sodium"
+      ],
+      "strength": "25 mcg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 13,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine",
+        "Levothyroxine",
+        "Thyronorm 25"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Thyronorm%2025%20mcg"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-024",
+      "brand_name": "Thyronorm",
+      "generic_name": "Thyroxine Sodium",
+      "molecules": [
+        "Thyroxine Sodium"
+      ],
+      "strength": "50 mcg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 13,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine",
+        "Levothyroxine",
+        "Thyronorm 50"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Thyronorm%2050%20mcg"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-025",
+      "brand_name": "Thyronorm",
+      "generic_name": "Thyroxine Sodium",
+      "molecules": [
+        "Thyroxine Sodium"
+      ],
+      "strength": "100 mcg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 13,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Thyroxine",
+        "Levothyroxine",
+        "Thyronorm 100"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Thyronorm%20100%20mcg"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-026",
+      "brand_name": "Duolin Inhaler",
+      "generic_name": "Levosalbutamol + Ipratropium Bromide",
+      "molecules": [
+        "Levosalbutamol",
+        "Ipratropium Bromide"
+      ],
+      "strength": "50/20 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": 14,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Duolin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Duolin%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-027",
+      "brand_name": "Duolin Respules",
+      "generic_name": "Levosalbutamol + Ipratropium Bromide",
+      "molecules": [
+        "Levosalbutamol",
+        "Ipratropium Bromide"
+      ],
+      "strength": "1.25 mg/500 mcg per 2.5 ml",
+      "form": "other",
+      "is_generic": false,
+      "priority_rank": 14,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Duolin",
+        "Duolin Respule"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Duolin%20Respules"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-028",
+      "brand_name": "Cilacar 10",
+      "generic_name": "Cilnidipine",
+      "molecules": [
+        "Cilnidipine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 15,
+      "category": "cardiovascular",
+      "aliases": [
+        "Cilacar",
+        "Cilnidipine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cilacar%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-029",
+      "brand_name": "Cilacar 5",
+      "generic_name": "Cilnidipine",
+      "molecules": [
+        "Cilnidipine"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 15,
+      "category": "cardiovascular",
+      "aliases": [
+        "Cilacar",
+        "Cilnidipine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cilacar%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-030",
+      "brand_name": "Cilacar 20",
+      "generic_name": "Cilnidipine",
+      "molecules": [
+        "Cilnidipine"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 15,
+      "category": "cardiovascular",
+      "aliases": [
+        "Cilacar",
+        "Cilnidipine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cilacar%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-031",
+      "brand_name": "Betadine Ointment",
+      "generic_name": "Povidone Iodine",
+      "molecules": [
+        "Povidone Iodine"
+      ],
+      "strength": "10% w/w",
+      "form": "ointment",
+      "is_generic": false,
+      "priority_rank": 16,
+      "category": "dermatology",
+      "aliases": [
+        "Betadine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Betadine%20Ointment"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-032",
+      "brand_name": "Betadine Gargle",
+      "generic_name": "Povidone Iodine",
+      "molecules": [
+        "Povidone Iodine"
+      ],
+      "strength": "2% w/v",
+      "form": "other",
+      "is_generic": false,
+      "priority_rank": 16,
+      "category": "dermatology",
+      "aliases": [
+        "Betadine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Betadine%20Gargle"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-033",
+      "brand_name": "Telma 40",
+      "generic_name": "Telmisartan",
+      "molecules": [
+        "Telmisartan"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 17,
+      "category": "cardiovascular",
+      "aliases": [
+        "Telma",
+        "Telmisartan"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Telma%2040"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-034",
+      "brand_name": "Telma 20",
+      "generic_name": "Telmisartan",
+      "molecules": [
+        "Telmisartan"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 17,
+      "category": "cardiovascular",
+      "aliases": [
+        "Telma",
+        "Telmisartan"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Telma%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-035",
+      "brand_name": "Telma 80",
+      "generic_name": "Telmisartan",
+      "molecules": [
+        "Telmisartan"
+      ],
+      "strength": "80 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 17,
+      "category": "cardiovascular",
+      "aliases": [
+        "Telma",
+        "Telmisartan"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Telma%2080"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-036",
+      "brand_name": "Ryzodeg",
+      "generic_name": "Insulin Degludec + Insulin Aspart",
+      "molecules": [
+        "Insulin Degludec",
+        "Insulin Aspart"
+      ],
+      "strength": "100 IU/ml",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 18,
+      "category": "antidiabetic",
+      "aliases": [
+        "Ryzodeg FlexTouch"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ryzodeg"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-037",
+      "brand_name": "Budecort 200",
+      "generic_name": "Budesonide",
+      "molecules": [
+        "Budesonide"
+      ],
+      "strength": "200 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": 19,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Budecort",
+        "Budesonide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Budecort%20200%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-038",
+      "brand_name": "Budecort 100",
+      "generic_name": "Budesonide",
+      "molecules": [
+        "Budesonide"
+      ],
+      "strength": "100 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": 19,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Budecort"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Budecort%20100%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-039",
+      "brand_name": "Ecosprin-AV 75",
+      "generic_name": "Aspirin + Atorvastatin",
+      "molecules": [
+        "Aspirin",
+        "Atorvastatin"
+      ],
+      "strength": "75/10 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": 20,
+      "category": "cardiovascular",
+      "aliases": [
+        "Ecosprin AV",
+        "Aspirin + Atorvastatin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ecosprin-AV%2075"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-040",
+      "brand_name": "Ecosprin-AV 150",
+      "generic_name": "Aspirin + Atorvastatin",
+      "molecules": [
+        "Aspirin",
+        "Atorvastatin"
+      ],
+      "strength": "150/10 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": 20,
+      "category": "cardiovascular",
+      "aliases": [
+        "Ecosprin AV"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ecosprin-AV%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-041",
+      "brand_name": "Manforce 100",
+      "generic_name": "Sildenafil",
+      "molecules": [
+        "Sildenafil"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 21,
+      "category": "other",
+      "aliases": [
+        "Manforce",
+        "Sildenafil"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Manforce%20100"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-042",
+      "brand_name": "Manforce 50",
+      "generic_name": "Sildenafil",
+      "molecules": [
+        "Sildenafil"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 21,
+      "category": "other",
+      "aliases": [
+        "Manforce"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Manforce%2050"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-043",
+      "brand_name": "Levipil 500",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 22,
+      "category": "neuro_psych",
+      "aliases": [
+        "Levipil",
+        "Levetiracetam"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Levipil%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-044",
+      "brand_name": "Levipil 250",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 22,
+      "category": "neuro_psych",
+      "aliases": [
+        "Levipil"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Levipil%20250"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-045",
+      "brand_name": "Ultracet",
+      "generic_name": "Tramadol + Paracetamol",
+      "molecules": [
+        "Tramadol",
+        "Paracetamol"
+      ],
+      "strength": "37.5/325 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 23,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Ultracet Semi",
+        "Tramadol + Paracetamol"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ultracet"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-046",
+      "brand_name": "Lantus",
+      "generic_name": "Insulin Glargine",
+      "molecules": [
+        "Insulin Glargine"
+      ],
+      "strength": "100 IU/ml",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 24,
+      "category": "antidiabetic",
+      "aliases": [
+        "Lantus Solostar",
+        "Insulin Glargine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Lantus"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-047",
+      "brand_name": "Dexorange Syrup",
+      "generic_name": "Ferric Ammonium Citrate + Cyanocobalamin + Folic Acid",
+      "molecules": [
+        "Ferric Ammonium Citrate",
+        "Cyanocobalamin",
+        "Folic Acid"
+      ],
+      "strength": "per 15 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": 25,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Dexorange"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dexorange%20Syrup"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-048",
+      "brand_name": "Electral",
+      "generic_name": "Oral Rehydration Salts (WHO-ORS)",
+      "molecules": [
+        "Oral Rehydration Salts"
+      ],
+      "strength": "21.8 g",
+      "form": "sachet",
+      "is_generic": false,
+      "priority_rank": 26,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Electral Powder",
+        "ORS"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "PharmEasy (Electral Powder 21.8 g)",
+          "url": "https://pharmeasy.in/online-medicine-order/electral-powder-21-80gm-45104"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-049",
+      "brand_name": "Rosuvas 10",
+      "generic_name": "Rosuvastatin",
+      "molecules": [
+        "Rosuvastatin"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 27,
+      "category": "cardiovascular",
+      "aliases": [
+        "Rosuvas",
+        "Rosuvastatin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Rosuvas%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-050",
+      "brand_name": "Rosuvas 20",
+      "generic_name": "Rosuvastatin",
+      "molecules": [
+        "Rosuvastatin"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 27,
+      "category": "cardiovascular",
+      "aliases": [
+        "Rosuvas"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Rosuvas%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-051",
+      "brand_name": "Brilinta 90",
+      "generic_name": "Ticagrelor",
+      "molecules": [
+        "Ticagrelor"
+      ],
+      "strength": "90 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 28,
+      "category": "cardiovascular",
+      "aliases": [
+        "Brilinta",
+        "Ticagrelor"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Brilinta%2090"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-052",
+      "brand_name": "Brilinta 60",
+      "generic_name": "Ticagrelor",
+      "molecules": [
+        "Ticagrelor"
+      ],
+      "strength": "60 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 28,
+      "category": "cardiovascular",
+      "aliases": [
+        "Brilinta"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Brilinta%2060"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-053",
+      "brand_name": "Pantop 40",
+      "generic_name": "Pantoprazole",
+      "molecules": [
+        "Pantoprazole"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 29,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pantop",
+        "Pantoprazole"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pantop%2040"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-054",
+      "brand_name": "Dytor 10",
+      "generic_name": "Torasemide",
+      "molecules": [
+        "Torasemide"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 30,
+      "category": "cardiovascular",
+      "aliases": [
+        "Dytor",
+        "Torsemide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dytor%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-055",
+      "brand_name": "Dytor 20",
+      "generic_name": "Torasemide",
+      "molecules": [
+        "Torasemide"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 30,
+      "category": "cardiovascular",
+      "aliases": [
+        "Dytor"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dytor%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-056",
+      "brand_name": "Vertin 16",
+      "generic_name": "Betahistine",
+      "molecules": [
+        "Betahistine"
+      ],
+      "strength": "16 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 31,
+      "category": "neuro_psych",
+      "aliases": [
+        "Vertin",
+        "Betahistine"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Vertin%2016"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-057",
+      "brand_name": "Vertin 8",
+      "generic_name": "Betahistine",
+      "molecules": [
+        "Betahistine"
+      ],
+      "strength": "8 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 31,
+      "category": "neuro_psych",
+      "aliases": [
+        "Vertin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Vertin%208"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-058",
+      "brand_name": "Zincovit",
+      "generic_name": "Multivitamin + Multimineral",
+      "molecules": [
+        "Multivitamin",
+        "Multimineral"
+      ],
+      "strength": "per tablet",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 32,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Zincovit Tablet"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zincovit"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-059",
+      "brand_name": "Zincovit Syrup",
+      "generic_name": "Multivitamin + Multimineral",
+      "molecules": [
+        "Multivitamin",
+        "Multimineral"
+      ],
+      "strength": "per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": 32,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Zincovit"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zincovit%20Syrup"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-060",
+      "brand_name": "Calpol 650",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "650 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 33,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Calpol",
+        "Paracetamol"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Calpol%20650"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-061",
+      "brand_name": "Calpol 500",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 33,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Calpol"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Calpol%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-062",
+      "brand_name": "Calpol 250 Suspension",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "250 mg per 5 ml",
+      "form": "suspension",
+      "is_generic": false,
+      "priority_rank": 33,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Calpol Paediatric"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Calpol%20250%20Suspension"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-063",
+      "brand_name": "T-Bact Ointment",
+      "generic_name": "Mupirocin",
+      "molecules": [
+        "Mupirocin"
+      ],
+      "strength": "2% w/w",
+      "form": "ointment",
+      "is_generic": false,
+      "priority_rank": 34,
+      "category": "dermatology",
+      "aliases": [
+        "T Bact",
+        "Mupirocin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=T-Bact%20Ointment"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-064",
+      "brand_name": "Gemer 1",
+      "generic_name": "Glimepiride + Metformin",
+      "molecules": [
+        "Glimepiride",
+        "Metformin"
+      ],
+      "strength": "1/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 35,
+      "category": "antidiabetic",
+      "aliases": [
+        "Gemer"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Gemer%201"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-065",
+      "brand_name": "Gemer 2",
+      "generic_name": "Glimepiride + Metformin",
+      "molecules": [
+        "Glimepiride",
+        "Metformin"
+      ],
+      "strength": "2/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 35,
+      "category": "antidiabetic",
+      "aliases": [
+        "Gemer"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Gemer%202"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-066",
+      "brand_name": "Levera 500",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 36,
+      "category": "neuro_psych",
+      "aliases": [
+        "Levera",
+        "Levetiracetam"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Levera%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-067",
+      "brand_name": "Levera 250",
+      "generic_name": "Levetiracetam",
+      "molecules": [
+        "Levetiracetam"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 36,
+      "category": "neuro_psych",
+      "aliases": [
+        "Levera"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Levera%20250"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-068",
+      "brand_name": "Dolo 650",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "650 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 37,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Dolo",
+        "Paracetamol"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dolo%20650"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-069",
+      "brand_name": "Dolo 500",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 37,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Dolo"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dolo%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-070",
+      "brand_name": "Dolo 250 Suspension",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "250 mg per 5 ml",
+      "form": "suspension",
+      "is_generic": false,
+      "priority_rank": 37,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Dolo"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dolo%20250%20Suspension"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-071",
+      "brand_name": "Mikacin 500",
+      "generic_name": "Amikacin",
+      "molecules": [
+        "Amikacin"
+      ],
+      "strength": "500 mg",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": 38,
+      "category": "antibiotic",
+      "aliases": [
+        "Mikacin",
+        "Amikacin"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Mikacin%20500%20Injection"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-072",
+      "brand_name": "Chymoral Forte",
+      "generic_name": "Trypsin-Chymotrypsin",
+      "molecules": [
+        "Trypsin-Chymotrypsin"
+      ],
+      "strength": "100000 AU",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": 39,
+      "category": "other",
+      "aliases": [
+        "Chymoral"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Chymoral%20Forte"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-073",
+      "brand_name": "Gabapin NT 100",
+      "generic_name": "Gabapentin + Nortriptyline",
+      "molecules": [
+        "Gabapentin",
+        "Nortriptyline"
+      ],
+      "strength": "100/10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Gabapin",
+        "Gabapin NT"
+      ],
+      "source": [
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Gabapin%20NT%20100"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-074",
+      "brand_name": "Gabapin NT 400",
+      "generic_name": "Gabapentin + Nortriptyline",
+      "molecules": [
+        "Gabapentin",
+        "Nortriptyline"
+      ],
+      "strength": "400/10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "neuro_psych",
+      "aliases": [
+        "Gabapin",
+        "Gabapin NT"
+      ],
+      "source": [
+        {
+          "label": "Pharmarack May 2026 top brands (BioSpectrum India)",
+          "url": "https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Gabapin%20NT%20400"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-075",
+      "brand_name": "Rybelsus 7",
+      "generic_name": "Semaglutide",
+      "molecules": [
+        "Semaglutide"
+      ],
+      "strength": "7 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Rybelsus",
+        "Semaglutide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Rybelsus%207"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-076",
+      "brand_name": "Rybelsus 14",
+      "generic_name": "Semaglutide",
+      "molecules": [
+        "Semaglutide"
+      ],
+      "strength": "14 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Rybelsus",
+        "Semaglutide"
+      ],
+      "source": [
+        {
+          "label": "PharmaTrac MAT Mar 2026 Top 40 Brands (Pharmarack / Medical Dialogues)",
+          "url": "https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf"
+        },
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Rybelsus%2014"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-077",
+      "brand_name": "Azithral 500",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Azithral",
+        "Azithromycin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Azithral%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-078",
+      "brand_name": "Azithral 250",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "250 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Azithral"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Azithral%20250"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-079",
+      "brand_name": "Pantocid 40",
+      "generic_name": "Pantoprazole",
+      "molecules": [
+        "Pantoprazole"
+      ],
+      "strength": "40 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pantocid",
+        "Pantoprazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pantocid%2040"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-080",
+      "brand_name": "Pantocid DSR",
+      "generic_name": "Pantoprazole + Domperidone",
+      "molecules": [
+        "Pantoprazole",
+        "Domperidone"
+      ],
+      "strength": "40/30 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Pantocid",
+        "Pantocid-DSR"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Pantocid%20DSR"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-081",
+      "brand_name": "Amlokind 5",
+      "generic_name": "Amlodipine",
+      "molecules": [
+        "Amlodipine"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Amlokind",
+        "Amlodipine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Amlokind%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-082",
+      "brand_name": "Amlokind 2.5",
+      "generic_name": "Amlodipine",
+      "molecules": [
+        "Amlodipine"
+      ],
+      "strength": "2.5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Amlokind"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Amlokind%202.5"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-083",
+      "brand_name": "Atorva 10",
+      "generic_name": "Atorvastatin",
+      "molecules": [
+        "Atorvastatin"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Atorva",
+        "Atorvastatin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Atorva%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-084",
+      "brand_name": "Atorva 20",
+      "generic_name": "Atorvastatin",
+      "molecules": [
+        "Atorvastatin"
+      ],
+      "strength": "20 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Atorva"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Atorva%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-085",
+      "brand_name": "Ascoril LS",
+      "generic_name": "Levosalbutamol + Ambroxol + Guaifenesin",
+      "molecules": [
+        "Levosalbutamol",
+        "Ambroxol",
+        "Guaifenesin"
+      ],
+      "strength": "per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Ascoril",
+        "Ascoril-LS",
+        "Ascoril LS Expectorant"
+      ],
+      "source": [
+        {
+          "label": "1mg (Ascoril LS Syrup)",
+          "url": "https://www.1mg.com/drugs/ascoril-ls-syrup-63412"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-086",
+      "brand_name": "Ascoril D Plus",
+      "generic_name": "Dextromethorphan + Phenylephrine + Chlorpheniramine Maleate",
+      "molecules": [
+        "Dextromethorphan",
+        "Phenylephrine",
+        "Chlorpheniramine Maleate"
+      ],
+      "strength": "per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Ascoril",
+        "Ascoril-D"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ascoril%20D%20Plus"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-087",
+      "brand_name": "Uprise-D3 60K",
+      "generic_name": "Cholecalciferol",
+      "molecules": [
+        "Cholecalciferol"
+      ],
+      "strength": "60000 IU",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Uprise D3",
+        "Vitamin D3",
+        "Cholecalciferol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Uprise-D3%2060K"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-088",
+      "brand_name": "Zentel 400",
+      "generic_name": "Albendazole",
+      "molecules": [
+        "Albendazole"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiparasitic",
+      "aliases": [
+        "Zentel",
+        "Albendazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zentel%20400"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-089",
+      "brand_name": "Cyclopam",
+      "generic_name": "Dicyclomine + Paracetamol",
+      "molecules": [
+        "Dicyclomine",
+        "Paracetamol"
+      ],
+      "strength": "20/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Cyclopam Tablet",
+        "Dicyclomine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cyclopam"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-090",
+      "brand_name": "Glycomet 500",
+      "generic_name": "Metformin",
+      "molecules": [
+        "Metformin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glycomet",
+        "Metformin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Glycomet%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-091",
+      "brand_name": "Glycomet 850",
+      "generic_name": "Metformin",
+      "molecules": [
+        "Metformin"
+      ],
+      "strength": "850 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Glycomet"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Glycomet%20850"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-092",
+      "brand_name": "Cremaffin Plus",
+      "generic_name": "Liquid Paraffin + Milk of Magnesia + Sodium Picosulfate",
+      "molecules": [
+        "Liquid Paraffin",
+        "Milk of Magnesia",
+        "Sodium Picosulfate"
+      ],
+      "strength": "per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Cremaffin"
+      ],
+      "source": [
+        {
+          "label": "1mg (Cremaffin Plus Syrup)",
+          "url": "https://www.1mg.com/drugs/cremaffin-plus-syrup-477515"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-093",
+      "brand_name": "Cremaffin",
+      "generic_name": "Liquid Paraffin + Milk of Magnesia",
+      "molecules": [
+        "Liquid Paraffin",
+        "Milk of Magnesia"
+      ],
+      "strength": "per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Cremaffin Syrup"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cremaffin"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-094",
+      "brand_name": "Nebicard 2.5",
+      "generic_name": "Nebivolol",
+      "molecules": [
+        "Nebivolol"
+      ],
+      "strength": "2.5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Nebicard",
+        "Nebivolol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Nebicard%202.5"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-095",
+      "brand_name": "Nebicard 5",
+      "generic_name": "Nebivolol",
+      "molecules": [
+        "Nebivolol"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Nebicard"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Nebicard%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-096",
+      "brand_name": "Ondem 4",
+      "generic_name": "Ondansetron",
+      "molecules": [
+        "Ondansetron"
+      ],
+      "strength": "4 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [
+        "Ondem",
+        "Ondansetron"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ondem%204"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-097",
+      "brand_name": "Ondem Syrup",
+      "generic_name": "Ondansetron",
+      "molecules": [
+        "Ondansetron"
+      ],
+      "strength": "2 mg per 5 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [
+        "Ondem"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ondem%20Syrup"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-098",
+      "brand_name": "Wysolone 10",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [
+        "Wysolone",
+        "Prednisolone"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Wysolone%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-099",
+      "brand_name": "Wysolone 5",
+      "generic_name": "Prednisolone",
+      "molecules": [
+        "Prednisolone"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [
+        "Wysolone"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Wysolone%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-100",
+      "brand_name": "Zerodol-P",
+      "generic_name": "Aceclofenac + Paracetamol",
+      "molecules": [
+        "Aceclofenac",
+        "Paracetamol"
+      ],
+      "strength": "100/325 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Zerodol P"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zerodol%20P"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-101",
+      "brand_name": "Monocef-O 200",
+      "generic_name": "Cefpodoxime",
+      "molecules": [
+        "Cefpodoxime"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Monocef O",
+        "Cefpodoxime"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Monocef-O%20200"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-102",
+      "brand_name": "Telma-H",
+      "generic_name": "Telmisartan + Hydrochlorothiazide",
+      "molecules": [
+        "Telmisartan",
+        "Hydrochlorothiazide"
+      ],
+      "strength": "40/12.5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Telma H",
+        "Telma-H 40"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Telma-H"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-103",
+      "brand_name": "Ecosprin 75",
+      "generic_name": "Aspirin",
+      "molecules": [
+        "Aspirin"
+      ],
+      "strength": "75 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Ecosprin",
+        "Aspirin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ecosprin%2075"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-104",
+      "brand_name": "Ecosprin 150",
+      "generic_name": "Aspirin",
+      "molecules": [
+        "Aspirin"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Ecosprin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ecosprin%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-105",
+      "brand_name": "Shelcal 500",
+      "generic_name": "Calcium Carbonate + Cholecalciferol",
+      "molecules": [
+        "Calcium Carbonate",
+        "Cholecalciferol"
+      ],
+      "strength": "500 mg/250 IU",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Shelcal",
+        "Calcium + Vitamin D3"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Shelcal%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-106",
+      "brand_name": "Becosules",
+      "generic_name": "Vitamin B-Complex + Vitamin C",
+      "molecules": [
+        "Vitamin B-Complex",
+        "Vitamin C"
+      ],
+      "strength": "per capsule",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Becosules Capsule",
+        "B-Complex"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Becosules"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-107",
+      "brand_name": "Neurobion Forte",
+      "generic_name": "Vitamin B-Complex",
+      "molecules": [
+        "Vitamin B-Complex"
+      ],
+      "strength": "per tablet",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Neurobion"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Neurobion%20Forte"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-108",
+      "brand_name": "Supradyn",
+      "generic_name": "Multivitamin + Multimineral",
+      "molecules": [
+        "Multivitamin",
+        "Multimineral"
+      ],
+      "strength": "per tablet",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Supradyn Daily"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Supradyn"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-109",
+      "brand_name": "Volini Gel",
+      "generic_name": "Diclofenac Diethylamine",
+      "molecules": [
+        "Diclofenac Diethylamine"
+      ],
+      "strength": "1.16% w/w",
+      "form": "gel",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Volini",
+        "Diclofenac Gel"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Volini%20Gel"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-110",
+      "brand_name": "Combiflam",
+      "generic_name": "Ibuprofen + Paracetamol",
+      "molecules": [
+        "Ibuprofen",
+        "Paracetamol"
+      ],
+      "strength": "400/325 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Ibuprofen + Paracetamol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Combiflam"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-111",
+      "brand_name": "Meftal-Spas",
+      "generic_name": "Dicyclomine + Mefenamic Acid",
+      "molecules": [
+        "Dicyclomine",
+        "Mefenamic Acid"
+      ],
+      "strength": "10/250 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Meftal Spas",
+        "Meftal"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Meftal-Spas"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-112",
+      "brand_name": "Allegra 120",
+      "generic_name": "Fexofenadine",
+      "molecules": [
+        "Fexofenadine"
+      ],
+      "strength": "120 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [
+        "Allegra",
+        "Fexofenadine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Allegra%20120"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-113",
+      "brand_name": "Allegra 180",
+      "generic_name": "Fexofenadine",
+      "molecules": [
+        "Fexofenadine"
+      ],
+      "strength": "180 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [
+        "Allegra"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Allegra%20180"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-114",
+      "brand_name": "Montair-LC",
+      "generic_name": "Montelukast + Levocetirizine",
+      "molecules": [
+        "Montelukast",
+        "Levocetirizine"
+      ],
+      "strength": "10/5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [
+        "Montair LC",
+        "Montelukast + Levocetirizine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Montair-LC"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-115",
+      "brand_name": "Asthalin 100 Inhaler",
+      "generic_name": "Salbutamol",
+      "molecules": [
+        "Salbutamol"
+      ],
+      "strength": "100 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Asthalin",
+        "Salbutamol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Asthalin%20100%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-116",
+      "brand_name": "Sinarest",
+      "generic_name": "Paracetamol + Chlorpheniramine Maleate + Phenylephrine",
+      "molecules": [
+        "Paracetamol",
+        "Chlorpheniramine Maleate",
+        "Phenylephrine"
+      ],
+      "strength": "500/2/10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Sinarest Tablet"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Sinarest"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-117",
+      "brand_name": "Cheston Cold",
+      "generic_name": "Paracetamol + Cetirizine + Phenylephrine",
+      "molecules": [
+        "Paracetamol",
+        "Cetirizine",
+        "Phenylephrine"
+      ],
+      "strength": "325/5/10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Cheston"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cheston%20Cold"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-118",
+      "brand_name": "Otrivin",
+      "generic_name": "Xylometazoline",
+      "molecules": [
+        "Xylometazoline"
+      ],
+      "strength": "0.1% w/v",
+      "form": "drops",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Otrivin Nasal Drops",
+        "Xylometazoline"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Otrivin"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-119",
+      "brand_name": "Digene Gel",
+      "generic_name": "Magnesium Hydroxide + Aluminium Hydroxide + Simethicone",
+      "molecules": [
+        "Magnesium Hydroxide",
+        "Aluminium Hydroxide",
+        "Simethicone"
+      ],
+      "strength": "per 10 ml",
+      "form": "gel",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Digene"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Digene%20Gel"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-120",
+      "brand_name": "Rantac 150",
+      "generic_name": "Ranitidine",
+      "molecules": [
+        "Ranitidine"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Rantac",
+        "Ranitidine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Rantac%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-121",
+      "brand_name": "Aciloc 150",
+      "generic_name": "Ranitidine",
+      "molecules": [
+        "Ranitidine"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Aciloc"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Aciloc%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-122",
+      "brand_name": "Omez 20",
+      "generic_name": "Omeprazole",
+      "molecules": [
+        "Omeprazole"
+      ],
+      "strength": "20 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Omez",
+        "Omeprazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Omez%2020"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-123",
+      "brand_name": "Taxim-O 200",
+      "generic_name": "Cefixime",
+      "molecules": [
+        "Cefixime"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Taxim O",
+        "Cefixime"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Taxim-O%20200"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-124",
+      "brand_name": "Zifi 200",
+      "generic_name": "Cefixime",
+      "molecules": [
+        "Cefixime"
+      ],
+      "strength": "200 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Zifi",
+        "Cefixime"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Zifi%20200"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-125",
+      "brand_name": "Ciplox 500",
+      "generic_name": "Ciprofloxacin",
+      "molecules": [
+        "Ciprofloxacin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Ciplox",
+        "Ciprofloxacin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ciplox%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-126",
+      "brand_name": "Metrogyl 400",
+      "generic_name": "Metronidazole",
+      "molecules": [
+        "Metronidazole"
+      ],
+      "strength": "400 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Metrogyl",
+        "Metronidazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Metrogyl%20400"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-127",
+      "brand_name": "Norflox-TZ",
+      "generic_name": "Norfloxacin + Tinidazole",
+      "molecules": [
+        "Norfloxacin",
+        "Tinidazole"
+      ],
+      "strength": "400/600 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Norflox TZ"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Norflox-TZ"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-128",
+      "brand_name": "O2",
+      "generic_name": "Ofloxacin + Ornidazole",
+      "molecules": [
+        "Ofloxacin",
+        "Ornidazole"
+      ],
+      "strength": "200/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "O2 Tablet",
+        "Ofloxacin + Ornidazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=O2%20Tablet"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-129",
+      "brand_name": "Azee 500",
+      "generic_name": "Azithromycin",
+      "molecules": [
+        "Azithromycin"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Azee",
+        "Azithromycin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Azee%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-130",
+      "brand_name": "Ceftum 500",
+      "generic_name": "Cefuroxime",
+      "molecules": [
+        "Cefuroxime"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antibiotic",
+      "aliases": [
+        "Ceftum",
+        "Cefuroxime"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Ceftum%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-131",
+      "brand_name": "Janumet 50/500",
+      "generic_name": "Sitagliptin + Metformin",
+      "molecules": [
+        "Sitagliptin",
+        "Metformin"
+      ],
+      "strength": "50/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Janumet"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Janumet%2050/500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-132",
+      "brand_name": "Januvia 100",
+      "generic_name": "Sitagliptin",
+      "molecules": [
+        "Sitagliptin"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Januvia",
+        "Sitagliptin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Januvia%20100"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-133",
+      "brand_name": "Amaryl 1",
+      "generic_name": "Glimepiride",
+      "molecules": [
+        "Glimepiride"
+      ],
+      "strength": "1 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Amaryl",
+        "Glimepiride"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Amaryl%201"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-134",
+      "brand_name": "Amaryl 2",
+      "generic_name": "Glimepiride",
+      "molecules": [
+        "Glimepiride"
+      ],
+      "strength": "2 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Amaryl"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Amaryl%202"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-135",
+      "brand_name": "Galvus Met 50/500",
+      "generic_name": "Vildagliptin + Metformin",
+      "molecules": [
+        "Vildagliptin",
+        "Metformin"
+      ],
+      "strength": "50/500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Galvus Met"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Galvus%20Met%2050/500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-136",
+      "brand_name": "Jardiance 10",
+      "generic_name": "Empagliflozin",
+      "molecules": [
+        "Empagliflozin"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Jardiance",
+        "Empagliflozin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Jardiance%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-137",
+      "brand_name": "Human Actrapid",
+      "generic_name": "Human Insulin (Soluble)",
+      "molecules": [
+        "Human Insulin"
+      ],
+      "strength": "40 IU/ml",
+      "form": "injection",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antidiabetic",
+      "aliases": [
+        "Actrapid"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Human%20Actrapid"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-138",
+      "brand_name": "Evion 400",
+      "generic_name": "Vitamin E",
+      "molecules": [
+        "Vitamin E"
+      ],
+      "strength": "400 mg",
+      "form": "capsule",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Evion",
+        "Tocopheryl Acetate"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Evion%20400"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-139",
+      "brand_name": "Limcee 500",
+      "generic_name": "Vitamin C",
+      "molecules": [
+        "Vitamin C"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Limcee",
+        "Ascorbic Acid"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Limcee%20500"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-140",
+      "brand_name": "Tayo 60K",
+      "generic_name": "Cholecalciferol",
+      "molecules": [
+        "Cholecalciferol"
+      ],
+      "strength": "60000 IU",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Tayo",
+        "Vitamin D3"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Tayo%2060K"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-141",
+      "brand_name": "Folvite 5",
+      "generic_name": "Folic Acid",
+      "molecules": [
+        "Folic Acid"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Folvite",
+        "Folic Acid"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Folvite"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-142",
+      "brand_name": "Orofer XT",
+      "generic_name": "Ferrous Ascorbate + Folic Acid",
+      "molecules": [
+        "Ferrous Ascorbate",
+        "Folic Acid"
+      ],
+      "strength": "100/1.5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "vitamin_supplement",
+      "aliases": [
+        "Orofer"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Orofer%20XT"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-143",
+      "brand_name": "Enterogermina",
+      "generic_name": "Bacillus clausii",
+      "molecules": [
+        "Bacillus clausii"
+      ],
+      "strength": "2 billion CFU per 5 ml",
+      "form": "suspension",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Enterogermina Oral Suspension"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Enterogermina"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-144",
+      "brand_name": "Econorm 250",
+      "generic_name": "Saccharomyces boulardii",
+      "molecules": [
+        "Saccharomyces boulardii"
+      ],
+      "strength": "250 mg",
+      "form": "sachet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Econorm"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Econorm%20250"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-145",
+      "brand_name": "Domstal 10",
+      "generic_name": "Domperidone",
+      "molecules": [
+        "Domperidone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiemetic",
+      "aliases": [
+        "Domstal",
+        "Domperidone"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Domstal%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-146",
+      "brand_name": "Avil 25",
+      "generic_name": "Pheniramine Maleate",
+      "molecules": [
+        "Pheniramine Maleate"
+      ],
+      "strength": "25 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [
+        "Avil",
+        "Pheniramine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Avil%2025"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-147",
+      "brand_name": "Cetzine 10",
+      "generic_name": "Cetirizine",
+      "molecules": [
+        "Cetirizine"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "antiallergic",
+      "aliases": [
+        "Cetzine",
+        "Cetirizine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Cetzine"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-148",
+      "brand_name": "Deriphyllin Retard 150",
+      "generic_name": "Etofylline + Theophylline",
+      "molecules": [
+        "Etofylline",
+        "Theophylline"
+      ],
+      "strength": "150 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Deriphyllin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Deriphyllin%20Retard%20150"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-149",
+      "brand_name": "Seroflo 250 Inhaler",
+      "generic_name": "Salmeterol + Fluticasone Propionate",
+      "molecules": [
+        "Salmeterol",
+        "Fluticasone Propionate"
+      ],
+      "strength": "25/250 mcg",
+      "form": "inhaler",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "respiratory_cold",
+      "aliases": [
+        "Seroflo"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Seroflo%20250%20Inhaler"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-150",
+      "brand_name": "Betnovate-N",
+      "generic_name": "Betamethasone Valerate + Neomycin",
+      "molecules": [
+        "Betamethasone Valerate",
+        "Neomycin"
+      ],
+      "strength": "0.1%/0.5% w/w",
+      "form": "cream",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Betnovate N",
+        "Betnovate"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Betnovate-N"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-151",
+      "brand_name": "Candid Cream",
+      "generic_name": "Clotrimazole",
+      "molecules": [
+        "Clotrimazole"
+      ],
+      "strength": "1% w/w",
+      "form": "cream",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Candid",
+        "Clotrimazole"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Candid%20Cream"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-152",
+      "brand_name": "Soframycin Cream",
+      "generic_name": "Framycetin",
+      "molecules": [
+        "Framycetin"
+      ],
+      "strength": "1% w/w",
+      "form": "cream",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "dermatology",
+      "aliases": [
+        "Soframycin",
+        "Framycetin"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Soframycin"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-153",
+      "brand_name": "Stamlo 5",
+      "generic_name": "Amlodipine",
+      "molecules": [
+        "Amlodipine"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Stamlo",
+        "Amlodipine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Stamlo%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-154",
+      "brand_name": "Deplatt 75",
+      "generic_name": "Clopidogrel",
+      "molecules": [
+        "Clopidogrel"
+      ],
+      "strength": "75 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Deplatt",
+        "Clopidogrel"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Deplatt%2075"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-155",
+      "brand_name": "Met XL 50",
+      "generic_name": "Metoprolol Succinate",
+      "molecules": [
+        "Metoprolol Succinate"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Met XL",
+        "Metoprolol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Met%20XL%2050"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-156",
+      "brand_name": "Concor 5",
+      "generic_name": "Bisoprolol",
+      "molecules": [
+        "Bisoprolol"
+      ],
+      "strength": "5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Concor",
+        "Bisoprolol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Concor%205"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-157",
+      "brand_name": "Losar 50",
+      "generic_name": "Losartan",
+      "molecules": [
+        "Losartan"
+      ],
+      "strength": "50 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "cardiovascular",
+      "aliases": [
+        "Losar",
+        "Losartan"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Losar%2050"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-158",
+      "brand_name": "Duphalac",
+      "generic_name": "Lactulose",
+      "molecules": [
+        "Lactulose"
+      ],
+      "strength": "10 g per 15 ml",
+      "form": "syrup",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "gastrointestinal",
+      "aliases": [
+        "Duphalac Syrup",
+        "Lactulose"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Duphalac"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-159",
+      "brand_name": "Voveran SR 100",
+      "generic_name": "Diclofenac",
+      "molecules": [
+        "Diclofenac"
+      ],
+      "strength": "100 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Voveran",
+        "Diclofenac"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Voveran%20SR%20100"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-160",
+      "brand_name": "Crocin Advance 500",
+      "generic_name": "Paracetamol",
+      "molecules": [
+        "Paracetamol"
+      ],
+      "strength": "500 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Crocin",
+        "Paracetamol"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Crocin%20Advance"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-161",
+      "brand_name": "Saridon",
+      "generic_name": "Paracetamol + Propyphenazone + Caffeine",
+      "molecules": [
+        "Paracetamol",
+        "Propyphenazone",
+        "Caffeine"
+      ],
+      "strength": "250/150/50 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "analgesic_antipyretic",
+      "aliases": [
+        "Saridon Tablet"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Saridon"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-162",
+      "brand_name": "Dexona 0.5",
+      "generic_name": "Dexamethasone",
+      "molecules": [
+        "Dexamethasone"
+      ],
+      "strength": "0.5 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "corticosteroid",
+      "aliases": [
+        "Dexona",
+        "Dexamethasone"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Dexona"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-163",
+      "brand_name": "Duphaston 10",
+      "generic_name": "Dydrogesterone",
+      "molecules": [
+        "Dydrogesterone"
+      ],
+      "strength": "10 mg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "other",
+      "aliases": [
+        "Duphaston",
+        "Dydrogesterone"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Duphaston%2010"
+        }
+      ]
+    },
+    {
+      "id": "topbrands-164",
+      "brand_name": "Eltroxin 50",
+      "generic_name": "Thyroxine Sodium",
+      "molecules": [
+        "Thyroxine Sodium"
+      ],
+      "strength": "50 mcg",
+      "form": "tablet",
+      "is_generic": false,
+      "priority_rank": null,
+      "category": "thyroid_hormone",
+      "aliases": [
+        "Eltroxin",
+        "Thyroxine"
+      ],
+      "source": [
+        {
+          "label": "1mg",
+          "url": "https://www.1mg.com/search/all?name=Eltroxin%2050"
+        }
+      ]
+    }
+  ]
+}
