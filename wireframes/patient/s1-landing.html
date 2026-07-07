@@ -44,7 +44,9 @@
     [자가통과] JS 비활성: 전 정보 열람(FX-A 정적) + 언어(?lang 링크 존재 — 서버 재렌더 대역이 없으므로
               noscript에서는 hi/en 병기 폴백으로 열람 보장) + 공유(wa.me 정적 링크) 성립
   S2:
-    [자가통과] 카드 1장에 5요소(무엇을·언제·몇 개·식전후·며칠) 완비 · 수량 숫자 24px+ · 스트립 아래 숫자열 병기 · 0.5→½
+    [자가통과] 카드 1장에 5요소(무엇을·언제·몇 개·식전후·며칠) 완비 · 0.5→½
+      (개정 2026-07-06 CTO 지시: 첫 화면=약×시간 매트릭스, 글리프 주연·숫자 병기(lg)로 "수량 숫자 24px+" 대체,
+       "1-1-1-0" 숫자열 행 제거 — 중복 3회 표시가 과밀의 원인. 공유 메시지의 숫자열은 유지)
     [자가통과] 음성 버튼이 영상보다 항상 위
     [자가통과] PRN·CUSTOM·STAT·WEEKLY 변형 카드 각 1+ (?fx=b) — CUSTOM은 영상·음성·스트립 없음 + 경고 카드
   C1:
@@ -256,6 +258,25 @@ html[data-state="soon-expire"] .s1-flag-expiring { display: inline-flex; }
 .tt-chip b { font-size: var(--font-size-xl); font-variant-numeric: tabular-nums; }
 .tt-chip .u { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
 
+/* 약×시간 매트릭스 — 첫 화면의 지배 시각 구조(2026-07-06 CTO 지시: 칩 시간표 대체).
+   행=약(색+숫자 배지, 봉투 번호 매칭), 열=M→N→E→H 고정, 셀=알약 글리프×수량(그림 주연).
+   행 전체가 #item-n 앵커 — 세로 스캔 "이 시간에 뭐", 가로 스캔 "이 약 언제" */
+.mx-head, .mx-row { display: grid; grid-template-columns: minmax(0, 2.5fr) repeat(4, 1fr); gap: 2px; align-items: center; }
+.mx-head { padding-bottom: 6px; }
+.mx-h { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.mx-h .ico22 { width: 22px; height: 22px; color: var(--color-icon-primary); }
+.mx-hl { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.5; text-align: center; }
+.mx-row { min-height: 56px; padding: 8px 0; border-top: 1px solid var(--color-border); text-decoration: none; color: var(--color-text-primary); touch-action: manipulation; }
+.mx-row:active { background: var(--color-overlay-pressed); }
+.mx-name { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: var(--font-weight-bold); line-height: 1.4; }
+.mx-name b { min-width: 0; overflow-wrap: break-word; } /* 공백 우선 줄바꿈 — 단어 중간 절단은 극단 폭에서만 */
+.mx-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 0; }
+.mx-g { display: inline-flex; align-items: center; justify-content: center; gap: 2px; flex-wrap: wrap; }
+.mx-cell .pict { width: 17px; height: 17px; color: var(--color-icon-primary); }
+.mx-sub { font-size: var(--font-size-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mx-sub b { color: var(--color-text-primary); }
+.mx-off { color: var(--color-text-disabled); font-weight: var(--font-weight-normal); }
+
 /* 항목 색+숫자 배지 — position 1..10 = hue-1..10 고정(재배열 금지). 색은 보조 부호, 숫자가 정본 */
 .badge-item {
   --badge-bg: var(--color-icon-gray);
@@ -323,14 +344,16 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
 .slot-cell.is-off { background: transparent; opacity: 0.35; }
 .slot-ico { width: 28px; height: 28px; color: var(--color-icon-primary); }
 .slot-cell.is-off .slot-ico { color: var(--color-icon-disabled); }
-.slot-qty { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.slot-qty { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
 .slot-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
 
-/* 복용량 픽토그램 행 — 알약 모양을 개수만큼 반복(정수 1~4, ½은 반알 글리프). 숫자가 정본, 그림은 강화 채널(§2.1) */
+/* 복용량 픽토그램 행 — 알약 모양을 개수만큼 반복(정수 1~4, ½은 반알 글리프).
+   2026-07-06 개정(CTO 지시): 카드 스트립에서 글리프가 주연(22px), 숫자는 병기(lg)로 강등 */
 .pict-row { display: inline-flex; align-items: center; justify-content: center; gap: 3px; }
 .pict { width: 18px; height: 18px; color: var(--color-icon-primary); flex: none; }
 .pict-row--sm .pict { width: 14px; height: 14px; }
-.slot-cell .pict-row { min-height: 18px; }
+.slot-cell .pict-row { min-height: 24px; }
+.slot-cell .pict { width: 22px; height: 22px; }
 .slot-cell.is-off .pict { color: var(--color-icon-disabled); }
 
 /* 식전/식후 스트립 — 픽토그램을 본문 아이콘(20px)보다 크게(30px), 문구는 굵게 */
@@ -340,12 +363,7 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
 /* 복용 기간 날짜 점 — 하루=한 칸(≤15일만, 그 이상은 숫자만) */
 .day-dots { display: inline-flex; flex-wrap: wrap; gap: 3px; max-width: 152px; vertical-align: middle; }
 .day-dots i { width: 8px; height: 8px; border-radius: 2px; background: var(--color-icon-secondary); }
-.dose-digits {
-  margin-top: 4px; text-align: center;
-  font-weight: var(--font-weight-bold); color: var(--color-text-secondary);
-  font-variant-numeric: tabular-nums; line-height: 1.6;
-}
-.dd-unit { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); }
+/* .dose-digits 숫자열 행 — 2026-07-06 매트릭스 개정으로 제거(공유 메시지에만 숫자열 유지) */
 
 /* PRN(필요시)·CUSTOM(특수 지시) 블록 — 경고 톤, 숫자 대자 */
 .prn-block, .custom-block {
@@ -539,29 +557,38 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
        (JS 있으면 현재 시간대 행 배경 하이라이트만 — 순수 장식이라 와이어프레임 미구현, 정보 손실 0) -->
   <section class="card" aria-labelledby="tt-title">
     <h2 class="sec-title" id="tt-title"><span lang="hi">हर दिन कब-कितनी</span><span lang="en">Every day — when &amp; how many</span></h2>
-    <p class="tt-hint"><span lang="hi">नंबर दबाएं — उस दवा का कार्ड खुलेगा</span><span lang="en">Tap a number to open that medicine card</span></p>
+    <p class="tt-hint"><span lang="hi">दवा की पंक्ति दबाएं — उसका कार्ड खुलेगा</span><span lang="en">Tap a medicine row to open its card</span></p>
     <div id="tt-body">
-      <!-- 슬롯 순서 M→N→E→H 고정 — 사용 슬롯만(FX-A: M·N·E). 칩 탭 = 앵커 점프(JS 불요) -->
-      <div class="tt-row">
-        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="tt-slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
-        <div class="tt-chips">
-          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><span class="pict-row pict-row--sm" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
-          <a class="tt-chip" href="#item-2"><span class="badge-item badge-item--sm hue-2">2</span><span class="pict-row pict-row--sm" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
-          <a class="tt-chip" href="#item-3"><span class="badge-item badge-item--sm hue-3">3</span><span class="pict-row pict-row--sm" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
-        </div>
+      <!-- 약×시간 매트릭스(정적 FX-A) — 열=M→N→E→H 고정 4열(빈 슬롯도 표시 = 격자 정직성), 행=약.
+           셀 = 알약 글리프×수량(½은 반알, ml은 스푼+숫자, 3개 이상은 글리프+×N). 행 탭 = 앵커 점프(JS 불요) -->
+      <div class="mx-head" aria-hidden="true">
+        <span></span>
+        <span class="mx-h"><svg class="ico22"><use href="#i-slot-m"/></svg><span class="mx-hl"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></span>
+        <span class="mx-h"><svg class="ico22"><use href="#i-slot-n"/></svg><span class="mx-hl"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></span>
+        <span class="mx-h"><svg class="ico22"><use href="#i-slot-e"/></svg><span class="mx-hl"><span lang="hi">शाम</span><span lang="en">Evening</span></span></span>
+        <span class="mx-h"><svg class="ico22"><use href="#i-slot-h"/></svg><span class="mx-hl"><span lang="hi">रात</span><span lang="en">Night</span></span></span>
       </div>
-      <div class="tt-row">
-        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="tt-slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
-        <div class="tt-chips">
-          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><span class="pict-row pict-row--sm" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
-        </div>
-      </div>
-      <div class="tt-row">
-        <div class="tt-slot"><svg class="ico24" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="tt-slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
-        <div class="tt-chips">
-          <a class="tt-chip" href="#item-1"><span class="badge-item badge-item--sm hue-1">1</span><span class="pict-row pict-row--sm" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><b>1</b><span class="u"><span lang="hi">गोली</span><span lang="en">tab</span></span></a>
-        </div>
-      </div>
+      <a class="mx-row" href="#item-1">
+        <span class="mx-name"><span class="badge-item badge-item--sm hue-1">1</span><b>Dolo 650</b></span>
+        <span class="mx-cell"><span class="mx-g" aria-hidden="true"><svg class="pict"><use href="#p-dot"/></svg></span></span>
+        <span class="mx-cell"><span class="mx-g" aria-hidden="true"><svg class="pict"><use href="#p-dot"/></svg></span></span>
+        <span class="mx-cell"><span class="mx-g" aria-hidden="true"><svg class="pict"><use href="#p-dot"/></svg></span></span>
+        <span class="mx-cell mx-off">–</span>
+      </a>
+      <a class="mx-row" href="#item-2">
+        <span class="mx-name"><span class="badge-item badge-item--sm hue-2">2</span><b>Azithral 500</b></span>
+        <span class="mx-cell"><span class="mx-g" aria-hidden="true"><svg class="pict"><use href="#p-dot"/></svg></span></span>
+        <span class="mx-cell mx-off">–</span>
+        <span class="mx-cell mx-off">–</span>
+        <span class="mx-cell mx-off">–</span>
+      </a>
+      <a class="mx-row" href="#item-3">
+        <span class="mx-name"><span class="badge-item badge-item--sm hue-3">3</span><b>Pantocid 40</b></span>
+        <span class="mx-cell"><span class="mx-g" aria-hidden="true"><svg class="pict"><use href="#p-dot"/></svg></span></span>
+        <span class="mx-cell mx-off">–</span>
+        <span class="mx-cell mx-off">–</span>
+        <span class="mx-cell mx-off">–</span>
+      </a>
     </div>
   </section>
 
@@ -591,12 +618,11 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
       </button>
       <p class="pat-line"><span lang="hi">दिन में 3 बार</span><span lang="en">3 times a day</span></p>
       <div class="slot-strip">
-        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
-        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">1</span><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
-        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">1</span><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
       </div>
-      <p class="dose-digits">1-1-1-0</p><!-- 숫자열 병기 — 약사 구두 설명·봉투 기입 관행 브리지. 숫자 ASCII, 0.5는 ½ -->
       <p class="k-row food-strip"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-after"/></svg><span lang="hi">खाने के बाद</span><span lang="en">After food</span></p>
       <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">5</b><span lang="hi">दिन</span><span lang="en">days</span><span class="day-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">15</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
       <!-- beacon: media.video_play(pattern, lang) · media.video_complete(ended 시, watched_pct) — 완주율 -->
@@ -631,12 +657,11 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
       </button>
       <p class="pat-line"><span lang="hi">दिन में 1 बार — सुबह</span><span lang="en">Once a day — morning</span></p>
       <div class="slot-strip">
-        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
       </div>
-      <p class="dose-digits">1-0-0-0</p>
       <p class="k-row food-strip"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-after"/></svg><span lang="hi">खाने के बाद</span><span lang="en">After food</span></p>
       <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">3</b><span lang="hi">दिन</span><span lang="en">days</span><span class="day-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">3</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
       <!-- beacon: media.video_play(pattern, lang) · media.video_complete -->
@@ -666,12 +691,11 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
       </button>
       <p class="pat-line"><span lang="hi">दिन में 1 बार — सुबह</span><span lang="en">Once a day — morning</span></p>
       <div class="slot-strip">
-        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="slot-qty">1</span><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
+        <div class="slot-cell"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="pict-row" aria-hidden="true"><svg class="pict"><use href="#p-tab"/></svg></span><span class="slot-qty">1</span><span class="slot-label"><span lang="hi">सुबह</span><span lang="en">Morning</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">दोपहर</span><span lang="en">Noon</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">शाम</span><span lang="en">Evening</span></span></div>
         <div class="slot-cell is-off"><svg class="slot-ico" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="slot-qty">0</span><span class="slot-label"><span lang="hi">रात</span><span lang="en">Night</span></span></div>
       </div>
-      <p class="dose-digits">1-0-0-0</p>
       <p class="k-row food-strip"><svg class="k-ico" aria-hidden="true"><use href="#i-tf-empty"/></svg><span lang="hi">खाली पेट</span><span lang="en">Empty stomach</span></p><!-- fixtures META.timing_food.empty_stomach와 글리프 단위 동일(ख nukta 없음 — 정적 마크업 = 빌더 출력 동형) -->
       <p class="k-row"><svg class="k-ico" aria-hidden="true"><use href="#i-cal"/></svg><b class="num-lg">10</b><span lang="hi">दिन</span><span lang="en">days</span><span class="day-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="dotsep">·</span><svg class="k-ico" aria-hidden="true"><use href="#i-pill"/></svg><span lang="hi">कुल</span><span lang="en">Total</span> <b class="num-lg">10</b><span lang="hi">गोली</span><span lang="en">tablets</span></p>
       <!-- beacon: media.video_play(pattern, lang) · media.video_complete -->
@@ -777,6 +801,7 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
     <symbol id="i-repeat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0 1 12-4.9M19 12a7 7 0 0 1-12 4.9"/><path d="M17 4v3.2h-3.2M7 20v-3.2h3.2"/></g></symbol>
     <!-- 복용량 픽토그램(수량 반복용 — 숫자가 정본, 그림은 보조 부호 §2.1. 단색 stroke = ?color=0 그레이스케일 안전) -->
     <symbol id="p-tab" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6v16.8" stroke-width="1.4"/></g></symbol>
+    <symbol id="p-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.6" fill="currentColor"/></symbol><!-- 매트릭스 셀 전용: 정제 1개 = 꽉 찬 점(소형에서 절개선 원은 반알로 오독) -->
     <symbol id="p-tab-half" viewBox="0 0 24 24"><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="p-cap" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.6" y="8" width="18.8" height="8" rx="4"/><path d="M12 8v8" stroke-width="1.4"/><path d="M6.4 10.4v3.2" stroke-width="1.4" stroke-linecap="round"/></g></symbol>
     <symbol id="p-spoon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="8.2" cy="15.6" rx="5.4" ry="3.6"/><path d="M4 15.2h8.4" stroke-width="1.4"/><path d="m12.9 12.4 7.3-7.3"/></g></symbol>
@@ -897,11 +922,8 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
   function mark(msg) { console.info("[계측 데모] " + msg); }
   function stype(key) { return (META.patterns[key] || {}).schedule_type || "daily"; }
 
-  /* ── 빌더(제품 Jinja 템플릿의 JS 대역 — DOM 구조는 정적 FX-A 마크업과 동일) ── */
-  function digitsOf(it) {
-    var s = ["M", "N", "E", "H"].map(function (k) { return qf(it.doses[k] || 0); }).join("-");
-    return s + (it.dose_unit === "ml" ? ' <span class="dd-unit">(ml)</span>' : "");
-  }
+  /* ── 빌더(제품 Jinja 템플릿의 JS 대역 — DOM 구조는 정적 FX-A 마크업과 동일) ──
+     digitsOf(카드 숫자열)는 2026-07-06 매트릭스 개정으로 제거 — 숫자열은 공유 메시지(shareDigits)에만 남음 */
   function unitPair(u, short) { var t = (short ? USHORT : META.dose_units)[u] || { hi: u, en: u }; return hiEn(t.hi, t.en); }
   function chipHtml(it, inner) {
     return '<a class="tt-chip" href="#item-' + it.position + '"><span class="badge-item badge-item--sm hue-' + it.position + '">' + it.position + "</span>" + inner + "</a>";
@@ -920,6 +942,21 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
     if (n < 1 || n > 15) return "";
     var s = ""; for (var i = 0; i < n; i++) s += "<i></i>";
     return '<span class="day-dots" aria-hidden="true">' + s + "</span>";
+  }
+  function mxCell(it, q) { /* 매트릭스 셀: 글리프×수량(≤2), 3개 이상 ×N, ml은 스푼+숫자, 0은 – */
+    if (!q) return '<span class="mx-cell mx-off">–</span>';
+    var g = "", sub = "";
+    if (it.dose_unit === "ml") { g = ico("p-spoon", "pict"); sub = "<b>" + qf(q) + "</b> ml"; }
+    else {
+      var id = it.dose_unit === "tablet" ? "p-dot" : PICTO[it.dose_unit] || "p-generic"; /* 매트릭스는 꽉 찬 점 */
+      var n = Math.floor(q), half = q - n >= 0.5;
+      if (q > 2.5) { g = ico(id, "pict"); sub = "×" + qf(q); }
+      else {
+        for (var i = 0; i < n; i++) g += ico(id, "pict");
+        if (half) g += ico(it.dose_unit === "tablet" ? "p-tab-half" : id, "pict");
+      }
+    }
+    return '<span class="mx-cell"><span class="mx-g" aria-hidden="true">' + g + "</span>" + (sub ? '<span class="mx-sub">' + sub + "</span>" : "") + "</span>";
   }
   function qtyChip(it, q) { return chipHtml(it, pictos(it.dose_unit, q, true) + "<b>" + qf(q) + '</b><span class="u">' + unitPair(it.dose_unit, true) + "</span>"); }
 
@@ -943,15 +980,22 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
     return h;
   }
 
-  function buildTT(f) {
-    var h = "", s, i, it, chips;
+  function buildTT(f) { /* 약×시간 매트릭스(2026-07-06 개정) — 4열 고정, daily 항목만 행으로. 비-daily는 아래 특수 행 유지 */
+    var h = "", s, i, it;
     var daily = f.items.filter(function (x) { return stype(x.pattern_key) === "daily"; });
-    for (s = 0; s < META.slot_order.length; s++) {
-      var slot = META.slot_order[s];
-      chips = "";
-      for (i = 0; i < daily.length; i++) { it = daily[i]; if ((it.doses[slot] || 0) > 0) chips += qtyChip(it, it.doses[slot]); }
-      if (!chips) continue; /* 사용 슬롯만 렌더 */
-      h += '<div class="tt-row"><div class="tt-slot">' + ico(SLOTICO[slot], "ico24") + '<span class="tt-slot-label">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></div>" + '<div class="tt-chips">' + chips + "</div></div>";
+    if (daily.length) {
+      h += '<div class="mx-head" aria-hidden="true"><span></span>';
+      for (s = 0; s < META.slot_order.length; s++) {
+        var slot = META.slot_order[s];
+        h += '<span class="mx-h">' + ico(SLOTICO[slot], "ico22") + '<span class="mx-hl">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></span>";
+      }
+      h += "</div>";
+      for (i = 0; i < daily.length; i++) {
+        it = daily[i];
+        h += '<a class="mx-row" href="#item-' + it.position + '"><span class="mx-name"><span class="badge-item badge-item--sm hue-' + it.position + '">' + it.position + "</span><b>" + esc(it.drug_name_raw) + "</b></span>";
+        for (s = 0; s < META.slot_order.length; s++) h += mxCell(it, it.doses[META.slot_order[s]] || 0);
+        h += "</a>";
+      }
     }
     for (i = 0; i < f.items.length; i++) {
       it = f.items[i];
@@ -982,7 +1026,7 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
     var h = '<div class="slot-strip">';
     for (var s = 0; s < META.slot_order.length; s++) {
       var slot = META.slot_order[s], d = it.doses[slot] || 0, on = d > 0;
-      h += '<div class="slot-cell' + (on ? "" : " is-off") + '">' + ico(SLOTICO[slot], "slot-ico") + '<span class="slot-qty">' + qf(d) + "</span>" + (on ? pictos(it.dose_unit, d, false) : "") + '<span class="slot-label">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></div>";
+      h += '<div class="slot-cell' + (on ? "" : " is-off") + '">' + ico(SLOTICO[slot], "slot-ico") + (on ? pictos(it.dose_unit, d, false) : "") + '<span class="slot-qty">' + qf(d) + "</span>" + '<span class="slot-label">' + hiEn(META.slots[slot].hi, META.slots[slot].en) + "</span></div>";
     }
     return h + "</div>";
   }
@@ -998,7 +1042,6 @@ html[data-color="0"] .badge-item { background: var(--color-icon-gray); }  /* ?co
     }
     h += '<p class="pat-line">' + hiEn(pt.name_hi, pt.name_en) + "</p>";
     if (t === "daily" || t === "weekly" || t === "once") h += buildStrip(it);
-    if (t === "daily") h += '<p class="dose-digits">' + digitsOf(it) + "</p>";
     if (t === "weekly") {
       var dw = META.days_of_week[(it.extra_params || {}).day_of_week] || { hi: "", en: "" };
       h += '<p class="k-row">' + ico("i-repeat", "k-ico") + "<b>" + hiEn("हर हफ़्ते — " + dw.hi, "Every week — " + dw.en) + "</b></p>";
