@@ -1,0 +1,98 @@
+<!doctype html>
+<!--
+  P1 · 새 처방 입력 (/rx/new) — wireframes/pharmacist/p1-input.html 실연동판.
+  서버 역할: 이 골격 + config 메타(JSON) 임베드뿐 — 폼 로직·API 호출은 /static/rx.js.
+  약사측 UI 영어 고정(병기 없음). 터치 타깃 ≥48px · 주 버튼 56px 유지.
+  범위 외(80%): 최근 약 레일(로컬 캐시), 완전한 오프라인 outbox(실패 시 인라인 재시도만),
+               G1 staff 쿠키 self-check, P8 outbox 시트.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>New Prescription — indoro</title>
+<link rel="stylesheet" href="/static/rx.css">
+</head>
+<body class="page-new">
+
+<!-- 앱바: 제목 + G2 연결 점(navigator.onLine) -->
+<header class="appbar">
+  <span class="appbar-title">New Prescription</span>
+  <span class="spacer"></span>
+  <span class="conn-dot" title="Connection"></span>
+</header>
+
+<!-- 오프라인 배너 — 자동완성만 조용히 비활성. 발급 시도는 가능(실패 시 인라인 재시도 — outbox는 범위 외) -->
+<div class="p1-banner p1-banner--offline" id="offlineBanner" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l18 18M9.5 6.2A9.8 9.8 0 0 1 21 9.5M5.6 8.4A9.6 9.6 0 0 0 3 9.5m3.4 3.2a6.4 6.4 0 0 1 5-1.9m4.2 1.9a6.5 6.5 0 0 0-1.7-1.2M9.8 15.9a3.3 3.3 0 0 1 4.4 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+  <span>Offline. Autocomplete is off — type the full name. Issuing will retry when back online. Keep this tab open.</span>
+</div>
+
+<!-- 에러 배너 (422 인라인 매핑 · 네트워크 실패 재시도) — rx.js가 채움 -->
+<div class="p1-banner p1-banner--error" id="errBanner" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V13M12 16.2v.3"/></svg>
+  <span id="errBannerTxt"></span>
+  <button class="btn btn-secondary" type="button" data-act="retry" id="errRetry" hidden>Retry</button>
+</div>
+
+<!-- 계측 [T0]: rx.js가 폼 오픈 시 client_input_id(UUIDv4, D10) 생성 + gross/active 타이머 시작.
+     이 화면의 서버 이벤트·클라 비콘 없음 — rx.form_opened 미도입(D16). -->
+<main class="screen stack" id="main">
+
+  <!-- (a) 처방 헤더 — 안내 언어 칩(접힘 금지) · 별칭 접힘. prescriptions.lang / patient_label -->
+  <section class="card" id="hdrCard">
+    <span class="field-label">Guide language <span class="t-secondary t-supporting">confirm with patient</span></span>
+    <div class="chip-row" id="hdrLang"></div>
+    <div id="aliasZone" class="fgroup"></div>
+  </section>
+
+  <!-- (b) 항목 카드 1..N — rx.js 렌더 -->
+  <div class="stack" id="itemList"></div>
+
+  <!-- (c) 약 추가 — 직전 카드 접힘 + duration_days 승계 -->
+  <button class="btn btn-secondary" type="button" data-act="add" id="addBtn">+ Add drug</button>
+  <span class="t-supporting t-secondary t-center" id="addNote"></span>
+
+</main>
+
+<!-- (d) 하단 고정 바 -->
+<div class="bottom-bar">
+  <span style="display:flex;flex-direction:column;gap:2px;flex:none;">
+    <span class="hstack"><span class="conn-dot"></span><b id="itemCount">0 items</b></span>
+    <span class="t-supporting t-secondary">Keep this tab open</span>
+  </span>
+  <button class="btn btn-primary" type="button" data-act="review" id="reviewBtn">Review &amp; Issue</button>
+</div>
+
+<!-- P2 제출 확인 시트 (P1 위 오버레이 — 별도 라우트 아님) -->
+<div class="sheet-backdrop" id="sheetBack">
+  <section class="sheet" aria-label="Confirm before issuing">
+    <header class="sheet-head">
+      <button class="appbar-btn" type="button" data-act="sheet-close">Back</button>
+      <div style="min-width:0;">
+        <div class="sheet-title">Confirm &amp; Issue</div>
+        <div class="t-supporting t-secondary" id="sheetSub"></div>
+      </div>
+    </header>
+    <div class="sheet-body">
+      <p class="t-supporting t-secondary">Compare each row with the paper prescription. Tap a row to edit that item. Rows follow envelope numbers (position order).</p>
+      <div class="stack" id="sheetRows"></div>
+      <div class="warn-zone" id="sheetWarn" hidden></div>
+    </div>
+    <footer class="sheet-foot">
+      <!-- [T1] Issue 탭: client_metrics 확정 → POST /api/prescriptions (rx.js).
+           서버가 커밋 트랜잭션에서 rx.created 기록 — 도달률 분모(§6.2). -->
+      <button class="btn btn-primary" type="button" data-act="issue" id="issueBtn">Issue</button>
+    </footer>
+  </section>
+</div>
+
+<script>
+/* 부트스트랩 — 메타 단일 소스: 서버 config(patterns.yaml + i18n.yaml)를 라우터가 임베드.
+   클라 하드코딩 금지(§4.8의 의도를 서버사이드 임베드로 충족 — 별도 fetch 왕복 0회). */
+window.INDORO = { page: "new", meta: {{ meta | tojson }} };
+</script>
+<script src="/static/rx.js"></script>
+</body>
+</html>

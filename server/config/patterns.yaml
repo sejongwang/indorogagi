@@ -1,0 +1,71 @@
+# indoro 패턴 카탈로그 — wireframes/shared/fixtures.js META에서 추출 (두 체계 한 소스)
+# 코어 8 + CUSTOM = 9항목 (docs/01 §3.4, D17). 값 발명 금지 — fixtures 그대로.
+# icon_key/video_key/audio_key는 80% 범위 제외(프리렌더 미디어 스텁) — assets 확정 시 추가.
+
+pattern_order: [OD_MORNING, OD_NIGHT, BD, TDS, QID, WEEKLY_ONCE, STAT_SINGLE, PRN, CUSTOM]
+slot_order: [M, N, E, H]
+
+patterns:
+  OD_MORNING:
+    schedule_type: daily
+    slots: [M]
+    digits: "1-0-0"
+    sort_order: 1
+    is_active: true
+    name: { hi: "दिन में 1 बार — सुबह", en: "Once a day — morning" }
+  OD_NIGHT:
+    schedule_type: daily
+    slots: [E]
+    digits: "0-0-1"
+    sort_order: 2
+    is_active: true
+    name: { hi: "दिन में 1 बार — रात", en: "Once a day — night" }
+  BD:
+    schedule_type: daily
+    slots: [M, E]
+    digits: "1-0-1"
+    sort_order: 3
+    is_active: true
+    name: { hi: "दिन में 2 बार", en: "Twice a day" }
+  TDS:
+    schedule_type: daily
+    slots: [M, N, E]
+    digits: "1-1-1"
+    sort_order: 4
+    is_active: true
+    name: { hi: "दिन में 3 बार", en: "3 times a day" }
+  QID:
+    schedule_type: daily
+    slots: [M, N, E, H]
+    digits: "1-1-1-1"
+    sort_order: 5
+    is_active: true
+    name: { hi: "दिन में 4 बार", en: "4 times a day" }
+  WEEKLY_ONCE:
+    schedule_type: weekly
+    slots: [M]
+    digits: "→ हफ़्ते में 1"
+    sort_order: 6
+    is_active: true
+    name: { hi: "हफ़्ते में 1 बार", en: "Once a week" }
+  STAT_SINGLE:
+    schedule_type: once
+    slots: [M]
+    digits: "1×"
+    sort_order: 7
+    is_active: true
+    name: { hi: "सिर्फ़ 1 बार", en: "One time only" }
+  PRN:
+    schedule_type: prn
+    slots: []
+    digits: "SOS"
+    sort_order: 8
+    is_active: true
+    name: { hi: "ज़रूरत पड़ने पर", en: "Only when needed" }
+  CUSTOM:
+    schedule_type: custom
+    slots: []
+    digits: "…"
+    sort_order: 9
+    is_active: true
+    name: { hi: "विशेष निर्देश", en: "Special instructions" }

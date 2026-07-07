@@ -1,0 +1,52 @@
+{#- 홈 코드 입력 폼 (§2.5 QR 스캔 실패 사다리 3단계 = 가족 대행 경로).
+    <form method="get" action="/c"> → GET /c?code=... (JS 불요). hi/en 병기 · no-store.
+    저문해 환자가 도메인을 직접 타이핑하는 경로가 아니라, 글 읽는 가족이 코드를 대행 입력하는 화면. -#}
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ UI.page_title }}</title>
+<link rel="icon" href="data:,">
+<style>
+:root { color-scheme: light only; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto; max-width: 480px; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 24px;
+  background: #f1f1f1; color: #171717;
+  font-family: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
+  font-size: 1.0625rem; line-height: 1.65; text-align: center;
+}
+p { margin: 0; overflow-wrap: break-word; }
+.big { font-size: 1.25rem; font-weight: 700; }
+.sub { color: #737373; font-size: 0.9375rem; }
+.card { background: #ffffff; border: 1px solid #ebebeb; border-radius: 0.75rem; padding: 24px 20px; display: flex; flex-direction: column; gap: 14px; align-items: center; width: 100%; }
+form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+label { font-weight: 600; text-align: left; }
+input[type="text"] {
+  font-size: 1.375rem; letter-spacing: 0.15em; text-align: center; text-transform: uppercase;
+  padding: 14px 12px; border: 2px solid #d4d4d4; border-radius: 0.625rem; width: 100%;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+button {
+  font-size: 1.125rem; font-weight: 700; padding: 14px; border: 0; border-radius: 0.625rem;
+  background: #171717; color: #ffffff; cursor: pointer; width: 100%;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <p class="big">{{ UI.home.title.hi }}</p>
+  <p class="big">{{ UI.home.title.en }}</p>
+  <p class="sub">{{ UI.home.body.hi }}<br>{{ UI.home.body.en }}</p>
+  <form method="get" action="/c">
+    <label for="code">{{ UI.home.label.hi }} · {{ UI.home.label.en }}</label>
+    <input type="text" id="code" name="code" inputmode="latin" autocapitalize="characters"
+           autocomplete="off" maxlength="12" placeholder="XXXX-XXXX" required>
+    <button type="submit">{{ UI.home.submit.hi }} · {{ UI.home.submit.en }}</button>
+  </form>
+</div>
+</body>
+</html>

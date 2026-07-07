@@ -1,0 +1,123 @@
+# indoro i18n 카탈로그 (hi/en) — wireframes/shared/fixtures.js META에서 추출.
+# 값 발명 금지 — fixtures 그대로 (D12/H10: Jinja 하드코딩 금지, 이 파일이 라벨 단일 소스).
+# UI 문구(ui.*)는 각 화면 구현 에이전트가 이 파일에 추가한다.
+
+slots:
+  M: { hi: "सुबह", en: "Morning" }
+  N: { hi: "दोपहर", en: "Noon" }
+  E: { hi: "शाम", en: "Evening" }
+  H: { hi: "रात", en: "Night" }
+
+timing_food:
+  before_food: { hi: "खाने से पहले", en: "Before food" }
+  after_food: { hi: "खाने के बाद", en: "After food" }
+  with_food: { hi: "खाने के साथ", en: "With food" }
+  empty_stomach: { hi: "खाली पेट", en: "Empty stomach" }
+
+dose_units:
+  tablet: { hi: "गोली", en: "tablet" }
+  capsule: { hi: "कैप्सूल", en: "capsule" }
+  ml: { hi: "ml", en: "ml" }
+  drop: { hi: "बूंद", en: "drop" }
+  puff: { hi: "पफ़", en: "puff" }
+  sachet: { hi: "पाउच", en: "sachet" }
+  application: { hi: "लगाएं", en: "apply" }
+
+prn_reasons:
+  fever: { hi: "बुख़ार", en: "Fever" }
+  pain: { hi: "दर्द", en: "Pain" }
+  vomiting: { hi: "उल्टी", en: "Vomiting" }
+  acidity: { hi: "एसिडिटी", en: "Acidity" }
+
+days_of_week:
+  sun: { hi: "रविवार", en: "Sunday" }
+  mon: { hi: "सोमवार", en: "Monday" }
+  tue: { hi: "मंगलवार", en: "Tuesday" }
+  wed: { hi: "बुधवार", en: "Wednesday" }
+  thu: { hi: "गुरुवार", en: "Thursday" }
+  fri: { hi: "शुक्रवार", en: "Friday" }
+  sat: { hi: "शनिवार", en: "Saturday" }
+
+# P1 기간 빈도 칩 (fixtures META.duration_presets)
+duration_presets: [3, 5, 7, 10, 15, 30]
+
+# ── UI 문구 (환자측 S1 patient.html · pending.html · gone.html — Jinja 하드코딩 금지 계약)
+# hi 문구는 wireframes/patient/s1-landing.html 정본에서 그대로 이식. {date}·{n}·{day}는 서버 format 치환.
+ui:
+  page_title: "दवा की जानकारी · Medicine Guide (indoro)"
+  months: # 서버 날짜 렌더(IST) — JS Intl 미의존 원칙(ui.month.* 각주)
+    hi: [जनवरी, फ़रवरी, मार्च, अप्रैल, मई, जून, जुलाई, अगस्त, सितंबर, अक्टूबर, नवंबर, दिसंबर]
+    en: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+  dose_units_short: # 시간표 칩 축약형(unit.*.short — H10 제안의 서버 반영)
+    tablet: { hi: "गोली", en: "tab" }
+    capsule: { hi: "कैप्सूल", en: "cap" }
+    ml: { hi: "ml", en: "ml" }
+    drop: { hi: "बूंद", en: "drop" }
+    puff: { hi: "पफ़", en: "puff" }
+    sachet: { hi: "पाउच", en: "sach" }
+    application: { hi: "लगाएं", en: "apply" }
+  s1:
+    from_pharmacy: { hi: "दवा दुकान से मिली जानकारी", en: "From your pharmacy" }
+    issued: { hi: "{date} को बनी (IST)", en: "Issued {date} (IST)" }
+    valid_till: { hi: "{date} तक चलेगी", en: "Valid till {date}" }
+    days: { hi: "दिन", en: "days" }
+    edited_flag: { hi: "{date} को बदला गया", en: "Changed on {date}" }
+    expiring_flag: { hi: "जल्द ख़त्म — {n} दिन बाक़ी", en: "Expires soon — {n} days left" }
+    for_label: { hi: "किसके लिए", en: "For" }
+    match_envelope: { hi: "दवा की पुड़िया पर जो नंबर लिखा है, नीचे उसी नंबर का कार्ड देखें", en: "Match the number on your packet with the same card below" }
+    tt_title: { hi: "हर दिन कब-कितनी", en: "Every day — when & how many" }
+    tt_hint: { hi: "दवा की पंक्ति दबाएं — उसका कार्ड खुलेगा", en: "Tap a medicine row to open its card" }
+    medicines: { hi: "दवाएं", en: "Medicines" }
+    listen: { hi: "सुनें", en: "Listen" }
+    stop: { hi: "रोकें", en: "Stop" }
+    watch_video: { hi: "वीडियो देखें", en: "Watch video" }
+    playing: { hi: "चल रहा है", en: "Playing" }
+    weekly_row: { hi: "हफ़्ते में 1 बार — {day}", en: "Once a week — {day}" }
+    every_week: { hi: "हर हफ़्ते — {day}", en: "Every week — {day}" }
+    custom_row: { hi: "विशेष निर्देश — कार्ड देखें", en: "Special — see card" }
+    prn_head: { hi: "ज़रूरत पड़ने पर ही", en: "Only when needed" }
+    prn_max: { hi: "दिन में ज़्यादा से ज़्यादा", en: "At most" }
+    prn_times: { hi: "बार", en: "times a day" }
+    prn_gap: { hi: "दो बार के बीच कम से कम", en: "Gap of at least" }
+    prn_hours: { hi: "घंटे", en: "hours" }
+    custom_head: { hi: "ख़ास तरीक़ा — दुकानदार की बताई विधि से ही लें", en: "Special directions — take exactly as the pharmacist explained" }
+    each_time: { hi: "हर बार", en: "Each time" }
+    total: { hi: "कुल", en: "Total" }
+    share_title: { hi: "घरवालों को भेजें", en: "Share with family" }
+    send_whatsapp: { hi: "WhatsApp पर भेजें", en: "Send on WhatsApp" }
+    copy_link: { hi: "लिंक कॉपी करें", en: "Copy link" }
+    copied: { hi: "कॉपी हो गया", en: "Copied" }
+    will_send: { hi: "यह मैसेज जाएगा:", en: "This message will be sent:" }
+    guide: { hi: "दवा की जानकारी", en: "Medicine guide" }
+    share_digits: # 공유 메시지 숫자열의 비-daily 표기(shareDigits 이식)
+      weekly: { hi: "हफ़्ते में 1", en: "1/week" }
+      once: { hi: "1×", en: "1×" }
+      prn: { hi: "SOS", en: "SOS" }
+      custom: { hi: "विशेष", en: "special" }
+    screenshot: { hi: "स्क्रीनशॉट लेकर रखें", en: "Take a screenshot and keep it" }
+    screenshot_sub: { hi: "बिना इंटरनेट भी दिखेगा", en: "Works without internet too" }
+    dpdp: { hi: "यह जानकारी सिर्फ़ दवा समझाने के लिए है — नाम-पता नहीं लिया जाता", en: "This page only explains your medicines — no name or address is collected" }
+    privacy: { hi: "गोपनीयता — और जानें", en: "Privacy — learn more" }
+    ask_pharmacy: { hi: "सवाल हो तो दुकान से पूछें:", en: "Questions? Ask your pharmacy:" }
+    try_later: { hi: "फिर बाद में", en: "Try again later" }
+  pending: # D8 대기 페이지(200 + meta refresh 30s) — hi/en 병기 문법
+    title: { hi: "जानकारी तैयार हो रही है", en: "Your guide is being prepared" }
+    body: { hi: "थोड़ी देर में यह पेज अपने आप फिर खुलेगा", en: "This page will try again in a moment" }
+    ask: { hi: "अगर फिर भी न खुले तो दवा दुकान से पूछें", en: "If it still does not open, ask your pharmacy" }
+  gone: # 410(만료·회수) + /c 코드 불일치 — hi/en 병기 문법
+    expired_title: { hi: "यह जानकारी पुरानी हो गई है", en: "This guide has expired" }
+    expired_body: { hi: "नई जानकारी के लिए दवा दुकान से पूछें", en: "Please ask your pharmacy for a new one" }
+    revoked_title: { hi: "यह लिंक अब उपलब्ध नहीं है", en: "This link is no longer available" }
+    code_miss_title: { hi: "कोड नहीं मिला", en: "Code not found" }
+    code_miss_body: { hi: "कोड फिर से जांचकर दोबारा डालें", en: "Check the code and try again" }
+    safety_title: { hi: "दवा की सामान्य हिदायतें", en: "General medicine safety" }
+    safety:
+      - { hi: "पुरानी दवा अपने मन से दोबारा शुरू न करें", en: "Do not restart old medicines on your own" }
+      - { hi: "बची हुई दवा किसी और को न दें", en: "Do not give leftover medicines to anyone else" }
+      - { hi: "कोई भी शक हो तो दुकान या डॉक्टर से पूछें", en: "If in doubt, ask your pharmacy or doctor" }
+    pharmacy: { hi: "दवा दुकान", en: "Pharmacy" }
+  home: # GET / 코드 입력 폼 (§2.5 가족 대행 경로 — JS 불요, <form method=get action=/c>)
+    title: { hi: "दवा की जानकारी खोलें", en: "Open your medicine guide" }
+    body: { hi: "पर्ची या पुड़िया पर लिखा कोड यहाँ डालें", en: "Enter the code printed on your slip or packet" }
+    label: { hi: "कोड", en: "Code" }
+    submit: { hi: "खोलें", en: "Open" }

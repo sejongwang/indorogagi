@@ -1,0 +1,21 @@
+[project]
+name = "indoro-server"
+version = "0.1.0"
+description = "indoro v0 관통 프로토타입 서버 (FastAPI + SQLite)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "jinja2",
+    "pyyaml",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

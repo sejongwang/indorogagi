@@ -1,0 +1,38 @@
+{#- S3 대기 페이지 (D8) — 미존재/동기화 대기 구분 없이 200. 모래시계 + meta refresh 30s.
+    토큰 존재 여부가 열거 공격에 미노출. hi/en 병기(언어 협상 불요) · JS 0 · no-store -#}
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="30">
+<title>{{ UI.page_title }}</title>
+<link rel="icon" href="data:,">
+<style>
+:root { color-scheme: light only; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto; max-width: 480px; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 24px;
+  background: #f1f1f1; color: #171717;
+  font-family: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
+  font-size: 1.0625rem; line-height: 1.65; text-align: center;
+}
+p { margin: 0; overflow-wrap: break-word; }
+.big { font-size: 1.25rem; font-weight: 700; }
+.sub { color: #737373; font-size: 0.875rem; }
+.ico { width: 56px; height: 56px; color: #737373; }
+.card { background: #ffffff; border: 1px solid #ebebeb; border-radius: 0.75rem; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="card">
+  <svg class="ico" aria-hidden="true" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12M6 20.5h12"/><path d="M7.5 3.5v3.2c0 2.6 4.5 3.9 4.5 5.3 0 1.4-4.5 2.7-4.5 5.3v3.2M16.5 3.5v3.2c0 2.6-4.5 3.9-4.5 5.3 0 1.4 4.5 2.7 4.5 5.3v3.2"/></g></svg>
+  <p class="big">{{ UI.pending.title.hi }}</p>
+  <p class="big">{{ UI.pending.title.en }}</p>
+  <p>{{ UI.pending.body.hi }}<br>{{ UI.pending.body.en }}</p>
+  <p class="sub">{{ UI.pending.ask.hi }}<br>{{ UI.pending.ask.en }}</p>
+</div>
+</body>
+</html>

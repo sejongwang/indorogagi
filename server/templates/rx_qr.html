@@ -1,0 +1,129 @@
+<!doctype html>
+<!--
+  P3 · 발급 완료·QR 표시 (/rx/{prescription_id}/qr) — wireframes/pharmacist/p3-qr.html 실연동판.
+  서버 역할: 이 골격 + prescription_id 임베드뿐 — 데이터는 rx.js가
+  GET /api/prescriptions/{id} (X-Pharmacy-Id)로 로드, QR은 클라 JS 렌더(D18,
+  static/vendor/qrcode.js — MIT qrcode-generator 1.4.4). URL = {origin}/p/{token} 그대로(D2).
+  화면/인쇄 모드: body[data-mode="screen|print"] — 인쇄는 @media print로 미리보기 카드만 지면에.
+  범위 외(80%): 오프라인 outbox 변형, "환자에게 시연" 미리보기 렌더, 스캔 실패 신고
+  (POST /api/prescriptions/{id}/scan-failure — P3 후속 배치), 프리렌더 미디어.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Prescription QR — indoro</title>
+<link rel="stylesheet" href="/static/rx.css">
+</head>
+<body class="page-qr" data-mode="screen">
+
+<!-- 앱바: "새 처방 입력" 최상단 1탭(카운터 회전율) + G2 연결 점.
+     [T0]는 P1 도착 시 rx.js가 새 client_input_id 생성으로 시작. -->
+<header class="appbar">
+  <span class="appbar-title">Prescription QR</span>
+  <span class="spacer"></span>
+  <span class="conn-dot" title="Connection"></span>
+  <a class="btn btn-primary btn-inline" id="btnNewRx" href="/rx/new">New Rx</a>
+</header>
+
+<main class="screen stack">
+
+  <!-- rx.created는 POST /api/prescriptions 커밋 트랜잭션에서 이미 서버 기록됨(§6.2) — 이 화면 추가 이벤트 없음 -->
+  <div class="hstack np" data-loaded hidden>
+    <span class="status-chip st-active" id="stChip">Issued</span>
+    <span class="t-supporting t-secondary" id="issueMeta"></span>
+  </div>
+
+  <!-- 로딩/에러 존 — GET /api/prescriptions/{id} 실패 시 재시도 버튼 -->
+  <div class="card qr-load" id="qrLoad">Loading…</div>
+
+  <!-- QR 스테이지 (화면 모드) — 스크롤 0 첫 화면 중앙, 실렌더 SVG -->
+  <section class="card qr-stage only-screen-mode" data-loaded hidden aria-label="QR code">
+    <div class="qr-box" id="qrMain"></div>
+
+    <!-- 짧은 코드 병기 — access.short_code_display (Crockford Base32 8자, D3) -->
+    <div class="short-code" id="shortCode"></div>
+    <p class="t-supporting t-secondary t-center" id="codeHint">Backup code &mdash; family can type it on the code page</p>
+
+    <!-- 환자 안내 1줄 — 약사측 언어 토글 없음, hi/en 상시 병기 -->
+    <p class="scan-line">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      <span lang="hi">कैमरे से स्कैन करें</span>
+      <span class="t-secondary">&middot;</span>
+      <span lang="en">Scan with phone camera</span>
+    </p>
+
+    <hr class="divider" style="width:100%">
+
+    <!-- 유효기간 — access.expires_at + D-3 "곧 만료" 플래그 -->
+    <div class="hstack validity">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+      <span class="t-supporting" id="validTill"></span>
+      <span class="flag flag-expiring" id="expFlag" hidden></span>
+    </div>
+
+    <!-- 화면 제시 폴백 수칙 — 웹은 시스템 밝기 제어 불가(P0 온보딩 수칙) -->
+    <p class="t-supporting t-secondary t-center">Set device brightness to maximum before showing (P0 checklist)</p>
+  </section>
+
+  <!-- 인쇄 미리보기 카드 (인쇄 모드 — 기본 경로 D21 · v0 = 브라우저 인쇄 다이얼로그) -->
+  <!-- 인쇄 QR 스펙: ECC Q · 한 변 ≥2cm · quiet zone 4모듈 (§2.1 — 접힘·오염 내성) -->
+  <section class="only-print-mode" data-loaded hidden aria-label="Print preview">
+    <div class="card card--emphasized print-card" id="printCard">
+      <h3 id="ppName"></h3>
+      <p class="t-supporting t-secondary" id="ppArea"></p>
+      <hr class="divider">
+      <div class="qr-box" id="qrPrint"></div>
+      <div class="short-code" id="ppCode"></div>
+      <p class="scan-line t-supporting">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        <span lang="hi">कैमरे से स्कैन करें</span>
+        <span class="t-secondary">&middot;</span>
+        <span lang="en">Scan with phone camera</span>
+      </p>
+      <p class="t-supporting t-secondary" id="ppValid"></p>
+    </div>
+    <p class="t-supporting t-secondary t-center np" style="margin-top:8px">58 mm thermal label &middot; v0 prints via browser dialog</p>
+  </section>
+
+  <!-- 항목 번호 나열 — items[].position 색+숫자 배지 (봉투 번호 안전망 §2.1 ③) -->
+  <section class="card np" data-loaded hidden aria-label="Packet numbers">
+    <p class="card-title">Packet numbers</p>
+    <div class="badge-row" id="badgeRow"></div>
+    <p class="t-supporting t-secondary" style="margin-top:8px">Check the same numbers are written on the medicine packets.</p>
+  </section>
+
+</main>
+
+<!-- 하단 고정 바: 주 행동 + 보조 (인쇄·전체화면 탭은 v0 미계측 — 이벤트 사전 §6.2 밖) -->
+<div class="bottom-bar np">
+  <div class="bar-row">
+    <button class="btn btn-primary only-screen-mode" type="button" id="btnFullscreen">Show fullscreen</button>
+    <button class="btn btn-primary only-print-mode" type="button" id="btnPrint">Print</button>
+  </div>
+  <div class="bar-row bar-row2">
+    <button class="btn btn-secondary only-screen-mode" type="button" id="btnGoPrint">Print view</button>
+    <button class="btn btn-secondary only-print-mode" type="button" id="btnGoScreen">Show on screen</button>
+  </div>
+</div>
+
+<!-- 전체화면 QR 오버레이 (탭하면 닫힘 · 흰 배경 고대비 — 스캔 실패 사다리 2단 §2.5) -->
+<div class="fs-overlay np" id="fsOverlay" role="dialog" aria-label="Fullscreen QR">
+  <div class="qr-box" id="qrFs"></div>
+  <div class="short-code" id="fsCode"></div>
+  <p class="scan-line">
+    <span lang="hi">कैमरे से स्कैन करें</span>
+    <span class="t-secondary">&middot;</span>
+    <span lang="en">Scan with phone camera</span>
+  </p>
+  <p class="t-supporting t-secondary">Tap anywhere to close</p>
+</div>
+
+<script>
+window.INDORO = { page: "qr", prescription_id: {{ prescription_id | tojson }} };
+</script>
+<script src="/static/vendor/qrcode.js"></script>
+<script src="/static/rx.js"></script>
+</body>
+</html>

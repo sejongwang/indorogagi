@@ -1,0 +1,57 @@
+{#- S4 410 페이지 — mode ∈ expired | revoked | code_miss (§4.6·§2.5).
+    expired: 약국명 + 일반 복약 안전수칙. revoked: 정보 0(사유 미표기).
+    code_miss(/c 불일치, 404): 재입력 안내. hi/en 병기 · JS 0 · no-store -#}
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ UI.page_title }}</title>
+<link rel="icon" href="data:,">
+<style>
+:root { color-scheme: light only; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto; max-width: 480px; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 24px;
+  background: #f1f1f1; color: #171717;
+  font-family: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
+  font-size: 1.0625rem; line-height: 1.65; text-align: center;
+}
+p { margin: 0; overflow-wrap: break-word; }
+.big { font-size: 1.25rem; font-weight: 700; }
+.sub { color: #737373; font-size: 0.875rem; }
+.ico { width: 56px; height: 56px; color: #737373; }
+.card { background: #ffffff; border: 1px solid #ebebeb; border-radius: 0.75rem; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; }
+.safety { text-align: left; background: #f8da9d; border-radius: 0.625rem; padding: 12px 14px; width: 100%; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem; }
+.safety b { display: block; }
+</style>
+</head>
+<body>
+<div class="card">
+  <svg class="ico" aria-hidden="true" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></svg>
+  {% if mode == "expired" %}
+  <p class="big">{{ UI.gone.expired_title.hi }}</p>
+  <p class="big">{{ UI.gone.expired_title.en }}</p>
+  <p>{{ UI.gone.expired_body.hi }}<br>{{ UI.gone.expired_body.en }}</p>
+  {% if pharmacy_name %}<p class="sub">{{ UI.gone.pharmacy.hi }} · {{ UI.gone.pharmacy.en }}: <b>{{ pharmacy_name }}</b></p>{% endif %}
+  {% elif mode == "code_miss" %}
+  <p class="big">{{ UI.gone.code_miss_title.hi }}</p>
+  <p class="big">{{ UI.gone.code_miss_title.en }}</p>
+  <p>{{ UI.gone.code_miss_body.hi }}<br>{{ UI.gone.code_miss_body.en }}</p>
+  {% else %}{#- revoked: 정보 0 — 사유·약국명·수칙 미표기 #}
+  <p class="big">{{ UI.gone.revoked_title.hi }}</p>
+  <p class="big">{{ UI.gone.revoked_title.en }}</p>
+  {% endif %}
+</div>
+{% if mode == "expired" %}
+<div class="safety">
+  <b>{{ UI.gone.safety_title.hi }} · {{ UI.gone.safety_title.en }}</b>
+  {% for s in UI.gone.safety %}
+  <p>{{ s.hi }}<br><span style="color:#5a4a00">{{ s.en }}</span></p>
+  {% endfor %}
+</div>
+{% endif %}
+</body>
+</html>

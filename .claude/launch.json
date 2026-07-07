@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8493", "--directory", "/Users/junehwi/indoro/wireframes"],
       "port": 8493
+    },
+    {
+      "name": "server",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "--project", "/Users/junehwi/indoro/server", "uvicorn", "app.main:app", "--port", "8600", "--app-dir", "/Users/junehwi/indoro/server"],
+      "port": 8600
     }
   ]
 }
