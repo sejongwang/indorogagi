@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sqlite3
 import unicodedata
@@ -19,6 +20,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 IMPORTER_VERSION = "drug-catalog-v2"
+NORMALIZATION_VERSION = "catalog-normalization-v2"
+PACKAGE_SCHEMA_VERSION = "2"
 PRODUCTION_APPROVAL_REGISTRY_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "drug-sources.json"
 )
@@ -57,6 +60,8 @@ _SOURCE_APPROVAL_FIELDS = (
     "source_artifact_sha256",
     "source_artifact_bytes",
     "transformation_method",
+    "snapshot_mode",
+    "package_schema_version",
 )
 
 _FORM_ALIASES = {
@@ -132,6 +137,67 @@ def _sha(value: Any) -> str:
     return hashlib.sha256(_json(value).encode("utf-8")).hexdigest()
 
 
+_NORMALIZED_PROJECTION_FIELDS = (
+    "name_type",
+    "brand_name_raw",
+    "brand_name_norm",
+    "brand_name_search",
+    "generic_name_raw",
+    "generic_name_norm",
+    "generic_name_search",
+    "strength_raw",
+    "strength_search",
+    "dosage_form_raw",
+    "dosage_form_code",
+    "route_raw",
+    "route_code",
+    "release_modifier_raw",
+    "release_modifier_code",
+    "manufacturer_name",
+    "marketer_name",
+    "rx_classification",
+    "short_display_name",
+    "package",
+    "usage_scope",
+    "lifecycle_status",
+    "review_status",
+    "dedupe_fingerprint",
+    "incomplete_fields",
+    "warnings",
+    "caution_keys",
+)
+
+
+def _normalized_projection(record: dict[str, Any]) -> dict[str, Any]:
+    """Return the exact deterministic projection written to searchable tables."""
+    projection = {field: record.get(field) for field in _NORMALIZED_PROJECTION_FIELDS}
+    projection["ingredients"] = sorted(
+        (dict(item) for item in record.get("ingredients") or []),
+        key=lambda item: (item.get("ordinal", 0), item.get("name_norm") or ""),
+    )
+    projection["aliases"] = sorted(
+        (dict(item) for item in record.get("aliases") or []),
+        key=lambda item: (
+            item.get("norm") or "",
+            item.get("alias_type") or "",
+            item.get("language") or "",
+        ),
+    )
+    return projection
+
+
+def _normalized_projection_diff(
+    previous: dict[str, Any] | None,
+    current: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    previous = previous or {}
+    return {
+        field: {"previous": previous.get(field), "next": current.get(field)}
+        for field in sorted(set(previous) | set(current))
+        if previous.get(field) != current.get(field)
+    }
+
+
 def records_sha256(records: Iterable[Any]) -> str:
     """Return the canonical hash used by the local production approval registry."""
     return _sha(list(records))
@@ -139,7 +205,12 @@ def records_sha256(records: Iterable[Any]) -> str:
 
 def source_metadata_sha256(source: dict[str, Any]) -> str:
     """Hash only source identity/provenance fields governed by package approval."""
-    return _sha({field: source.get(field) for field in _SOURCE_APPROVAL_FIELDS})
+    values = {field: source.get(field) for field in _SOURCE_APPROVAL_FIELDS}
+    values["snapshot_mode"] = source.get("snapshot_mode") or "delta"
+    values["package_schema_version"] = str(
+        source.get("package_schema_version") or PACKAGE_SCHEMA_VERSION
+    )
+    return _sha(values)
 
 
 def _load_approval_registry(
@@ -327,6 +398,14 @@ def _source_allowed(source: dict[str, Any]) -> None:
                 raise ValueError(f"production source {field} cannot be after accessed_at")
     if scope == "reference":
         raise ValueError("reference-only source cannot be imported into the searchable catalog")
+    snapshot_mode = str(source.get("snapshot_mode") or "delta").lower()
+    if snapshot_mode not in ("delta", "full"):
+        raise ValueError("source snapshot_mode must be delta or full")
+    package_schema_version = str(
+        source.get("package_schema_version") or PACKAGE_SCHEMA_VERSION
+    ).strip()
+    if not package_schema_version:
+        raise ValueError("source package_schema_version must not be empty")
 
 
 def _normalize_aliases(raw_aliases: Any) -> list[dict[str, str]]:
@@ -673,6 +752,15 @@ def _presentation_id(conn: sqlite3.Connection, source: dict[str, Any], source_id
     return _id(), True
 
 
+def _existing_presentation(
+    conn: sqlite3.Connection, source_id: str, source_record_id: str
+) -> sqlite3.Row | None:
+    return conn.execute(
+        "SELECT * FROM drug_presentations WHERE source_id=? AND source_record_id=?",
+        (source_id, source_record_id),
+    ).fetchone()
+
+
 def _write_relations(conn: sqlite3.Connection, presentation_id: str,
                      source_record_id: str, record: dict[str, Any]) -> None:
     now = _now()
@@ -741,9 +829,35 @@ def _write_relations(conn: sqlite3.Connection, presentation_id: str,
         )
 
 
-def _write_presentation(conn: sqlite3.Connection, source: dict[str, Any], source_id: str,
-                        record: dict[str, Any]) -> str:
+def _write_presentation(
+    conn: sqlite3.Connection,
+    source: dict[str, Any],
+    source_id: str,
+    record: dict[str, Any],
+    import_run_id: str,
+) -> tuple[str, dict[str, Any]]:
     presentation_id, is_new = _presentation_id(conn, source, source_id, record)
+    previous = None if is_new else conn.execute(
+        "SELECT * FROM drug_presentations WHERE id=?", (presentation_id,)
+    ).fetchone()
+    projection = _normalized_projection(record)
+    projection_json = _json(projection)
+    projection_sha256 = _sha(projection)
+    previous_projection: dict[str, Any] | None = None
+    previous_projection_sha256 = None
+    if previous is not None:
+        previous_projection_sha256 = previous["normalized_projection_sha256"]
+        try:
+            parsed = json.loads(previous["normalized_projection_json"] or "null")
+            previous_projection = parsed if isinstance(parsed, dict) else None
+        except json.JSONDecodeError:
+            previous_projection = None
+    normalized_changed = is_new or previous_projection_sha256 != projection_sha256
+    normalized_diff = (
+        _normalized_projection_diff(previous_projection, projection)
+        if normalized_changed
+        else {}
+    )
     now = _now()
     values = (
         source_id, record["source_record_id"], record["name_type"], record["brand_name_raw"],
@@ -767,12 +881,22 @@ def _write_presentation(conn: sqlite3.Connection, source: dict[str, Any], source
                 route_code, release_modifier_raw, release_modifier_code, manufacturer_name,
                 marketer_name, rx_classification, short_display_name, package_summary,
                 usage_scope, lifecycle_status, review_status, dedupe_fingerprint,
-                incomplete_fields_json, warnings_json, source_updated_at, updated_at, id, created_at)
+                incomplete_fields_json, warnings_json, source_updated_at, updated_at,
+                workflow_review_status, operational_lifecycle_status, record_version,
+                normalized_projection_json, normalized_projection_sha256, id, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            values + (presentation_id, now),
+                       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            values + (
+                "needs_review" if record["review_status"] == "needs_review" else "unverified",
+                record["lifecycle_status"],
+                1,
+                projection_json,
+                projection_sha256,
+                presentation_id,
+                now,
+            ),
         )
-    else:
+    elif normalized_changed:
         conn.execute(
             """UPDATE drug_presentations SET
                source_id=?, source_record_id=?, name_type=?, brand_name_raw=?, brand_name_norm=?,
@@ -781,14 +905,48 @@ def _write_presentation(conn: sqlite3.Connection, source: dict[str, Any], source
                route_code=?, release_modifier_raw=?, release_modifier_code=?, manufacturer_name=?,
                marketer_name=?, rx_classification=?, short_display_name=?, package_summary=?,
                usage_scope=?, lifecycle_status=?, review_status=?, dedupe_fingerprint=?,
-               incomplete_fields_json=?, warnings_json=?, source_updated_at=?, updated_at=?
+               incomplete_fields_json=?, warnings_json=?, source_updated_at=?, updated_at=?,
+               normalized_projection_json=?, normalized_projection_sha256=?
                WHERE id=?""",
-            values + (presentation_id,),
+            values + (projection_json, projection_sha256, presentation_id),
         )
-    _write_relations(conn, presentation_id, record["source_record_id"], record)
+    else:
+        conn.execute(
+            "UPDATE drug_presentations SET source_updated_at=? WHERE id=?",
+            (
+                source.get("source_updated_at") or source.get("declared_as_of"),
+                presentation_id,
+            ),
+        )
+    previous_workflow_review = (
+        previous["workflow_review_status"] if previous is not None else None
+    )
+    previous_operational_lifecycle = (
+        previous["operational_lifecycle_status"] if previous is not None else None
+    )
+    if previous is not None:
+        from app.catalog_governance import record_source_refresh
+
+        next_review, _ = record_source_refresh(
+            conn,
+            previous,
+            import_run_id=import_run_id,
+            source_record_sha256=record["raw_sha256"],
+            normalized_projection_changed=normalized_changed,
+        )
+    else:
+        next_review = (
+            "needs_review" if record["review_status"] == "needs_review" else "unverified"
+        )
+    if is_new or normalized_changed:
+        _write_relations(conn, presentation_id, record["source_record_id"], record)
 
     aliases = [alias["raw"] for alias in record["aliases"]]
     cautions = record.get("caution_keys") or []
+    governance = conn.execute(
+        "SELECT workflow_review_status FROM drug_presentations WHERE id=?", (presentation_id,)
+    ).fetchone()
+    approved = int(bool(governance) and governance["workflow_review_status"] == "approved")
     legacy = conn.execute("SELECT id FROM drugs WHERE id=?", (presentation_id,)).fetchone()
     if legacy:
         conn.execute(
@@ -797,7 +955,7 @@ def _write_presentation(conn: sqlite3.Connection, source: dict[str, Any], source
                aliases_json=?, caution_keys_json=?, source=?, verified=? WHERE id=?""",
             (record["brand_name_raw"], record["generic_name_raw"], record["strength_raw"],
              record["dosage_form_code"] or record["dosage_form_raw"], _json(aliases), _json(cautions),
-             source["slug"], int(record["review_status"] == "verified"), presentation_id),
+             source["slug"], approved, presentation_id),
         )
     else:
         conn.execute(
@@ -809,9 +967,28 @@ def _write_presentation(conn: sqlite3.Connection, source: dict[str, Any], source
             (presentation_id, record["brand_name_raw"], record["generic_name_raw"],
              record["strength_raw"], record["dosage_form_code"] or record["dosage_form_raw"],
              _json(aliases), _json(cautions), source["slug"],
-             int(record["review_status"] == "verified"), now),
+             approved, now),
         )
-    return presentation_id
+    return presentation_id, {
+        "change_type": "created" if is_new else "changed" if normalized_changed else "unchanged",
+        "normalized_projection_json": projection_json,
+        "normalized_projection_sha256": projection_sha256,
+        "previous_normalized_projection_sha256": previous_projection_sha256,
+        "normalized_diff": normalized_diff,
+        "changed_fields": sorted(normalized_diff),
+        "previous_workflow_review_status": previous_workflow_review,
+        "next_workflow_review_status": next_review,
+        "previous_operational_lifecycle_status": previous_operational_lifecycle,
+        "next_operational_lifecycle_status": record["lifecycle_status"]
+        if is_new
+        else previous_operational_lifecycle,
+        "review_required": next_review in ("unverified", "needs_review"),
+        "review_reopened": bool(
+            normalized_changed
+            and previous_workflow_review in ("approved", "rejected")
+            and next_review == "needs_review"
+        ),
+    }
 
 
 def _source_record_row(
@@ -858,14 +1035,20 @@ def _link_run_record(
     item: dict[str, Any],
     status: str,
     presentation_id: str | None,
-) -> None:
+    processing: dict[str, Any] | None = None,
+) -> str:
+    processing = processing or {}
+    run_record_id = _id()
     conn.execute(
         """INSERT INTO drug_import_run_records
            (id, import_run_id, record_ordinal, source_record_row_id, source_record_id,
-            ingest_status, errors_json, presentation_id, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ingest_status, errors_json, presentation_id,
+            normalized_projection_json, normalized_projection_sha256,
+            previous_normalized_projection_sha256, normalized_diff_json,
+            review_required, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            _id(),
+            run_record_id,
             run_id,
             item["record_ordinal"],
             raw_row_id,
@@ -873,9 +1056,54 @@ def _link_run_record(
             status,
             _json(item["incomplete_fields"] + item["warnings"]),
             presentation_id,
+            processing.get("normalized_projection_json"),
+            processing.get("normalized_projection_sha256"),
+            processing.get("previous_normalized_projection_sha256"),
+            _json(processing.get("normalized_diff") or {}),
+            int(bool(processing.get("review_required"))),
             _now(),
         ),
     )
+    return run_record_id
+
+
+def _accumulate_processing_report(
+    report: dict[str, Any],
+    *,
+    source_record_id: str,
+    presentation_id: str | None,
+    processing: dict[str, Any],
+) -> None:
+    change_type = processing.get("change_type") or "ingest_issue"
+    count_field = {
+        "created": "normalization_created_count",
+        "changed": "normalization_changed_count",
+        "unchanged": "normalization_unchanged_count",
+        "ingest_issue": "source_ingest_issue_count",
+    }[change_type]
+    report[count_field] += 1
+    if processing.get("review_required"):
+        report["review_required_count"] += 1
+    if processing.get("review_reopened"):
+        report["review_reopened_count"] += 1
+    if change_type in ("created", "changed"):
+        report["normalization_changes"].append(
+            {
+                "source_record_id": source_record_id,
+                "presentation_id": presentation_id,
+                "change_type": change_type,
+                "previous_normalized_projection_sha256": processing.get(
+                    "previous_normalized_projection_sha256"
+                ),
+                "normalized_projection_sha256": processing.get(
+                    "normalized_projection_sha256"
+                ),
+                "changed_fields": processing.get("changed_fields") or [],
+                "normalized_diff": processing.get("normalized_diff") or {},
+                "review_required": bool(processing.get("review_required")),
+                "review_reopened": bool(processing.get("review_reopened")),
+            }
+        )
 
 
 def _ensure_database_mode(conn: sqlite3.Connection, expected_mode: str) -> None:
@@ -929,6 +1157,11 @@ def import_catalog(
         raise ValueError("demo source requires a demo catalog database")
     raw_records = list(records)
     safe_raw_records = [_json_safe_record(record) for record in raw_records]
+    snapshot_mode = str(source.get("snapshot_mode") or "delta").lower()
+    package_schema_version = str(
+        source.get("package_schema_version") or PACKAGE_SCHEMA_VERSION
+    )
+    code_revision = source.get("code_revision") or os.environ.get("INDORO_CODE_REVISION")
     approval = None
     if source["usage_scope"] == "production":
         approval = _production_approval(source, raw_records, approval_registry)
@@ -951,6 +1184,16 @@ def import_catalog(
         seen_source_ids.add(item["source_record_id"])
         normalized.append(item)
 
+    package_content_hash = _sha({"source": source, "records": safe_raw_records})
+    processing_hash = _sha(
+        {
+            "package_content_sha256": package_content_hash,
+            "importer_version": IMPORTER_VERSION,
+            "normalization_version": NORMALIZATION_VERSION,
+            "package_schema_version": package_schema_version,
+            "snapshot_mode": snapshot_mode,
+        }
+    )
     report = _quality_from_records(normalized)
     report.update({
         "source_slug": source["slug"], "source_version": str(source["version"]),
@@ -965,9 +1208,29 @@ def import_catalog(
         "source_artifact_sha256": source.get("source_artifact_sha256"),
         "source_artifact_bytes": source.get("source_artifact_bytes"),
         "transformation_method": source.get("transformation_method"),
-        "input_sha256": _sha({"source": source, "records": safe_raw_records}),
+        # input_sha256 remains the database replay key for backward compatibility.
+        # package_content_sha256 is the pure source+record content hash.
+        "input_sha256": processing_hash,
+        "package_content_sha256": package_content_hash,
         "records_sha256": records_sha256(safe_raw_records),
         "approval_registry_sha256": approval["registry_sha256"] if approval else None,
+        "importer_version": IMPORTER_VERSION,
+        "normalization_version": NORMALIZATION_VERSION,
+        "package_schema_version": package_schema_version,
+        "snapshot_mode": snapshot_mode,
+        "code_revision": code_revision,
+        "retirement_baseline_missing": False,
+        "retirement_baseline_import_run_id": None,
+        "retirement_batch_id": None,
+        "retirement_candidate_count": 0,
+        "normalization_created_count": 0,
+        "normalization_changed_count": 0,
+        "normalization_unchanged_count": 0,
+        "source_ingest_issue_count": 0,
+        "review_required_count": 0,
+        "review_reopened_count": 0,
+        "normalization_changes": [],
+        "normalization_comparison_available": False,
     })
     if dry_run:
         return report
@@ -991,6 +1254,7 @@ def import_catalog(
             return replay
 
         run_id = _id()
+        report["normalization_comparison_available"] = True
         started = _now()
         license_snapshot = {
             "reuse_status": source.get("reuse_status"),
@@ -1012,14 +1276,19 @@ def import_catalog(
                (id, source_id, version, published_at, source_updated_at, input_uri,
                 input_sha256, records_sha256, accessed_at, source_snapshot_json,
                 license_snapshot_json, approval_snapshot_json, approval_registry_sha256,
-                importer_version, mode, status, started_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'apply', 'completed', ?)""",
+                importer_version, normalization_version, package_schema_version,
+                snapshot_mode, package_content_sha256, code_revision,
+                mode, status, started_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                       'apply', 'completed', ?)""",
             (run_id, source_id, str(source["version"]), source.get("published_at"),
              source.get("source_updated_at") or source.get("declared_as_of"),
              source.get("input_uri") or source.get("source_url"),
              input_hash, report["records_sha256"], source.get("accessed_at"), _json(source),
              _json(license_snapshot), _json(approval_snapshot) if approval_snapshot else None,
-             approval["registry_sha256"] if approval else None, IMPORTER_VERSION, started),
+             approval["registry_sha256"] if approval else None, IMPORTER_VERSION,
+             NORMALIZATION_VERSION, package_schema_version, snapshot_mode,
+             package_content_hash, code_revision, started),
         )
 
         for item in normalized:
@@ -1027,23 +1296,79 @@ def import_catalog(
             conn.execute(f"SAVEPOINT {savepoint}")
             try:
                 presentation_id = None
+                processing: dict[str, Any] = {}
                 status = "quarantined" if item.get("quarantined") else "excluded"
                 if not item["excluded"]:
-                    presentation_id = _write_presentation(conn, source, source_id, item)
+                    presentation_id, processing = _write_presentation(
+                        conn, source, source_id, item, run_id
+                    )
                     status = "needs_review" if item["review_status"] == "needs_review" else "imported"
+                else:
+                    previous = _existing_presentation(
+                        conn, source_id, item["source_record_id"]
+                    )
+                    if previous is not None:
+                        from app.catalog_governance import record_source_ingest_issue
+
+                        presentation_id = previous["id"]
+                        next_review, _ = record_source_ingest_issue(
+                            conn,
+                            previous,
+                            import_run_id=run_id,
+                            source_record_sha256=item["raw_sha256"],
+                            ingest_status=status,
+                        )
+                        processing = {
+                            "change_type": "ingest_issue",
+                            "normalized_projection_json": previous[
+                                "normalized_projection_json"
+                            ],
+                            "normalized_projection_sha256": previous[
+                                "normalized_projection_sha256"
+                            ],
+                            "previous_normalized_projection_sha256": previous[
+                                "normalized_projection_sha256"
+                            ],
+                            "normalized_diff": {
+                                "source_ingest_status": {
+                                    "previous": "valid_projection",
+                                    "next": status,
+                                }
+                            },
+                            "changed_fields": ["source_ingest_status"],
+                            "review_required": next_review
+                            in ("unverified", "needs_review"),
+                            "review_reopened": previous["workflow_review_status"]
+                            == "approved"
+                            and next_review == "needs_review",
+                        }
                 raw_row_id = _source_record_row(
                     conn, source_id, run_id, item, status, presentation_id
                 )
-                _link_run_record(
-                    conn, run_id, raw_row_id, item, status, presentation_id
+                run_record_id = _link_run_record(
+                    conn,
+                    run_id,
+                    raw_row_id,
+                    item,
+                    status,
+                    presentation_id,
+                    processing,
                 )
-                if presentation_id:
+                if presentation_id and not item["excluded"]:
                     conn.execute(
                         """UPDATE drug_presentations
-                           SET current_source_record_row_id=? WHERE id=?""",
-                        (raw_row_id, presentation_id),
+                           SET current_source_record_row_id=?,
+                               current_import_run_record_id=?
+                           WHERE id=?""",
+                        (raw_row_id, run_record_id, presentation_id),
                     )
                 conn.execute(f"RELEASE SAVEPOINT {savepoint}")
+                _accumulate_processing_report(
+                    report,
+                    source_record_id=item["source_record_id"],
+                    presentation_id=presentation_id,
+                    processing=processing,
+                )
             except Exception as exc:
                 conn.execute(f"ROLLBACK TO SAVEPOINT {savepoint}")
                 conn.execute(f"RELEASE SAVEPOINT {savepoint}")
@@ -1056,13 +1381,106 @@ def import_catalog(
                 )
                 evidence_savepoint = f"catalog_evidence_{item['record_ordinal']}"
                 conn.execute(f"SAVEPOINT {evidence_savepoint}")
+                previous = _existing_presentation(
+                    conn, source_id, item["source_record_id"]
+                )
+                presentation_id = previous["id"] if previous is not None else None
+                next_review = "needs_review"
+                if previous is not None:
+                    from app.catalog_governance import record_source_ingest_issue
+
+                    next_review, _ = record_source_ingest_issue(
+                        conn,
+                        previous,
+                        import_run_id=run_id,
+                        source_record_sha256=item["raw_sha256"],
+                        ingest_status="quarantined",
+                    )
+                processing = {
+                    "change_type": "ingest_issue",
+                    "normalized_projection_json": (
+                        previous["normalized_projection_json"]
+                        if previous is not None
+                        else None
+                    ),
+                    "normalized_projection_sha256": (
+                        previous["normalized_projection_sha256"]
+                        if previous is not None
+                        else None
+                    ),
+                    "previous_normalized_projection_sha256": (
+                        previous["normalized_projection_sha256"]
+                        if previous is not None
+                        else None
+                    ),
+                    "normalized_diff": {
+                        "source_ingest_status": {
+                            "previous": "valid_projection" if previous is not None else None,
+                            "next": "quarantined",
+                        }
+                    },
+                    "changed_fields": ["source_ingest_status"],
+                    "review_required": next_review in ("unverified", "needs_review"),
+                    "review_reopened": bool(
+                        previous is not None
+                        and previous["workflow_review_status"] == "approved"
+                        and next_review == "needs_review"
+                    ),
+                }
                 raw_row_id = _source_record_row(
-                    conn, source_id, run_id, item, "quarantined", None
+                    conn, source_id, run_id, item, "quarantined", presentation_id
                 )
                 _link_run_record(
-                    conn, run_id, raw_row_id, item, "quarantined", None
+                    conn,
+                    run_id,
+                    raw_row_id,
+                    item,
+                    "quarantined",
+                    presentation_id,
+                    processing,
                 )
                 conn.execute(f"RELEASE SAVEPOINT {evidence_savepoint}")
+                _accumulate_processing_report(
+                    report,
+                    source_record_id=item["source_record_id"],
+                    presentation_id=presentation_id,
+                    processing=processing,
+                )
+
+        if snapshot_mode == "full":
+            baseline = conn.execute(
+                """SELECT id FROM drug_import_runs
+                   WHERE source_id=? AND id<>? AND mode='apply' AND status='completed'
+                     AND snapshot_mode='full'
+                   ORDER BY completed_at DESC, rowid DESC LIMIT 1""",
+                (source_id, run_id),
+            ).fetchone()
+            if baseline is None:
+                report["retirement_baseline_missing"] = True
+            else:
+                report["retirement_baseline_import_run_id"] = baseline["id"]
+                incoming_ids = {
+                    item["source_record_id"]
+                    for item in normalized
+                    if "source_record_id_missing" not in item.get("warnings", [])
+                }
+                from app.catalog_governance import retirement_candidate_presentations
+
+                missing = retirement_candidate_presentations(
+                    conn, source_id, incoming_ids
+                )
+                if missing:
+                    from app.catalog_governance import create_retirement_batch
+
+                    batch_id = create_retirement_batch(
+                        conn,
+                        source_id=source_id,
+                        import_run_id=run_id,
+                        baseline_import_run_id=baseline["id"],
+                        candidates=missing,
+                    )
+                    report["retirement_batch_id"] = batch_id
+                    report["retirement_candidate_count"] = len(missing)
 
         final_quality = _quality_from_records(normalized)
         for key, value in final_quality.items():
@@ -1086,10 +1504,16 @@ def _row_result(row: sqlite3.Row, aliases: list[str]) -> dict[str, Any]:
     data = dict(row)
     warnings = json.loads(data.get("warnings_json") or "[]")
     incomplete = json.loads(data.get("incomplete_fields_json") or "[]")
-    if data["review_status"] == "needs_review":
+    workflow_review = data.get("workflow_review_status") or (
+        "needs_review" if data.get("review_status") == "needs_review" else "unverified"
+    )
+    operational_lifecycle = data.get("operational_lifecycle_status") or data["lifecycle_status"]
+    if workflow_review == "needs_review":
         warnings.append("Catalog record needs review; confirm every detail with the prescription.")
-    elif data["review_status"] == "unverified":
+    elif workflow_review == "unverified":
         warnings.append("Catalog record is not yet pharmacist-verified.")
+    elif workflow_review == "rejected":
+        warnings.append("Catalog record was rejected in human review and cannot be newly selected.")
     if data["usage_scope"] == "demo":
         warnings.append("Demo catalog record; not an approved production source.")
     form = data.get("dosage_form_code") or data.get("dosage_form_raw")
@@ -1105,14 +1529,17 @@ def _row_result(row: sqlite3.Row, aliases: list[str]) -> dict[str, Any]:
         "manufacturer": data.get("manufacturer_name"),
         "marketing_company": data.get("marketer_name"),
         "name_type": data.get("name_type"),
-        "review_status": data["review_status"],
-        "lifecycle_status": data["lifecycle_status"],
+        "review_status": workflow_review,
+        "lifecycle_status": operational_lifecycle,
+        "source_review_status": data.get("review_status"),
+        "source_lifecycle_status": data.get("lifecycle_status"),
+        "record_version": data.get("record_version", 1),
         "usage_scope": data["usage_scope"],
         "aliases": aliases,
         "unit_options": _unit_options(data.get("dosage_form_code"), data.get("route_code")),
         "warnings": list(dict.fromkeys(warnings)),
         "incomplete_fields": incomplete,
-        "verified": int(data["review_status"] == "verified"),
+        "verified": int(workflow_review == "approved"),
         "default_pattern_key": None,
         "default_timing_food": None,
         "default_dose_unit": None,
@@ -1131,7 +1558,9 @@ def search_catalog(conn: sqlite3.Connection, q: str, limit: int = 8,
     placeholders = ",".join("?" for _ in scopes)
     rows = conn.execute(
         f"""SELECT * FROM drug_presentations
-            WHERE lifecycle_status='active' AND usage_scope IN ({placeholders})""",
+            WHERE operational_lifecycle_status='active'
+              AND workflow_review_status<>'rejected'
+              AND usage_scope IN ({placeholders})""",
         scopes,
     ).fetchall()
     if not rows:
@@ -1192,7 +1621,12 @@ def search_catalog(conn: sqlite3.Connection, q: str, limit: int = 8,
             rank = 7
         if rank is None:
             continue
-        review_rank = {"verified": 0, "unverified": 1, "needs_review": 2}[row["review_status"]]
+        review_rank = {
+            "approved": 0,
+            "unverified": 1,
+            "needs_review": 2,
+            "rejected": 3,
+        }[row["workflow_review_status"]]
         scope_rank = 0 if row["usage_scope"] == "production" else 1
         result = _row_result(row, [alias["alias_raw"] for alias in aliases])
         if rank in (2, 3):
@@ -1237,6 +1671,7 @@ def get_presentation_snapshot(conn: sqlite3.Connection, presentation_id: str) ->
         ).fetchall()
     ]
     snapshot = _row_result(row, aliases)
+    snapshot["normalized_projection_sha256"] = row["normalized_projection_sha256"]
     snapshot["patient_display_generic"] = False
     snapshot["patient_caution_keys"] = []
     snapshot["snapshot_at"] = _now()
@@ -1245,18 +1680,19 @@ def get_presentation_snapshot(conn: sqlite3.Connection, presentation_id: str) ->
                   sr.source_record_id, sr.raw_sha256,
                   ir.version AS source_version, ir.published_at, ir.source_updated_at,
                   ir.accessed_at, ir.input_uri, ir.input_sha256, ir.records_sha256,
-                  ir.importer_version, ir.source_snapshot_json,
+                  ir.importer_version, ir.normalization_version,
+                  ir.package_schema_version, ir.snapshot_mode, ir.code_revision,
+                  ir.source_snapshot_json,
                   ir.license_snapshot_json, ir.approval_snapshot_json,
                   ir.approval_registry_sha256, ir.completed_at
            FROM drug_presentations p
            JOIN drug_sources s ON s.id=p.source_id
-           LEFT JOIN drug_source_records sr
-             ON sr.id=p.current_source_record_row_id
            LEFT JOIN drug_import_run_records irr
-             ON irr.source_record_row_id=sr.id AND irr.presentation_id=p.id
+             ON irr.id=p.current_import_run_record_id
+           LEFT JOIN drug_source_records sr
+             ON sr.id=irr.source_record_row_id
            LEFT JOIN drug_import_runs ir ON ir.id=irr.import_run_id
            WHERE p.id=?
-           ORDER BY ir.rowid DESC
            LIMIT 1""",
         (presentation_id,),
     ).fetchone()
@@ -1310,7 +1746,9 @@ def build_quality_report(conn: sqlite3.Connection) -> dict[str, Any]:
     ).fetchall()
     run_record_links = conn.execute(
         """SELECT import_run_id, record_ordinal, source_record_id, ingest_status,
-                  errors_json, presentation_id
+                  errors_json, presentation_id, normalized_projection_sha256,
+                  previous_normalized_projection_sha256, normalized_diff_json,
+                  review_required
            FROM drug_import_run_records"""
     ).fetchall()
     fingerprint_counts = Counter(row["dedupe_fingerprint"] for row in records)
@@ -1338,6 +1776,24 @@ def build_quality_report(conn: sqlite3.Connection) -> dict[str, Any]:
         ),
         "import_run_record_links": len(run_record_links),
         "needs_review": sum(row["review_status"] == "needs_review" for row in records),
+        "missing_normalized_projection": sum(
+            not row.get("normalized_projection_sha256") for row in records
+        ),
+        "reprocessing_changed": sum(
+            bool(row["previous_normalized_projection_sha256"])
+            and row["normalized_projection_sha256"]
+            != row["previous_normalized_projection_sha256"]
+            for row in run_record_links
+        ),
+        "reprocessing_unchanged": sum(
+            bool(row["previous_normalized_projection_sha256"])
+            and row["normalized_projection_sha256"]
+            == row["previous_normalized_projection_sha256"]
+            for row in run_record_links
+        ),
+        "reprocessing_review_required": sum(
+            bool(row["review_required"]) for row in run_record_links
+        ),
         "duplicate_candidates": sum(count - 1 for count in fingerprint_counts.values() if count > 1),
         "missing_brand_name": sum(not row.get("brand_name_raw") for row in records),
         "missing_generic_name": sum(not row.get("generic_name_raw") for row in records),
@@ -1382,6 +1838,10 @@ def quality_report_markdown(report: dict[str, Any]) -> str:
         ("Raw source records", "raw_total"), ("Canonical presentations", "imported"),
         ("Excluded", "excluded"), ("Quarantined run records", "quarantined"),
         ("Needs review", "needs_review"),
+        ("Missing normalized projection snapshot", "missing_normalized_projection"),
+        ("Changed reprocessing records", "reprocessing_changed"),
+        ("Unchanged reprocessing records", "reprocessing_unchanged"),
+        ("Reprocessing records requiring review", "reprocessing_review_required"),
         ("Duplicate candidates", "duplicate_candidates"),
         ("Missing brand/product name", "missing_brand_name"),
         ("Missing ingredient name", "missing_generic_name"),

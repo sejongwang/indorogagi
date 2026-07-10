@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23173f2d'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>{% block title %}Catalog operations{% endblock %} · indoro</title>
+  <link rel="stylesheet" href="/static/rx.css">
+  <link rel="stylesheet" href="/static/catalog-ops.css">
+</head>
+<body class="catalog-ops">
+  <header class="ops-header">
+    <div class="ops-header__inner">
+      <a class="ops-brand" href="/catalog/review">indoro · Catalog operations</a>
+      <nav class="ops-nav" aria-label="Catalog operations">
+        <a href="/catalog/review" {% if active_nav == 'review' %}aria-current="page"{% endif %}>Review queue</a>
+        <a href="/catalog/retirements" {% if active_nav == 'retirements' %}aria-current="page"{% endif %}>Retirement batches</a>
+      </nav>
+    </div>
+  </header>
+  <div class="ops-safety" data-qa="ops-safety-banner">
+    <strong>Prototype · local operations only.</strong>
+    No production authentication or CSRF protection is implemented. Do not expose this UI publicly.
+  </div>
+  <main class="ops-shell">
+    {% if flash %}<div class="ops-message ops-message--success" role="status" data-qa="flash-message">{{ flash|replace('-', ' ') }}</div>{% endif %}
+    {% if error %}<div class="ops-message ops-message--error" role="alert" {% if conflict %}data-qa="conflict-message"{% endif %}>{{ error }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

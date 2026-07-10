@@ -1,0 +1,59 @@
+{% extends "catalog_ops_base.html" %}
+{% block title %}Review queue{% endblock %}
+{% block content %}
+<section data-qa="catalog-review-page" class="ops-stack">
+  <div class="ops-page-heading">
+    <div>
+      <p class="ops-eyebrow">Human verification</p>
+      <h1>Medicine review queue</h1>
+      <p>Source quality and pharmacist decisions are kept separate. Catalog lifecycle is shown independently.</p>
+    </div>
+    <div class="ops-counts" aria-label="Review status counts">
+      <span><b>{{ counts.get('needs_review', 0) }}</b> needs review</span>
+      <span><b>{{ counts.get('unverified', 0) }}</b> unverified</span>
+      <span><b>{{ counts.get('approved', 0) }}</b> approved</span>
+      <span><b>{{ counts.get('rejected', 0) }}</b> rejected</span>
+    </div>
+  </div>
+
+  <form class="ops-filter card" method="get" action="/catalog/review" data-qa="review-filters">
+    <label class="field"><span class="field-label">Search</span><input class="input" name="q" value="{{ filters.q }}" placeholder="Brand, ingredient, strength, source ID"></label>
+    <label class="field"><span class="field-label">Source</span><select class="input" name="source"><option value="">All sources</option>{% for source in sources %}<option value="{{ source.slug }}" {% if filters.source == source.slug %}selected{% endif %}>{{ source.name }} · {{ source.slug }}</option>{% endfor %}</select></label>
+    <label class="field"><span class="field-label">Review status</span><select class="input" name="review_status"><option value="">All</option>{% for value in ['unverified','needs_review','approved','rejected'] %}<option value="{{ value }}" {% if filters.review_status == value %}selected{% endif %}>{{ value|replace('_',' ') }}</option>{% endfor %}</select></label>
+    <label class="field"><span class="field-label">Catalog lifecycle</span><select class="input" name="lifecycle_status"><option value="">All</option>{% for value in ['active','inactive','retired'] %}<option value="{{ value }}" {% if filters.lifecycle_status == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+    <label class="field"><span class="field-label">Data issue</span><select class="input" name="issue"><option value="">All issues</option>{% for value, label in [('missing_ingredient','Missing ingredient'),('missing_strength','Missing strength'),('missing_dosage_form','Missing dosage form'),('missing_route','Missing route'),('dangerous_similar_name','Similar-name candidate')] %}<option value="{{ value }}" {% if filters.issue == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <label class="field"><span class="field-label">Import run</span><input class="input ops-mono" name="import_run" value="{{ filters.import_run }}" placeholder="Exact run ID"></label>
+    <div class="ops-filter__actions"><button class="btn btn-primary" type="submit">Apply filters</button><a class="btn btn-secondary" href="/catalog/review">Clear</a></div>
+  </form>
+
+  <div class="ops-result-heading"><h2>{{ records|length }} records</h2><p>Full names are never truncated.</p></div>
+  <div class="ops-record-list">
+    {% for item in records %}
+    <article class="ops-record card" data-qa="review-row" data-presentation-id="{{ item.id }}">
+      <div class="ops-record__identity">
+        <h2><a href="/catalog/review/{{ item.id }}">{{ item.brand_name_raw }}</a></h2>
+        <p>{{ item.generic_name_raw or 'Ingredient missing' }}{% if item.strength_raw %} · {{ item.strength_raw }}{% endif %}{% if item.dosage_form_raw %} · {{ item.dosage_form_raw }}{% endif %}{% if item.route_raw %} · {{ item.route_raw }}{% endif %}</p>
+        {% if item.manufacturer_name %}<p class="ops-muted">{{ item.manufacturer_name }}</p>{% endif %}
+      </div>
+      <div class="ops-record__status">
+        <span class="ops-status review-{{ item.workflow_review_status }}" data-qa="review-status">Review: {{ item.workflow_review_status|replace('_',' ') }}</span>
+        <span class="ops-status lifecycle-{{ item.operational_lifecycle_status }}" data-qa="lifecycle-status">Lifecycle: {{ item.operational_lifecycle_status }}</span>
+      </div>
+      <div class="ops-record__source">
+        <b>{{ item.source_slug }}</b>
+        <span class="ops-mono">{{ item.source_record_id }}</span>
+        {% if item.incomplete_fields %}<span>Missing: {{ item.incomplete_fields|join(', ') }}</span>{% endif %}
+        {% if item.warnings %}<span>Warnings: {{ item.warnings|join(', ') }}</span>{% endif %}
+        {% if item.import_run_id %}<span>Latest import: <span class="ops-mono">{{ item.import_run_id }}</span> · {{ item.latest_ingest_status }}</span>{% endif %}
+        {% if item.latest_evidence_not_applied %}<span class="ops-warning">Latest source evidence was not applied to the current normalized projection.</span>{% endif %}
+        <span>Catalog updated: {{ item.updated_at }}</span>
+        {% if item.last_reviewer_id %}<span>Last: {{ item.last_reviewer_id }} · {{ item.last_reviewed_at }}</span>{% endif %}
+      </div>
+      <a class="btn btn-secondary" href="/catalog/review/{{ item.id }}">Review record</a>
+    </article>
+    {% else %}
+    <div class="card ops-empty">No catalog records match these filters.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

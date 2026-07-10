@@ -1,0 +1,26 @@
+{
+  "source": {
+    "slug": "indoro-governance-synthetic-demo",
+    "name": "indoro governance synthetic demo",
+    "operator": "indoro test suite",
+    "tier": 3,
+    "usage_scope": "demo",
+    "reuse_status": "demo_only",
+    "version": "2.1.0",
+    "snapshot_mode": "delta",
+    "package_schema_version": "2",
+    "source_url": "https://example.invalid/indoro-synthetic-governance-demo",
+    "input_uri": "data/catalog/governance-demo/delta-v2-1.json"
+  },
+  "records": [
+    {
+      "source_record_id": "gov-delta-009",
+      "brand_name": "DEMO Delta Addition",
+      "generic_name": "Invented Delta Ingredient",
+      "ingredients": [{"name": "Invented Delta Ingredient", "strength": "4 mg"}],
+      "strength": "4 mg",
+      "form": "tablet",
+      "route": "oral"
+    }
+  ]
+}

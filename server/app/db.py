@@ -248,6 +248,11 @@ CREATE TABLE IF NOT EXISTS drug_import_runs (
     approval_snapshot_json TEXT CHECK (approval_snapshot_json IS NULL OR json_valid(approval_snapshot_json)),
     approval_registry_sha256 TEXT,
     importer_version  TEXT NOT NULL,
+    normalization_version TEXT NOT NULL DEFAULT 'catalog-normalization-v1',
+    package_schema_version TEXT NOT NULL DEFAULT '1',
+    snapshot_mode     TEXT NOT NULL DEFAULT 'delta' CHECK (snapshot_mode IN ('delta','full')),
+    package_content_sha256 TEXT,
+    code_revision     TEXT,
     mode              TEXT NOT NULL CHECK (mode IN ('apply','dry_run')),
     status            TEXT NOT NULL CHECK (status IN ('completed','failed')),
     raw_total         INTEGER NOT NULL DEFAULT 0,
@@ -289,11 +294,25 @@ CREATE TABLE IF NOT EXISTS drug_presentations (
     lifecycle_status      TEXT NOT NULL DEFAULT 'active' CHECK (lifecycle_status IN ('active','inactive')),
     review_status         TEXT NOT NULL DEFAULT 'unverified'
                           CHECK (review_status IN ('verified','unverified','needs_review')),
+    -- Source/normalization 상태와 사람이 결정한 운영 상태는 의도적으로 분리한다.
+    -- 기존 review_status/lifecycle_status는 원본 package projection으로 유지된다.
+    workflow_review_status TEXT NOT NULL DEFAULT 'unverified'
+                          CHECK (workflow_review_status IN
+                                 ('unverified','needs_review','approved','rejected')),
+    operational_lifecycle_status TEXT NOT NULL DEFAULT 'active'
+                          CHECK (operational_lifecycle_status IN
+                                 ('active','inactive','retired')),
+    record_version        INTEGER NOT NULL DEFAULT 1 CHECK (record_version >= 1),
+    normalized_projection_json TEXT CHECK (
+        normalized_projection_json IS NULL OR json_valid(normalized_projection_json)
+    ),
+    normalized_projection_sha256 TEXT,
     dedupe_fingerprint    TEXT NOT NULL,
     incomplete_fields_json TEXT CHECK (incomplete_fields_json IS NULL OR json_valid(incomplete_fields_json)),
     warnings_json          TEXT CHECK (warnings_json IS NULL OR json_valid(warnings_json)),
     source_updated_at      TEXT,
     current_source_record_row_id TEXT REFERENCES drug_source_records(id),
+    current_import_run_record_id TEXT REFERENCES drug_import_run_records(id),
     created_at             TEXT NOT NULL,
     updated_at             TEXT NOT NULL,
     UNIQUE (source_id, source_record_id)
@@ -332,6 +351,15 @@ CREATE TABLE IF NOT EXISTS drug_import_run_records (
     ingest_status        TEXT NOT NULL CHECK (ingest_status IN ('imported','needs_review','excluded','quarantined')),
     errors_json          TEXT CHECK (errors_json IS NULL OR json_valid(errors_json)),
     presentation_id      TEXT REFERENCES drug_presentations(id),
+    normalized_projection_json TEXT CHECK (
+        normalized_projection_json IS NULL OR json_valid(normalized_projection_json)
+    ),
+    normalized_projection_sha256 TEXT,
+    previous_normalized_projection_sha256 TEXT,
+    normalized_diff_json TEXT CHECK (
+        normalized_diff_json IS NULL OR json_valid(normalized_diff_json)
+    ),
+    review_required      INTEGER NOT NULL DEFAULT 0 CHECK (review_required IN (0,1)),
     created_at           TEXT NOT NULL,
     UNIQUE (import_run_id, record_ordinal)
 );
@@ -386,6 +414,138 @@ CREATE TABLE IF NOT EXISTS drug_packages (
     created_at       TEXT NOT NULL
 );
 
+-- 약사/데이터 운영자의 presentation 결정 이력. 현재 상태는 presentation에
+-- projection하지만 이 원장은 UPDATE/DELETE할 수 없다.
+CREATE TABLE IF NOT EXISTS drug_review_decisions (
+    id                        TEXT PRIMARY KEY,
+    presentation_id           TEXT NOT NULL REFERENCES drug_presentations(id),
+    retirement_batch_id       TEXT,
+    retirement_candidate_id   TEXT,
+    source_id                 TEXT NOT NULL REFERENCES drug_sources(id),
+    source_record_id          TEXT NOT NULL,
+    source_record_sha256      TEXT,
+    import_run_id             TEXT REFERENCES drug_import_runs(id),
+    action                    TEXT NOT NULL CHECK (action IN (
+        'review_requested','review_approved','review_rejected',
+        'lifecycle_inactivated','lifecycle_reactivated',
+        'source_record_updated','source_record_quarantined',
+        'retirement_kept','retirement_marked',
+        'retirement_investigation','retirement_applied','retirement_cancelled'
+    )),
+    previous_review_status    TEXT CHECK (
+        previous_review_status IS NULL OR previous_review_status IN
+        ('unverified','needs_review','approved','rejected')
+    ),
+    next_review_status        TEXT CHECK (
+        next_review_status IS NULL OR next_review_status IN
+        ('unverified','needs_review','approved','rejected')
+    ),
+    previous_lifecycle_status TEXT CHECK (
+        previous_lifecycle_status IS NULL OR previous_lifecycle_status IN
+        ('active','inactive','retired')
+    ),
+    next_lifecycle_status     TEXT CHECK (
+        next_lifecycle_status IS NULL OR next_lifecycle_status IN
+        ('active','inactive','retired')
+    ),
+    reason_code               TEXT NOT NULL,
+    note                      TEXT NOT NULL,
+    reviewer_id               TEXT NOT NULL,
+    reviewer_role             TEXT NOT NULL,
+    expected_record_version   INTEGER NOT NULL,
+    resulting_record_version  INTEGER NOT NULL,
+    normalized_snapshot_json  TEXT CHECK (
+        normalized_snapshot_json IS NULL OR json_valid(normalized_snapshot_json)
+    ),
+    normalized_projection_sha256 TEXT,
+    created_at                TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_drug_review_decisions_presentation
+    ON drug_review_decisions (presentation_id, created_at DESC);
+CREATE TRIGGER IF NOT EXISTS drug_review_decisions_no_update
+BEFORE UPDATE ON drug_review_decisions
+BEGIN
+    SELECT RAISE(ABORT, 'drug_review_decisions is append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS drug_review_decisions_no_delete
+BEFORE DELETE ON drug_review_decisions
+BEGIN
+    SELECT RAISE(ABORT, 'drug_review_decisions is append-only');
+END;
+
+CREATE TABLE IF NOT EXISTS drug_retirement_batches (
+    id                     TEXT PRIMARY KEY,
+    source_id              TEXT NOT NULL REFERENCES drug_sources(id),
+    import_run_id          TEXT NOT NULL UNIQUE REFERENCES drug_import_runs(id),
+    baseline_import_run_id TEXT NOT NULL REFERENCES drug_import_runs(id),
+    snapshot_mode          TEXT NOT NULL CHECK (snapshot_mode = 'full'),
+    status                 TEXT NOT NULL DEFAULT 'proposed' CHECK (
+        status IN ('proposed','under_review','approved','applied','cancelled')
+    ),
+    candidate_count        INTEGER NOT NULL DEFAULT 0 CHECK (candidate_count >= 0),
+    created_by             TEXT NOT NULL,
+    approved_by            TEXT,
+    created_at             TEXT NOT NULL,
+    approved_at            TEXT,
+    applied_at             TEXT,
+    cancelled_at           TEXT,
+    reason                 TEXT,
+    record_version         INTEGER NOT NULL DEFAULT 1 CHECK (record_version >= 1)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_retirement_batches_source
+    ON drug_retirement_batches (source_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS drug_retirement_candidates (
+    id                            TEXT PRIMARY KEY,
+    batch_id                      TEXT NOT NULL REFERENCES drug_retirement_batches(id) ON DELETE CASCADE,
+    presentation_id               TEXT NOT NULL REFERENCES drug_presentations(id),
+    source_record_id              TEXT NOT NULL,
+    previous_lifecycle_status     TEXT NOT NULL CHECK (
+        previous_lifecycle_status IN ('active','inactive','retired')
+    ),
+    expected_presentation_version INTEGER NOT NULL,
+    decision                      TEXT NOT NULL DEFAULT 'pending' CHECK (
+        decision IN ('pending','keep_active','retire','needs_investigation')
+    ),
+    reason_code                   TEXT,
+    review_note                   TEXT,
+    reviewer_id                   TEXT,
+    reviewed_at                   TEXT,
+    applied_at                    TEXT,
+    record_version                INTEGER NOT NULL DEFAULT 1 CHECK (record_version >= 1),
+    UNIQUE (batch_id, presentation_id)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_retirement_candidates_batch
+    ON drug_retirement_candidates (batch_id, decision);
+
+CREATE TABLE IF NOT EXISTS drug_retirement_batch_events (
+    id                    TEXT PRIMARY KEY,
+    batch_id              TEXT NOT NULL REFERENCES drug_retirement_batches(id),
+    action                TEXT NOT NULL CHECK (action IN
+        ('batch_created','candidate_decided','batch_approved','batch_applied','batch_cancelled')),
+    previous_status       TEXT,
+    next_status           TEXT NOT NULL,
+    actor_id              TEXT NOT NULL,
+    actor_role            TEXT NOT NULL,
+    reason_code           TEXT NOT NULL,
+    note                  TEXT NOT NULL,
+    expected_batch_version INTEGER NOT NULL,
+    resulting_batch_version INTEGER NOT NULL,
+    created_at            TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_drug_retirement_batch_events_batch
+    ON drug_retirement_batch_events (batch_id, created_at);
+CREATE TRIGGER IF NOT EXISTS drug_retirement_batch_events_no_update
+BEFORE UPDATE ON drug_retirement_batch_events
+BEGIN
+    SELECT RAISE(ABORT, 'drug_retirement_batch_events is append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS drug_retirement_batch_events_no_delete
+BEFORE DELETE ON drug_retirement_batch_events
+BEGIN
+    SELECT RAISE(ABORT, 'drug_retirement_batch_events is append-only');
+END;
+
 CREATE TABLE IF NOT EXISTS events (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,  -- 유일한 INTEGER PK(D9 예외)
     event_type      TEXT NOT NULL,
@@ -436,6 +596,12 @@ def init_db(db_path: str | Path | None = None) -> None:
     conn = get_conn(db_path)
     try:
         conn.executescript(SCHEMA_SQL)
+        governance_migration_pending = conn.execute(
+            "SELECT 1 FROM schema_migrations WHERE version=5"
+        ).fetchone() is None
+        applied_run_migration_pending = conn.execute(
+            "SELECT 1 FROM schema_migrations WHERE version=7"
+        ).fetchone() is None
         _ensure_column(conn, "prescription_items", "drug_input_raw", "TEXT")
         _ensure_column(
             conn,
@@ -488,9 +654,154 @@ def init_db(db_path: str | Path | None = None) -> None:
         _ensure_column(conn, "drug_import_runs", "approval_registry_sha256", "TEXT")
         _ensure_column(
             conn,
+            "drug_import_runs",
+            "normalization_version",
+            "TEXT NOT NULL DEFAULT 'catalog-normalization-v1'",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_runs",
+            "package_schema_version",
+            "TEXT NOT NULL DEFAULT '1'",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_runs",
+            "snapshot_mode",
+            "TEXT NOT NULL DEFAULT 'delta' CHECK (snapshot_mode IN ('delta','full'))",
+        )
+        _ensure_column(conn, "drug_import_runs", "package_content_sha256", "TEXT")
+        _ensure_column(conn, "drug_import_runs", "code_revision", "TEXT")
+        _ensure_column(
+            conn,
             "drug_presentations",
             "current_source_record_row_id",
             "TEXT REFERENCES drug_source_records(id)",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "current_import_run_record_id",
+            "TEXT REFERENCES drug_import_run_records(id)",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "workflow_review_status",
+            "TEXT NOT NULL DEFAULT 'unverified' CHECK (workflow_review_status IN "
+            "('unverified','needs_review','approved','rejected'))",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "operational_lifecycle_status",
+            "TEXT NOT NULL DEFAULT 'active' CHECK (operational_lifecycle_status IN "
+            "('active','inactive','retired'))",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "record_version",
+            "INTEGER NOT NULL DEFAULT 1 CHECK (record_version >= 1)",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "normalized_projection_json",
+            "TEXT CHECK (normalized_projection_json IS NULL OR "
+            "json_valid(normalized_projection_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "normalized_projection_sha256",
+            "TEXT",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_run_records",
+            "normalized_projection_json",
+            "TEXT CHECK (normalized_projection_json IS NULL OR "
+            "json_valid(normalized_projection_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_run_records",
+            "normalized_projection_sha256",
+            "TEXT",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_run_records",
+            "previous_normalized_projection_sha256",
+            "TEXT",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_run_records",
+            "normalized_diff_json",
+            "TEXT CHECK (normalized_diff_json IS NULL OR json_valid(normalized_diff_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_run_records",
+            "review_required",
+            "INTEGER NOT NULL DEFAULT 0 CHECK (review_required IN (0,1))",
+        )
+        _ensure_column(
+            conn,
+            "drug_review_decisions",
+            "normalized_snapshot_json",
+            "TEXT CHECK (normalized_snapshot_json IS NULL OR "
+            "json_valid(normalized_snapshot_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_review_decisions",
+            "normalized_projection_sha256",
+            "TEXT",
+        )
+        # One-time additive backfill. Re-running these statements at every startup would
+        # silently overwrite later human review/lifecycle decisions without an audit row.
+        if governance_migration_pending:
+            # Source `verified` has no reviewer identity/audit proof, so it deliberately
+            # does not become workflow `approved`. Restrictive source declarations seed
+            # only the initial governance projection.
+            conn.execute(
+                """UPDATE drug_presentations
+                   SET workflow_review_status='needs_review'
+                   WHERE review_status='needs_review'
+                     AND workflow_review_status='unverified'"""
+            )
+            conn.execute(
+                """UPDATE drug_presentations
+                   SET operational_lifecycle_status='inactive'
+                   WHERE lifecycle_status='inactive'
+                     AND operational_lifecycle_status='active'"""
+            )
+        if applied_run_migration_pending:
+            conn.execute(
+                """UPDATE drug_presentations AS p
+                   SET current_import_run_record_id=(
+                       SELECT irr.id
+                       FROM drug_import_run_records irr
+                       WHERE irr.presentation_id=p.id
+                         AND irr.source_record_row_id=p.current_source_record_row_id
+                         AND irr.ingest_status IN ('imported','needs_review')
+                         AND (
+                           p.normalized_projection_sha256 IS NULL
+                           OR irr.normalized_projection_sha256=
+                              p.normalized_projection_sha256
+                         )
+                       ORDER BY irr.rowid DESC
+                       LIMIT 1
+                   )
+                   WHERE p.current_import_run_record_id IS NULL"""
+            )
+        conn.execute(
+            """CREATE INDEX IF NOT EXISTS idx_drug_presentations_governance
+               ON drug_presentations
+                  (usage_scope, operational_lifecycle_status, workflow_review_status)"""
         )
         conn.execute(
             """INSERT OR IGNORE INTO schema_migrations
@@ -512,6 +823,33 @@ def init_db(db_path: str | Path | None = None) -> None:
             (
                 "catalog database production/demo role",
                 "drug-catalog-v4-database-mode",
+                now_utc(),
+            ),
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (5, ?, ?, ?)""",
+            (
+                "catalog review audit and full-snapshot retirement governance",
+                "drug-catalog-v5-governance-additive",
+                now_utc(),
+            ),
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (6, ?, ?, ?)""",
+            (
+                "catalog normalized projection snapshots and reprocessing diffs",
+                "drug-catalog-v6-normalized-audit-additive",
+                now_utc(),
+            ),
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (7, ?, ?, ?)""",
+            (
+                "catalog applied import-run record identity",
+                "drug-catalog-v7-applied-run-record",
                 now_utc(),
             ),
         )
@@ -738,11 +1076,20 @@ def _insert_items_tx(
                 selection_warnings.append(
                     "demo_catalog_not_available_for_pharmacy_free_text_preserved"
                 )
-            elif drug_snapshot.get("lifecycle_status") == "inactive":
+            elif drug_snapshot.get("lifecycle_status") != "active":
+                lifecycle_status = drug_snapshot.get("lifecycle_status")
                 drug_snapshot = None
                 match_state = "free_text"
                 selection_warnings.append(
                     "inactive_catalog_link_cleared_free_text_preserved"
+                    if lifecycle_status == "inactive"
+                    else "retired_catalog_link_cleared_free_text_preserved"
+                )
+            elif drug_snapshot.get("review_status") == "rejected":
+                drug_snapshot = None
+                match_state = "free_text"
+                selection_warnings.append(
+                    "rejected_catalog_link_cleared_free_text_preserved"
                 )
             elif normalize_identity(drug_name_raw) != normalize_identity(
                 drug_snapshot.get("brand_name")
@@ -769,8 +1116,8 @@ def _insert_items_tx(
                 selection_warnings.append("catalog_record_unverified")
             if drug_snapshot.get("usage_scope") == "demo":
                 selection_warnings.append("demo_catalog_record")
-            if drug_snapshot.get("lifecycle_status") == "inactive":
-                selection_warnings.append("inactive_catalog_record")
+            if drug_snapshot.get("lifecycle_status") != "active":
+                selection_warnings.append("nonactive_catalog_record")
             if drug_snapshot.get("incomplete_fields"):
                 selection_warnings.append("catalog_record_incomplete")
             unit_options = drug_snapshot.get("unit_options") or []
