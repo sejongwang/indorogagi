@@ -1,5 +1,7 @@
 # 모바일 복약 포스터 구현·시각 QA
 
+> **후속 정본:** 이 문서는 첫 번째 하루 흐름 포스터 반복의 기록이다. 반복 가로 행동 띠로 재구현한 최신 결과와 캡처는 [`07-infographic-poster-visual-qa.md`](07-infographic-poster-visual-qa.md)를 본다.
+
 - 검증일: 2026-07-10
 - 브라우저: Playwright Chromium, Android Chrome과 같은 모바일 viewport
 - 서버: `http://127.0.0.1:8600`

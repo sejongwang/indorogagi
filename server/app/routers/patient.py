@@ -31,15 +31,22 @@ _BOT_RE = re.compile(
     re.IGNORECASE,
 )
 
-# 픽토그램 심볼 매핑. 7개 dose_unit 모두 고유한 자체 SVG를 사용한다.
+# 픽토그램 심볼 매핑. 모든 dose_unit은 글자·숫자와 함께 자체 SVG를 사용한다.
 _PICTO = {
     "tablet": "p-tab",
     "capsule": "p-cap",
     "ml": "p-spoon",
+    "measuring_spoon": "p-measuring-spoon",
     "drop": "p-drop",
     "puff": "p-puff",
+    "inhalation": "p-inhalation",
     "sachet": "p-sachet",
+    "packet": "p-packet",
     "application": "p-application",
+    "suppository": "p-suppository",
+    "injection": "p-injection",
+    "patch": "p-patch",
+    "spray": "p-spray",
 }
 _SLOT_ICO = {"M": "i-slot-m", "N": "i-slot-n", "E": "i-slot-e", "H": "i-slot-h"}
 _TF_ICO = {
@@ -135,13 +142,46 @@ def _fmt2(pair: dict[str, str], **kw: Any) -> dict[str, str]:
 
 # ---------------------------------------------------------------- 뷰모델 빌더
 
-def _dose_view(unit: str, q: float, unit_pair: dict[str, str], ui: dict[str, Any]) -> dict[str, Any]:
+def _contextual_unit_pair(
+    unit: str,
+    drug: dict[str, Any] | None,
+    i18n: dict[str, Any],
+    *,
+    short: bool = False,
+) -> dict[str, str]:
+    """Keep the stored unit stable while a selected catalogue route clarifies drops."""
+    base = (
+        i18n["ui"]["dose_units_short"].get(unit)
+        if short
+        else i18n["dose_units"].get(unit)
+    ) or {"hi": unit, "en": unit}
+    if unit != "drop" or not drug:
+        return base
+    route = str(
+        drug.get("route_code")
+        or drug.get("route")
+        or drug.get("route_display")
+        or ""
+    ).lower()
+    route = {
+        "eye": "ophthalmic",
+        "ocular": "ophthalmic",
+        "ear": "otic",
+        "intranasal": "nasal",
+    }.get(route, route)
+    return (
+        (i18n.get("dose_unit_route_labels") or {}).get("drop", {}).get(route)
+        or base
+    )
+
+
+def _dose_view(unit: str, q: float, unit_pair: dict[str, str]) -> dict[str, Any]:
     """아이콘만으로 뜻을 전달하지 않도록 그림·숫자·단위 라벨을 한 묶음으로 만든다."""
     return {
         "unit_key": unit,
         "q": _qf(q),
         "glyphs": _pictos(unit, q),
-        "unit": ui["dose_units_short"].get(unit) or unit_pair,
+        "unit": unit_pair,
     }
 
 
@@ -157,8 +197,14 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
         st = pat.get("schedule_type", "daily")
         name = pat.get("name") or {"hi": key, "en": key}
         unit = it["dose_unit"] or "tablet"
-        unit_pair = i18n["dose_units"].get(unit) or {"hi": unit, "en": unit}
         drug = it["drug"]
+        route_context = (
+            {"route_code": it["administration_route"]}
+            if it.get("administration_route")
+            else drug
+        )
+        unit_pair = _contextual_unit_pair(unit, route_context, i18n)
+        unit_short_pair = _contextual_unit_pair(unit, route_context, i18n, short=True)
         doses = it["doses"]
 
         v: dict[str, Any] = {
@@ -170,7 +216,9 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
             "pattern_key": key,
             "pattern_name": name,
             "unit": unit,
+            "administration_route": it.get("administration_route"),
             "unit_pair": unit_pair,
+            "unit_short_pair": unit_short_pair,
             "doses": doses,
             "detail_doses": [],
             "weekly_day": None,
@@ -184,7 +232,10 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
             "cautions": [],
             "note": it["note"],
         }
-        if drug and drug.get("generic_name"):
+        # 카탈로그에 존재한다는 사실만으로 성분/함량을 환자에게 노출하지 않는다.
+        # 발급 스냅샷에서 약사가 명시적으로 허용한 경우에만 보조 표기를 만든다.
+        # 현재 입력 UI에는 이 opt-in이 없으므로 신규 발급의 안전한 기본값은 False다.
+        if drug and drug.get("patient_display_generic") is True and drug.get("generic_name"):
             v["enrich"] = " · ".join(x for x in (drug["generic_name"], drug.get("strength")) if x)
 
         for slot in cfg["slot_order"]:
@@ -194,7 +245,7 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
                     "key": slot,
                     "ico": _SLOT_ICO[slot],
                     "label": i18n["slots"][slot],
-                    "dose": _dose_view(unit, q, unit_pair, ui),
+                    "dose": _dose_view(unit, q, unit_short_pair),
                 })
 
         if st == "weekly":
@@ -215,13 +266,15 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
             v["custom_instr"] = (it["extra_params"] or {}).get("instructions") or ""
         if it["timing_food"]:
             v["food"] = {
+                "key": it["timing_food"],
                 "ico": _TF_ICO.get(it["timing_food"], "i-tf-with"),
                 "label": i18n["timing_food"].get(it["timing_food"])
                 or {"hi": it["timing_food"], "en": it["timing_food"]},
             }
 
-        # 주의 배지: drug_id 매칭 시만. 카탈로그 결측 라벨은 키 노출 폴백(§3.4)
-        for ck in (drug or {}).get("caution_keys") or []:
+        # 내부 카탈로그 경고·불완전 상태는 약사 확인용이다. 환자 경고는 약사가
+        # 확인해 발급 스냅샷의 patient_caution_keys에 넣은 항목만 허용한다.
+        for ck in (drug or {}).get("patient_caution_keys") or []:
             label = (i18n.get("caution") or {}).get(ck)
             v["cautions"].append(label or {"hi": f"caution.{ck}", "en": f"caution.{ck}"})
 
@@ -229,11 +282,11 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
         if st != "daily":
             if st in ("weekly", "once"):
                 q = next((float(doses.get(s) or 0) for s in cfg["slot_order"] if doses.get(s)), 1.0)
-                v["special_dose"] = _dose_view(unit, q, unit_pair, ui)
+                v["special_dose"] = _dose_view(unit, q, unit_short_pair)
             elif st == "prn":
                 q = (it["extra_params"] or {}).get("dose_per_use")
                 if isinstance(q, (int, float)) and not isinstance(q, bool) and q > 0:
-                    v["special_dose"] = _dose_view(unit, float(q), unit_pair, ui)
+                    v["special_dose"] = _dose_view(unit, float(q), unit_short_pair)
             label = (
                 _fmt2(s1["weekly_row"], day=v["weekly_day"]) if st == "weekly"
                 else s1["custom_row"] if st == "custom"
@@ -285,7 +338,7 @@ def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
                 "position": v["position"],
                 "hue": v["hue"],
                 "name_raw": v["name_raw"],
-                "dose": _dose_view(v["unit"], q, v["unit_pair"], ui),
+                "dose": _dose_view(v["unit"], q, v["unit_short_pair"]),
                 "food": v["food"],
                 "duration_days": v["duration_days"],
             })
@@ -296,11 +349,30 @@ def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
             "actions": actions,
         })
 
-    # 첫 화면에서 실제 약명까지 보이게 한다. 시간 리본의 숫자만으로는 저문해
-    # 사용자가 "언제 무엇을" 3초 안에 확인하기 어렵기 때문에, 첫 비어 있지 않은
-    # 일과 슬롯을 포스터 제목 바로 아래에 한 번 더 짧게 요약한다.
+    # 첫 비어 있지 않은 일과 띠에만 "여기서 시작" 표지를 붙여
+    # 실제 약명과 복용 행동을 따라가기 시작할 위치를 분명히 한다.
     first_slot = next((slot for slot in day_slots if slot["actions"]), None)
     specials = [v for v in views if v["stype"] != "daily"]
+
+    note_display = None
+    has_demo_catalog_item = any(
+        (item.get("drug_catalog_snapshot") or {}).get("usage_scope") == "demo"
+        for item in bundle["items"]
+    )
+    if has_demo_catalog_item:
+        # demo scope는 서버가 저장한 발급 스냅샷에서 판정한다. 클라이언트 note가
+        # 경고 문구를 빠뜨리거나 바꿔도 합성 약품을 실제 권고처럼 보이지 않게 한다.
+        note_display = s1["demo_warning"]
+    elif presc["note"]:
+        is_demo_note = (
+            "DEMO ONLY" in presc["note"]
+            and "केवल डेमो" in presc["note"]
+        )
+        note_display = (
+            s1["demo_warning"]
+            if is_demo_note
+            else {lang_key: presc["note"] for lang_key in LANGS}
+        )
 
     # C2 공유 — wa.me URL에는 약명·용법·patient_label을 넣지 않고 불투명 토큰 링크만 보낸다.
     # 핵심 복약 정보의 오프라인 보관은 화면 스크린샷으로 안내한다.
@@ -322,6 +394,7 @@ def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
         "slot_ico": _SLOT_ICO,
         "pharmacy": pharmacy,
         "presc": presc,
+        "note_display": note_display,
         "trust": trust,
         "views": views,
         "day_slots": day_slots,

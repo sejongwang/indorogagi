@@ -245,6 +245,7 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
   .lang-switch, .share-section { display: none; }
 }
 </style>
+<link rel="stylesheet" href="/static/patient-poster.css">
 </head>
 <body>
 <div class="page">
@@ -269,71 +270,67 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
     {% if trust.expiring %}<p class="trust-flag">{{ ico("i-warn") }}{{ he(trust.expiring) }}</p>{% endif %}
   </header>
 
-  {% if presc.note %}<aside class="rx-note">{{ ico("i-warn") }}<span>{{ presc.note }}</span></aside>{% endif %}
+  {% if note_display %}<aside class="rx-note">{{ ico("i-warn") }}<span>{{ he(note_display) }}</span></aside>{% endif %}
 
   <main>
-    <section class="hero" aria-labelledby="poster-title">
+    <section class="poster-intro" aria-labelledby="poster-title">
       <p class="hero-kicker">{{ he(T.poster_kicker) }}</p>
       <h1 id="poster-title">{{ he(T.poster_title) }}</h1>
       <p class="hero-sub">{{ he(T.poster_sub) }}</p>
-      {% if first_slot %}
-      <section class="first-glance" aria-label="{{ T.at_a_glance[lang] }}">
-        <p class="first-glance-head">{{ ico(first_slot.ico) }}<span>{{ he(T.at_a_glance) }} · {{ he(first_slot.label) }}</span></p>
-        <div class="first-glance-actions">
-          {% for a in first_slot.actions %}
-          <div class="first-glance-action">
-            <span class="first-glance-badge hue-{{ a.hue }}">{{ a.position }}</span>
-            <p><span class="first-glance-name">{{ a.name_raw }}</span><br><span class="first-glance-dose">{{ a.dose.q }} {{ he(a.dose.unit) }}</span></p>
-          </div>
-          {% endfor %}
-        </div>
-      </section>
-      {% elif first_special %}
-      <section class="first-glance" aria-label="{{ T.at_a_glance[lang] }}">
-        <p class="first-glance-head">{{ ico(first_special.special.icon) }}<span>{{ he(T.at_a_glance) }} · {{ he(first_special.special.label) }}</span></p>
-        <div class="first-glance-actions"><div class="first-glance-action">
-          <span class="first-glance-badge hue-{{ first_special.hue }}">{{ first_special.position }}</span>
-          <p><span class="first-glance-name">{{ first_special.name_raw }}</span>{% if first_special.special_dose %}<br><span class="first-glance-dose">{{ first_special.special_dose.q }} {{ he(first_special.special_dose.unit) }}</span>{% endif %}</p>
-        </div></div>
-      </section>
-      {% endif %}
       <div class="packet-rule">{{ ico("i-envelope", "icon-lg") }}<span>{{ he(T.match_envelope) }}</span></div>
     </section>
 
-    <nav class="day-ribbon" aria-label="{{ T.daily_order_label[lang] }}">
-      {% for slot in day_slots %}
-      <a class="day-stop" href="#time-{{ slot.key }}">
-        {{ ico(slot.ico) }}
-        <span class="day-label">{{ he(slot.label) }}</span>
-        <span class="packet-dots">
-          {% if slot.actions %}{% for a in slot.actions %}<span class="packet-dot hue-{{ a.hue }}">{{ a.position }}</span>{% endfor %}
-          {% else %}<span class="no-dot">—</span>{% endif %}
-        </span>
-      </a>
-      {% endfor %}
-    </nav>
-
     <p class="section-band">{{ he(T.today_schedule) }}</p>
-    <div class="daily-flow">
+    <div class="infographic-flow" aria-label="{{ T.daily_order_label[lang] }}">
       {% for slot in day_slots %}
-      <section class="time-block" id="time-{{ slot.key }}" aria-labelledby="time-label-{{ slot.key }}">
-        <header class="time-head">{{ ico(slot.ico, "icon-lg") }}<h2 id="time-label-{{ slot.key }}">{{ he(slot.label) }}</h2></header>
-        <div class="time-actions">
+      <section class="time-panel slot-{{ slot.key }}" id="time-{{ slot.key }}" aria-labelledby="time-label-{{ slot.key }}">
+        <header class="time-banner">
+          <span class="time-visual">{{ ico(slot.ico, "icon-lg") }}<span class="step-number">{{ loop.index }}</span></span>
+          <span>
+            <span class="time-step">{{ he(T.step) }} {{ loop.index }}</span>
+            <h2 class="time-name" id="time-label-{{ slot.key }}">{{ he(slot.label) }}</h2>
+            {% if first_slot and slot.key == first_slot.key %}<span class="start-flag">{{ he(T.start_here) }}</span>{% endif %}
+          </span>
+          <span class="panel-packets" aria-label="{{ T.packet[lang] }}">
+            {% if slot.actions %}{% for a in slot.actions %}<span class="panel-packet hue-{{ a.hue }}">{{ a.position }}</span>{% endfor %}
+            {% else %}<span class="panel-empty">—</span>{% endif %}
+          </span>
+        </header>
+        <div class="time-body">
           {% if slot.actions %}
           {% for a in slot.actions %}
-          <article class="dose-row">
-            <div class="dose-main">
+          <article class="medicine-strip">
+            <div class="medicine-identity">
               <div class="packet-wrap"><span class="packet-badge hue-{{ a.hue }}">{{ a.position }}</span><span class="packet-label">{{ he(T.packet) }}</span></div>
               <div>
+                <p class="medicine-label">{{ he(T.packet) }} {{ a.position }}</p>
                 <h3 class="drug-name">{{ a.name_raw }}</h3>
-                <div class="dose-fact"><span class="dose-picts">{{ picts(a.dose.glyphs) }}</span><strong class="dose-number">{{ a.dose.q }}</strong><span class="dose-unit">{{ he(a.dose.unit) }}</span></div>
               </div>
             </div>
-            <div class="action-meta">
-              {% if a.food %}<p class="meal-order">{{ ico(a.food.ico) }}<span>{{ he(a.food.label) }}</span></p>{% endif %}
-              {% if a.dose.unit_key == "ml" %}<p class="duration-line">{{ ico("p-spoon") }}<span>{{ he(T.measure_ml) }}</span></p>{% endif %}
-              {% if a.duration_days %}<p class="duration-line">{{ ico("i-cal") }}<span><strong>{{ a.duration_days }}</strong> {{ he(T.days) }}</span></p>{% endif %}
+            <div class="action-sequence"{% if a.food %} data-food="{{ a.food.key }}"{% endif %}>
+              <div class="action-node dose-node">
+                <span class="node-label">{{ he(T.take_amount) }}</span>
+                <span class="dose-fact"><span class="dose-picts">{{ picts(a.dose.glyphs) }}</span><strong class="dose-number">{{ a.dose.q }}</strong><span class="dose-unit">{{ he(a.dose.unit) }}</span></span>
+              </div>
+              {% if a.food %}
+              {{ ico("i-arrow", "sequence-arrow") }}
+              <div class="action-node meal-node">
+                <span class="node-label">{{ he(T.food_order) }}</span>
+                {{ ico(a.food.ico, "meal-figure") }}
+                <strong class="node-value">{{ he(a.food.label) }}</strong>
+              </div>
+              {% endif %}
+              {% if a.duration_days %}
+              {{ ico("i-arrow", "sequence-arrow") }}
+              <div class="action-node duration-node">
+                <span class="node-label">{{ he(T.continue_for) }}</span>
+                <span class="calendar-figure">{{ ico("i-cal", "icon-lg") }}<strong>{{ a.duration_days }}</strong></span>
+                <strong class="node-value">{{ a.duration_days }} {{ he(T.days) }}</strong>
+              </div>
+              {% endif %}
             </div>
+            {% if a.dose.unit_key == "ml" %}<p class="action-note">{{ ico("p-spoon") }}<span>{{ he(T.measure_ml) }}</span></p>{% endif %}
+            {% if a.dose.unit_key == "measuring_spoon" %}<p class="action-note">{{ ico("p-measuring-spoon") }}<span>{{ he(T.measure_spoon) }}</span></p>{% endif %}
           </article>
           {% endfor %}
           {% else %}<p class="empty-time">{{ he(T.no_medicine) }}</p>{% endif %}
@@ -353,19 +350,47 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
         </div>
         <div class="special-facts">
           {% for d in v.detail_doses %}<p class="duration-line special-time">{{ ico(d.ico) }}<strong>{{ he(d.label) }}</strong></p>{% endfor %}
-          {% if v.special_dose %}<div class="dose-fact">{% if v.stype == "prn" %}<strong>{{ he(T.each_time) }}:</strong>{% endif %}<span class="dose-picts">{{ picts(v.special_dose.glyphs) }}</span><strong class="dose-number">{{ v.special_dose.q }}</strong><span class="dose-unit">{{ he(v.special_dose.unit) }}</span></div>
+          {% if v.special_dose %}
+          <div class="action-sequence special-sequence{% if v.prn %} prn-dose-sequence{% endif %}"{% if v.food %} data-food="{{ v.food.key }}"{% endif %}>
+            <div class="action-node">
+              <span class="node-label">{% if v.stype == "prn" %}{{ he(T.each_time) }}{% else %}{{ he(T.take_amount) }}{% endif %}</span>
+              <span class="dose-fact"><span class="dose-picts">{{ picts(v.special_dose.glyphs) }}</span><strong class="dose-number">{{ v.special_dose.q }}</strong><span class="dose-unit">{{ he(v.special_dose.unit) }}</span></span>
+            </div>
+            {% if v.food %}
+            {{ ico("i-arrow", "sequence-arrow") }}
+            <div class="action-node">
+              <span class="node-label">{{ he(T.food_order) }}</span>
+              {{ ico(v.food.ico, "meal-figure") }}
+              <strong class="node-value">{{ he(v.food.label) }}</strong>
+            </div>
+            {% endif %}
+            {% if not v.prn and v.duration_days %}
+            {{ ico("i-arrow", "sequence-arrow") }}
+            <div class="action-node">
+              <span class="node-label">{{ he(T.continue_for) }}</span>
+              <span class="calendar-figure">{{ ico("i-cal", "icon-lg") }}<strong>{{ v.duration_days }}</strong></span>
+              <strong class="node-value">{{ v.duration_days }} {{ he(T.days) }}</strong>
+            </div>
+            {% endif %}
+          </div>
+          {% if v.special_dose.unit_key == "measuring_spoon" %}<p class="action-note">{{ ico("p-measuring-spoon") }}<span>{{ he(T.measure_spoon) }}</span></p>{% endif %}
+          {% if v.prn and (v.prn.max_per_day or v.prn.min_gap_hours) %}
+          <div class="prn-rules">
+            {% if v.prn.max_per_day %}
+            <div class="prn-rule">{{ ico("i-repeat", "icon-lg") }}<span><span class="node-label">{{ he(T.prn_max) }}</span><strong class="prn-rule-number">{{ v.prn.max_per_day }}</strong><strong class="prn-rule-unit">{{ he(T.prn_times) }}</strong></span></div>
+            {% endif %}
+            {% if v.prn.min_gap_hours %}
+            <div class="prn-rule">{{ ico("i-clock", "icon-lg") }}<span><span class="node-label">{{ he(T.prn_gap) }}</span><strong class="prn-rule-number">{{ v.prn.min_gap_hours }}</strong><strong class="prn-rule-unit">{{ he(T.prn_hours) }}</strong></span></div>
+            {% endif %}
+          </div>
+          {% endif %}
           {% elif v.stype == "prn" %}<p class="limit-box caution">{{ he(T.prn_dose_missing) }}</p>{% endif %}
           {% if v.prn %}
-          <div class="limit-box">
-            <p><strong>{{ he(T.prn_head) }}</strong>{% if v.prn.reason %} — {{ he(v.prn.reason) }}{% endif %}</p>
-            {% if v.prn.max_per_day %}<p>{{ he(T.prn_max) }} <strong>{{ v.prn.max_per_day }}</strong> {{ he(T.prn_times) }}</p>{% endif %}
-            {% if v.prn.min_gap_hours %}<p>{{ he(T.prn_gap) }} <strong>{{ v.prn.min_gap_hours }}</strong> {{ he(T.prn_hours) }}</p>{% endif %}
-          </div>
+          <p class="limit-box"><strong>{{ he(T.prn_head) }}</strong>{% if v.prn.reason %} — {{ he(v.prn.reason) }}{% endif %}</p>
           {% if v.prn.limits_missing %}<p class="limit-box caution">{{ ico("i-warn") }}<span>{{ he(T.prn_limits_missing) }}</span></p>{% endif %}
           {% endif %}
           {% if v.custom_instr %}<p class="limit-box">{{ v.custom_instr }}</p>{% endif %}
-          {% if v.food %}<p class="meal-order">{{ ico(v.food.ico) }}<span>{{ he(v.food.label) }}</span></p>{% endif %}
-          {% if v.duration_days %}<p class="duration-line">{{ ico("i-cal") }}<span><strong>{{ v.duration_days }}</strong> {{ he(T.days) }}</span></p>{% endif %}
+          {% if v.prn and v.duration_days %}<p class="duration-line">{{ ico("i-cal") }}<span><strong>{{ v.duration_days }}</strong> {{ he(T.days) }}</span></p>{% endif %}
         </div>
       </article>
       {% endfor %}
@@ -388,6 +413,7 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
           <div class="detail-dose">{{ ico(d.ico) }}<b>{{ he(d.label) }}</b><span class="dose-picts">{{ picts(d.dose.glyphs) }}</span><strong class="dose-number">{{ d.dose.q }}</strong><span class="dose-unit">{{ he(d.dose.unit) }}</span></div>
           {% endfor %}
           {% if v.unit == "ml" %}<p class="detail-fact">{{ ico("p-spoon") }}<span>{{ he(T.measure_ml) }}</span></p>{% endif %}
+          {% if v.unit == "measuring_spoon" %}<p class="detail-fact">{{ ico("p-measuring-spoon") }}<span>{{ he(T.measure_spoon) }}</span></p>{% endif %}
           {% if v.food %}<p class="detail-fact meal-order">{{ ico(v.food.ico) }}<span>{{ he(v.food.label) }}</span></p>{% endif %}
           {% if v.duration_days %}<p class="detail-fact">{{ ico("i-cal") }}<span>{{ he(T.duration) }}: <strong>{{ v.duration_days }} {{ he(T.days) }}</strong></span></p>{% endif %}
           {% if v.total_q %}<p class="detail-fact">{{ ico("i-package") }}<span>{{ he(T.total) }}: <strong>{{ v.total_q }} {{ he(v.unit_pair) }}</strong></span></p>{% endif %}
@@ -427,15 +453,16 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
   <symbol id="i-slot-n" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="16" cy="16" r="6"/><path d="M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5 25 25M25 7l-3.5 3.5M10.5 21.5 7 25"/></g></symbol>
   <symbol id="i-slot-e" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 21h26M10 21a6 6 0 0 1 12 0M16 26v3M8 18l-4 3M24 18l4 3"/></g></symbol>
   <symbol id="i-slot-h" viewBox="0 0 32 32"><path d="M22 21A10 10 0 0 1 12 5a11 11 0 1 0 10 16Z" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="m24 6 1 2.5L28 9l-3 .8-1 2.5-1-2.5L20 9l3-.5Z" fill="currentColor"/></symbol>
-  <symbol id="i-tf-before" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="12" width="10" height="7" rx="3.5"/><path d="M6 12v7M13 15.5h8m-3-3 3 3-3 3"/><circle cx="31" cy="16" r="7"/><circle cx="31" cy="16" r="2"/></g></symbol>
-  <symbol id="i-tf-after" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="16" r="7"/><circle cx="9" cy="16" r="2"/><path d="M18 15.5h8m-3-3 3 3-3 3"/><rect x="29" y="12" width="10" height="7" rx="3.5"/><path d="M34 12v7"/></g></symbol>
-  <symbol id="i-tf-with" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="18" r="9"/><circle cx="20" cy="18" r="3"/><rect x="15" y="3" width="10" height="7" rx="3.5"/><path d="M20 3v7"/></g></symbol>
-  <symbol id="i-tf-empty" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="13" cy="18" r="8"/><path d="M7 12l12 12"/><rect x="25" y="5" width="11" height="7" rx="3.5"/><path d="M30.5 5v7"/></g></symbol>
+  <symbol id="i-tf-before" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="11" height="7" rx="3.5"/><path d="M6.5 13v7M15 16.5h8m-3-3 3 3-3 3"/><circle cx="37" cy="17" r="8"/><path d="M31 18h12M33 14h.1M37 13h.1M41 14h.1"/></g><g font-family="Arial,sans-serif" font-size="6" font-weight="900" text-anchor="middle"><circle cx="6" cy="6" r="5" fill="currentColor"/><text x="6" y="8" fill="#fff">1</text><circle cx="38" cy="6" r="5" fill="currentColor"/><text x="38" y="8" fill="#fff">2</text></g></symbol>
+  <symbol id="i-tf-after" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="17" r="8"/><path d="M4 18h12M6 14h.1M10 13h.1M14 14h.1M21 16.5h8m-3-3 3 3-3 3"/><rect x="35" y="13" width="11" height="7" rx="3.5"/><path d="M40.5 13v7"/></g><g font-family="Arial,sans-serif" font-size="6" font-weight="900" text-anchor="middle"><circle cx="10" cy="6" r="5" fill="currentColor"/><text x="10" y="8" fill="#fff">1</text><circle cx="41" cy="6" r="5" fill="currentColor"/><text x="41" y="8" fill="#fff">2</text></g></symbol>
+  <symbol id="i-tf-with" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="18" r="10"/><path d="M16 19h16M19 14h.1M24 13h.1M29 14h.1"/><rect x="19" y="2" width="11" height="7" rx="3.5"/><path d="M24.5 2v7"/></g></symbol>
+  <symbol id="i-tf-empty" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="18" r="9"/><path d="M9 19h14M10 11l12 14"/><rect x="33" y="6" width="12" height="8" rx="4"/><path d="M39 6v8"/></g></symbol>
   <symbol id="i-cal" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="21" rx="3"/><path d="M4 13h24M10 4v6M22 4v6"/></g></symbol>
   <symbol id="i-clock" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8l5 3"/></g></symbol>
   <symbol id="i-check" viewBox="0 0 32 32"><path d="m6 17 6 6L26 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-warn" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4 29 27H3Z"/><path d="M16 12v7M16 23v.5"/></g></symbol>
   <symbol id="i-envelope" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="7" width="26" height="19" rx="3"/><path d="m4 9 12 9L28 9"/></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 32 32"><path d="M5 16h20m-7-7 7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-repeat" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16a10 10 0 0 1 17-7M25 16a10 10 0 0 1-17 7"/><path d="M24 4v6h-6M8 28v-6h6"/></g></symbol>
   <symbol id="i-pill" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="15" height="9" rx="4.5"/><path d="M10.5 7v9"/><circle cx="22" cy="22" r="6"/><path d="m18 18 8 8"/></g></symbol>
   <symbol id="i-package" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="m5 10 11-6 11 6v14l-11 5-11-5Z"/><path d="m5 10 11 6 11-6M16 16v13"/></g></symbol>
@@ -447,10 +474,17 @@ html[data-lang="hi"] .hero h1 { line-height: 1.6; }
   <symbol id="p-tab-half" viewBox="0 0 32 32"><path d="M16 5a11 11 0 0 0 0 22Z" fill="currentColor"/><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
   <symbol id="p-cap" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="10" width="26" height="12" rx="6"/><path d="M16 10v12"/></g></symbol>
   <symbol id="p-spoon" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h18l-2 22H9Z"/><path d="M9 11h5M9 16h7M9 21h5"/></g></symbol>
+  <symbol id="p-measuring-spoon" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="11" rx="6" ry="7"/><path d="M14 15l13 12M20 21l3-3"/><path d="M6 11h6"/></g><text x="9" y="13" fill="currentColor" font-family="Arial,sans-serif" font-size="5" font-weight="800" text-anchor="middle">5 ml</text></symbol>
   <symbol id="p-drop" viewBox="0 0 32 32"><path d="M16 4c6 7 9 11 9 16a9 9 0 1 1-18 0c0-5 3-9 9-16Z" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
   <symbol id="p-puff" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M11 6h10v8H11zM14 14v12h8V15M8 9H4M7 4 4 2M7 14l-3 2"/></g></symbol>
+  <symbol id="p-inhalation" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 27h16M10 27V17h12v10M13 17V9h6v8"/><path d="M11 5c1.5-2 3-2 4.5 0s3 2 4.5 0M8 11c1.5-2 3-2 4.5 0"/></g></symbol>
   <symbol id="p-sachet" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4h18l-2 24H9Z"/><path d="M9 10h14M12 17h8"/></g></symbol>
+  <symbol id="p-packet" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 4h20v24H6Z"/><path d="m6 8 3-2 3 2 4-2 4 2 3-2 3 2M6 24l3 2 3-2 4 2 4-2 3 2 3-2"/><path d="M11 14h10M11 19h7"/></g></symbol>
   <symbol id="p-application" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 25c5-9 7-14 10-14 2 0 2 3 0 7l5-9c1-2 4 0 3 2l-3 8 4-6c1-2 4 0 3 2l-4 8c-2 4-6 6-11 6Z"/><path d="M5 7h7M8.5 3.5v7"/></g></symbol>
+  <symbol id="p-suppository" viewBox="0 0 32 32"><path d="M16 3c6 6 8 10 8 16a8 8 0 0 1-16 0c0-6 2-10 8-16Z" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M9 19h14" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="p-injection" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m8 23 13-13 5 5-13 13H8Z"/><path d="m18 7 8 8M23 4l5 5M10 20l5 5M4 28l5-5"/><path d="M14 18l2 2M17 15l2 2"/></g></symbol>
+  <symbol id="p-patch" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="24" height="24" rx="5"/><path d="M16 10v12M10 16h12"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="24" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="24" r="1" fill="currentColor"/><circle cx="24" cy="24" r="1" fill="currentColor"/></g></symbol>
+  <symbol id="p-spray" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12h10l2 16H10Z"/><path d="M14 12V7h10M20 7v4"/><path d="M8 7H4M9 3 6 1M9 11l-3 2"/></g></symbol>
   <symbol id="p-generic" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="5" width="22" height="22" rx="6"/><path d="M11 16h10"/></g></symbol>
 </defs>
 </svg>

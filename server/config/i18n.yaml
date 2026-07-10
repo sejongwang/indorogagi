@@ -4,7 +4,7 @@
 
 slots:
   M: { hi: "सुबह", en: "Morning" }
-  N: { hi: "दोपहर", en: "Noon" }
+  N: { hi: "दोपहर", en: "Afternoon" }
   E: { hi: "शाम", en: "Evening" }
   H: { hi: "रात", en: "Night" }
 
@@ -18,10 +18,41 @@ dose_units:
   tablet: { hi: "गोली", en: "tablet" }
   capsule: { hi: "कैप्सूल", en: "capsule" }
   ml: { hi: "ml", en: "ml" }
+  measuring_spoon: { hi: "5 ml की नाप वाली चम्मच", en: "marked 5 ml measuring spoon" }
   drop: { hi: "बूंद", en: "drop" }
   puff: { hi: "पफ़", en: "puff" }
+  inhalation: { hi: "इनहेलेशन", en: "inhalation" }
   sachet: { hi: "पाउच", en: "sachet" }
-  application: { hi: "लगाएं", en: "apply" }
+  packet: { hi: "पैकेट", en: "packet" }
+  application: { hi: "लगाएं", en: "application" }
+  suppository: { hi: "सपोज़िटरी", en: "suppository" }
+  injection: { hi: "इंजेक्शन", en: "injection" }
+  patch: { hi: "पैच", en: "patch" }
+  spray: { hi: "स्प्रे", en: "spray" }
+
+# ``drop`` remains the API/storage value. A selected catalogue route only
+# clarifies the label; it never changes or guesses the prescription.
+dose_unit_route_labels:
+  drop:
+    oral: { hi: "मुँह से देने वाली बूंद", en: "oral drop" }
+    ophthalmic: { hi: "आँख की बूंद", en: "eye drop" }
+    otic: { hi: "कान की बूंद", en: "ear drop" }
+    nasal: { hi: "नाक की बूंद", en: "nasal drop" }
+
+administration_routes:
+  oral: { hi: "मुँह से", en: "Oral" }
+  ophthalmic: { hi: "आँख में", en: "Eye" }
+  otic: { hi: "कान में", en: "Ear" }
+  nasal: { hi: "नाक में", en: "Nose" }
+  inhalation: { hi: "साँस से", en: "Inhaled" }
+  topical: { hi: "त्वचा पर", en: "On skin" }
+  rectal: { hi: "मलाशय", en: "Rectal" }
+  vaginal: { hi: "योनि", en: "Vaginal" }
+  transdermal: { hi: "त्वचा पैच", en: "Transdermal" }
+  intravenous: { hi: "नस में", en: "IV" }
+  intramuscular: { hi: "मांसपेशी में", en: "IM" }
+  subcutaneous: { hi: "त्वचा के नीचे", en: "Subcutaneous" }
+  other: { hi: "अन्य", en: "Other" }
 
 prn_reasons:
   fever: { hi: "बुख़ार", en: "Fever" }
@@ -52,16 +83,29 @@ ui:
     tablet: { hi: "गोली", en: "tab" }
     capsule: { hi: "कैप्सूल", en: "cap" }
     ml: { hi: "ml", en: "ml" }
+    measuring_spoon: { hi: "5 ml नाप चम्मच", en: "marked 5 ml spoon" }
     drop: { hi: "बूंद", en: "drop" }
     puff: { hi: "पफ़", en: "puff" }
+    inhalation: { hi: "इनहेलेशन", en: "inhalation" }
     sachet: { hi: "पाउच", en: "sach" }
-    application: { hi: "लगाएं", en: "apply" }
+    packet: { hi: "पैकेट", en: "packet" }
+    application: { hi: "लगाएं", en: "application" }
+    suppository: { hi: "सपोज़िटरी", en: "suppository" }
+    injection: { hi: "इंजेक्शन", en: "injection" }
+    patch: { hi: "पैच", en: "patch" }
+    spray: { hi: "स्प्रे", en: "spray" }
   s1:
     from_pharmacy: { hi: "दवा दुकान से मिली जानकारी", en: "From your pharmacy" }
     poster_kicker: { hi: "आज की दवा", en: "TODAY'S MEDICINES" }
     poster_title: { hi: "आज दवा ऐसे लें", en: "Take today's medicines in this order" }
     poster_sub: { hi: "सुबह से रात तक ऊपर से नीचे देखें", en: "Follow from morning to night, top to bottom" }
+    demo_warning: { hi: "केवल डेमो — यह वास्तविक दवा सलाह नहीं है", en: "DEMO ONLY — NOT MEDICAL ADVICE" }
     at_a_glance: { hi: "एक नज़र में", en: "At a glance" }
+    start_here: { hi: "यहाँ से शुरू करें", en: "START HERE" }
+    step: { hi: "कदम", en: "Step" }
+    take_amount: { hi: "इतनी दवा लें", en: "Take this amount" }
+    food_order: { hi: "खाने का क्रम", en: "Food order" }
+    continue_for: { hi: "इतने दिन", en: "Continue for" }
     language_label: { hi: "भाषा चुनें", en: "Choose language" }
     daily_order_label: { hi: "सुबह से रात तक दवा का क्रम", en: "Medicine order from morning to night" }
     today_schedule: { hi: "आज कब और कितनी दवा", en: "When and how much to take today" }
@@ -73,6 +117,7 @@ ui:
     open_details: { hi: "पूरी जानकारी", en: "Details" }
     duration: { hi: "कितने दिन", en: "Duration" }
     measure_ml: { hi: "निशान वाले कप या सिरिंज से नापें", en: "Measure with a marked cup or oral syringe" }
+    measure_spoon: { hi: "केवल 5 ml की नाप वाली दवा की चम्मच लें — घर की चाय की चम्मच नहीं", en: "Use only a marked 5 ml medicine spoon — not a household teaspoon" }
     issued: { hi: "{date} को बनी (IST)", en: "Issued {date} (IST)" }
     valid_till: { hi: "{date} तक चलेगी", en: "Valid till {date}" }
     days: { hi: "दिन", en: "days" }

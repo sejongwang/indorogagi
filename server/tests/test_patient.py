@@ -96,18 +96,25 @@ def test_render_smoke_infographic(client, issue, rx_payload):
     r = client.get(f"/p/{token}")
     assert r.status_code == 200
     text = r.text
-    assert "day-ribbon" in text
-    assert "daily-flow" in text
-    assert "time-block" in text
-    assert "dose-row" in text
+    assert "/static/patient-poster.css" in text
+    assert "infographic-flow" in text
+    assert "time-panel" in text
+    assert "time-banner" in text
+    assert "medicine-strip" in text
+    assert "action-sequence" in text
     assert "packet-badge" in text
-    assert "first-glance" in text
-    body = text.split("</style>", 1)[1]
-    assert "Dolo 650" in body.split('<div class="packet-rule">', 1)[0]  # 첫 화면 요약에 실제 약명
-    assert "meal-order" in text
-    assert "mx-row" not in text             # 이전 약×시간 관리형 매트릭스 제거
-    assert "ph--video" not in text          # 미구현 미디어가 복약 정보보다 앞서지 않음
-    assert "btn-audio" not in text
+    assert "meal-node" in text
+    assert "duration-node" in text
+    assert 'data-food="after_food"' in text
+    assert "Dolo 650" in text.split('id="time-N"', 1)[0]  # 첫 비어 있지 않은 시간 띠 안에 실제 약명
+    body = text.split("<body>", 1)[1]
+    assert "day-ribbon" not in body       # 시간 탭/대시보드형 요약 제거
+    assert "first-glance" not in body     # 중복 카드 요약 제거
+    assert "time-block" not in body       # 좌측 시간 열 + 우측 카드 구조 제거
+    assert "dose-row" not in body
+    assert "mx-row" not in body             # 이전 약×시간 관리형 매트릭스 제거
+    assert "ph--video" not in body          # 미구현 미디어가 복약 정보보다 앞서지 않음
+    assert "btn-audio" not in body
     assert [text.index(f'id="time-{slot}"') for slot in ("M", "N", "E", "H")] == sorted(
         text.index(f'id="time-{slot}"') for slot in ("M", "N", "E", "H")
     )
@@ -116,6 +123,22 @@ def test_render_smoke_infographic(client, issue, rx_payload):
     r_en = client.get(f"/p/{token}", params={"lang": "en"})
     assert r_en.status_code == 200
     assert re.search(r'<html[^>]*\blang="en"', r_en.text)  # ?lang= 우선 (D12)
+    assert "Afternoon" in r_en.text
+
+
+def test_infographic_ab_prototype_is_served_and_marked_demo(client):
+    """비교용 정적 A/B는 실제 /static URL에서 열리고 의료 조언으로 오인되지 않는다."""
+    r = client.get("/static/ux-infographic-poster-en.html")
+
+    assert r.status_code == 200
+    assert "Infographic strip prototype" in r.text
+    assert "DEMO ONLY" in r.text
+    assert all(label in r.text for label in ("Morning", "Afternoon", "Evening", "Night"))
+    assert r.text.count('class="medicine-strip"') == 7
+    assert r.text.count('class="prn-rule"') == 2
+    assert "Repeat the packet" not in r.text
+    assert "Packet 4 · 1 drop" not in r.text
+    assert "Diagnosis is not inferred or displayed" in r.text
 
 
 def test_complex_poster_keeps_units_half_dose_prn_and_long_names(client, issue):
@@ -142,6 +165,8 @@ def test_complex_poster_keeps_units_half_dose_prn_and_long_names(client, issue):
     assert "हर बार" in core and "Demo SOS Pain Tablet" in core
     assert "दिन में ज़्यादा से ज़्यादा" in core
     assert ">3<" in core and ">6<" in core
+    assert 'class="prn-rules"' in core
+    assert core.count('class="prn-rule"') == 2
     assert all(f">{n}<" in core for n in range(1, 7))
     assert "text-overflow" not in core
     for icon_id in ("p-tab", "p-cap", "p-spoon", "p-drop", "p-puff", "p-sachet", "p-application"):
