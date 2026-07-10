@@ -39,6 +39,11 @@ EVENTS_MAX_BODY_BYTES = 2048   # §4.7: 요청당 ≤2KB
 EVENTS_MAX_COUNT = 20          # §4.7: 요청당 ≤20개
 
 REISSUE_REASONS = ("wrong_patient", "input_error", "other")  # §4.4
+ADMINISTRATION_ROUTES = (
+    "oral", "ophthalmic", "otic", "nasal", "inhalation", "topical",
+    "rectal", "vaginal", "transdermal", "intravenous", "intramuscular",
+    "subcutaneous", "other",
+)
 # §6.2 scan.failed reason enum — 스캔 불가 단말 비율 실측(§2.5)
 SCAN_FAILURE_REASONS = ("no_qr_camera", "camera_broken", "feature_phone", "refused")
 
@@ -116,6 +121,17 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
         name = item.get("drug_name_raw")
         if not isinstance(name, str) or not name.strip():
             return _verr(f"{p}.drug_name_raw", "required")
+        input_raw = item.get("drug_input_raw")
+        if input_raw is not None and not isinstance(input_raw, str):
+            return _verr(f"{p}.drug_input_raw", "must be a string or null")
+        match_state = item.get("drug_match_state")
+        if match_state is not None and match_state not in (
+            "free_text", "selected", "selected_then_modified"
+        ):
+            return _verr(
+                f"{p}.drug_match_state",
+                "must be free_text, selected, or selected_then_modified",
+            )
 
         key = item.get("pattern_key")
         pat = patterns.get(key) if isinstance(key, str) else None
@@ -179,8 +195,19 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
                 return _verr(f"{p}.{prn_field}", "must be a number > 0")
 
         unit = item.get("dose_unit")
-        if unit is not None and unit not in DOSE_UNITS:
+        if not isinstance(unit, str) or unit not in DOSE_UNITS:
             return _verr(f"{p}.dose_unit", f"must be one of {list(DOSE_UNITS)}")
+        route = item.get("administration_route")
+        if route is not None and route not in ADMINISTRATION_ROUTES:
+            return _verr(
+                f"{p}.administration_route",
+                f"must be one of {list(ADMINISTRATION_ROUTES)} or null",
+            )
+        if unit == "drop" and route not in ("oral", "ophthalmic", "otic", "nasal"):
+            return _verr(
+                f"{p}.administration_route",
+                "oral, ophthalmic, otic, or nasal route is required for drops",
+            )
         tf = item.get("timing_food")
         if tf is not None and tf not in TIMING_FOOD:
             return _verr(f"{p}.timing_food", f"must be one of {list(TIMING_FOOD)} or null")
@@ -540,7 +567,12 @@ async def scan_failure(prescription_id: str, request: Request):
 @router.get("/drugs")
 def search_drugs(request: Request):
     """§4.5 자동완성 — q 2자 미만 빈 배열, limit 기본 8·최대 20.
-    어떤 실패로도 200 + 배열(입력 흐름을 절대 막지 않는다) — 쿼리 파싱도 직접 수행."""
+    어떤 실패로도 200 + 배열(입력 흐름을 절대 막지 않는다) — 쿼리 파싱도 직접 수행.
+
+    운영 검색에는 승인된 production source만 포함한다. 명시적 데모 약국에서만
+    Tier 3 demo source를 더해 UX를 시연한다. 클라이언트가 임의 쿼리 파라미터로
+    demo 범위를 켤 수 없게 약국 컨텍스트만 사용한다.
+    """
     try:
         q = request.query_params.get("q") or ""
         try:
@@ -549,7 +581,10 @@ def search_drugs(request: Request):
             limit = 8
         conn = db.get_conn()
         try:
-            return db.search_drugs(conn, q, limit=limit)
+            include_demo = (
+                request.headers.get("X-Pharmacy-Id") == db.DEMO_CATALOG_PHARMACY_ID
+            )
+            return db.search_drugs(conn, q, limit=limit, include_demo=include_demo)
         finally:
             conn.close()
     except Exception:

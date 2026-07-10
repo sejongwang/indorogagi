@@ -1,0 +1,12 @@
+source_row,display_name,generic_name,strength,form,route,release_modifier,price_unit,ceiling_price_inr
+1,Glimepiride 2 mg tablet,Glimepiride,2 mg,tablet,,,1 tablet,5.94
+2,Glimepiride 1 mg tablet,Glimepiride,1 mg,tablet,,,1 tablet,3.78
+3,Insulin Intermediate Acting (NPH) 40 IU/ml injection,Insulin Intermediate Acting (NPH),40 IU/ml,injection,,,1 ml,17.4
+4,Insulin Premix 30:70 (Regular:NPH) 40 IU/ml injection,Insulin Premix 30:70 (Regular:NPH),40 IU/ml,injection,,,1 ml,17.4
+5,Insulin (Soluble) 40 IU/ml injection,Insulin (Soluble),40 IU/ml,injection,,,1 ml,17.4
+6,Insulin Glargine 100 IU/ml injection,Insulin Glargine,100 IU/ml,injection,,,1 ml,208.34
+7,Disposable pen containing Insulin Glargine 100 IU/ml,Insulin Glargine,100 IU/ml,injection,,,1 ml,250.0
+8,Metformin 1000 mg tablet,Metformin,1000 mg,tablet,,,1 tablet,3.57
+9,Metformin 500 mg tablet,Metformin,500 mg,tablet,,,1 tablet,2.07
+10,Metformin modified release 1000 mg tablet,Metformin,1000 mg,tablet,,MR,1 tablet,4.15
+11,Teneligliptin 20 mg tablet,Teneligliptin,20 mg,tablet,,,1 tablet,11.35

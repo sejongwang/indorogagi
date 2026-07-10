@@ -1,0 +1,23 @@
+{
+  "slug": "nppa-antidiabetes-formulations-2026-03",
+  "name": "NPPA anti-diabetic ceiling-price formulations (March 2026)",
+  "operator": "National Pharmaceutical Pricing Authority",
+  "tier": 1,
+  "usage_scope": "production",
+  "reuse_status": "approved",
+  "license_name": "NPPA Copyright Policy",
+  "license_url": "https://www.nppa.gov.in/en/copyrightpolicy",
+  "attribution_text": "Source: National Pharmaceutical Pricing Authority, Government of India; anti-diabetic ceiling-price formulations, as on March 2026.",
+  "source_url": "https://www.nppa.gov.in/storage/uploads/pdf/2845-fb-posts-anti-diabetes-a2491c25ce7e20c9200884e1f92cf68a.pdf",
+  "input_uri": "https://www.nppa.gov.in/storage/uploads/pdf/2845-fb-posts-anti-diabetes-a2491c25ce7e20c9200884e1f92cf68a.pdf",
+  "version": "2026-03",
+  "published_at": null,
+  "source_updated_at": "2026-05-06",
+  "declared_as_of": null,
+  "accessed_at": "2026-07-10",
+  "source_artifact_manifest": "data/catalog/nppa-anti-diabetes-2026-03.source-manifest.json",
+  "source_artifact_sha256": "fd23814ae3a0009a0d8d6e14d079ff3e72605edfae6041e3529ccd988f311e62",
+  "source_artifact_bytes": 401697,
+  "transformation_method": "Human-reviewed PDF table transcription to committed CSV, then deterministic CSV-to-package conversion.",
+  "notes": "NPPA-authored formulation facts only. Brand, manufacturer, diagnosis, dosing and substitution information are not inferred. Ceiling-price facts remain in raw source metadata and are not shown to patients. source_updated_at records the official PDF HTTP Last-Modified date observed on accessed_at."
+}

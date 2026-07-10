@@ -10,6 +10,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 import secrets
 import sqlite3
 import uuid
@@ -17,8 +19,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-# 기본 DB 경로: server/var/indoro.db (gitignore 대상)
-DB_PATH_DEFAULT = Path(__file__).resolve().parent.parent / "var" / "indoro.db"
+# 기본 DB 경로: server/var/indoro.db (gitignore 대상). 합성 Tier 3 fixture는
+# INDORO_DB_PATH로 지정한 별도 demo DB에서만 실행한다.
+DB_PATH_DEFAULT = Path(
+    os.environ.get("INDORO_DB_PATH")
+    or Path(__file__).resolve().parent.parent / "var" / "indoro.db"
+)
+DEMO_CATALOG_PHARMACY_ID = "ph-demo-001"
 
 # D3: short_code = Crockford Base32 8자(40-bit) — I, L, O, U 제외
 CROCKFORD_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
@@ -122,13 +129,26 @@ CREATE TABLE IF NOT EXISTS prescription_items (
     prescription_id   TEXT NOT NULL REFERENCES prescriptions(id) ON DELETE CASCADE,
     position          INTEGER NOT NULL,
     drug_name_raw     TEXT NOT NULL,                -- 자유 텍스트가 정본
+    drug_input_raw    TEXT,                         -- 카탈로그 선택 전 약사 입력 원문
     drug_id           TEXT,                         -- drugs 논리 참조(FK 아님 — 존재 검증만, §4.3)
+    drug_match_state  TEXT NOT NULL DEFAULT 'free_text'
+                      CHECK (drug_match_state IN ('free_text','selected','selected_then_modified')),
+    drug_catalog_snapshot_json TEXT
+                      CHECK (drug_catalog_snapshot_json IS NULL OR json_valid(drug_catalog_snapshot_json)),
+    drug_selection_warning_json TEXT
+                      CHECK (drug_selection_warning_json IS NULL OR json_valid(drug_selection_warning_json)),
     pattern_key       TEXT NOT NULL,                -- patterns.yaml 키 참조(DB FK 아님)
     dose_morning      REAL NOT NULL DEFAULT 0,
     dose_noon         REAL NOT NULL DEFAULT 0,
     dose_evening      REAL NOT NULL DEFAULT 0,
     dose_night        REAL NOT NULL DEFAULT 0,
     dose_unit         TEXT NOT NULL DEFAULT 'tablet',
+    administration_route TEXT CHECK (
+        administration_route IN ('oral','ophthalmic','otic','nasal','inhalation',
+                                 'topical','rectal','vaginal','transdermal',
+                                 'intravenous','intramuscular','subcutaneous','other')
+        OR administration_route IS NULL
+    ),
     timing_food       TEXT CHECK (timing_food IN ('before_food','after_food','with_food','empty_stomach') OR timing_food IS NULL),
     duration_days     INTEGER,
     total_quantity    REAL,
@@ -180,6 +200,192 @@ CREATE TABLE IF NOT EXISTS drugs (
     created_at          TEXT NOT NULL
 );
 
+-- 의약품 카탈로그 v2. 기존 drugs는 처방 호환 projection으로 유지하고,
+-- 신규 import/search는 출처·원본·presentation을 분리한다.
+CREATE TABLE IF NOT EXISTS schema_migrations (
+    version    INTEGER PRIMARY KEY,
+    name       TEXT NOT NULL,
+    checksum   TEXT NOT NULL,
+    applied_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS catalog_database_meta (
+    id           INTEGER PRIMARY KEY CHECK (id = 1),
+    catalog_mode TEXT NOT NULL CHECK (catalog_mode IN ('production','demo')),
+    created_at   TEXT NOT NULL,
+    updated_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS drug_sources (
+    id                    TEXT PRIMARY KEY,
+    slug                  TEXT NOT NULL UNIQUE,
+    name                  TEXT NOT NULL,
+    operator              TEXT,
+    tier                  INTEGER NOT NULL CHECK (tier IN (1,2,3)),
+    usage_scope           TEXT NOT NULL CHECK (usage_scope IN ('production','demo','reference')),
+    reuse_status          TEXT NOT NULL,
+    license_name          TEXT,
+    license_url           TEXT,
+    attribution_text      TEXT,
+    source_url            TEXT,
+    legal_review_required INTEGER NOT NULL DEFAULT 0,
+    created_at            TEXT NOT NULL,
+    updated_at            TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS drug_import_runs (
+    id                TEXT PRIMARY KEY,
+    source_id         TEXT NOT NULL REFERENCES drug_sources(id),
+    version           TEXT NOT NULL,
+    published_at      TEXT,
+    source_updated_at TEXT,
+    input_uri         TEXT,
+    input_sha256      TEXT NOT NULL,
+    records_sha256    TEXT,
+    accessed_at       TEXT,
+    source_snapshot_json TEXT CHECK (source_snapshot_json IS NULL OR json_valid(source_snapshot_json)),
+    license_snapshot_json TEXT CHECK (license_snapshot_json IS NULL OR json_valid(license_snapshot_json)),
+    approval_snapshot_json TEXT CHECK (approval_snapshot_json IS NULL OR json_valid(approval_snapshot_json)),
+    approval_registry_sha256 TEXT,
+    importer_version  TEXT NOT NULL,
+    mode              TEXT NOT NULL CHECK (mode IN ('apply','dry_run')),
+    status            TEXT NOT NULL CHECK (status IN ('completed','failed')),
+    raw_total         INTEGER NOT NULL DEFAULT 0,
+    imported          INTEGER NOT NULL DEFAULT 0,
+    excluded          INTEGER NOT NULL DEFAULT 0,
+    needs_review      INTEGER NOT NULL DEFAULT 0,
+    duplicate_candidates INTEGER NOT NULL DEFAULT 0,
+    report_json       TEXT CHECK (report_json IS NULL OR json_valid(report_json)),
+    started_at        TEXT NOT NULL,
+    completed_at      TEXT,
+    UNIQUE (source_id, version, input_sha256, mode)
+);
+
+CREATE TABLE IF NOT EXISTS drug_presentations (
+    id                    TEXT PRIMARY KEY,
+    source_id             TEXT NOT NULL REFERENCES drug_sources(id),
+    source_record_id      TEXT NOT NULL,
+    name_type             TEXT NOT NULL DEFAULT 'brand' CHECK (name_type IN ('brand','generic')),
+    brand_name_raw        TEXT NOT NULL,
+    brand_name_norm       TEXT NOT NULL,
+    brand_name_search     TEXT NOT NULL,
+    generic_name_raw      TEXT,
+    generic_name_norm     TEXT,
+    generic_name_search   TEXT,
+    strength_raw          TEXT,
+    strength_search       TEXT,
+    dosage_form_raw       TEXT,
+    dosage_form_code      TEXT,
+    route_raw             TEXT,
+    route_code            TEXT,
+    release_modifier_raw  TEXT,
+    release_modifier_code TEXT,
+    manufacturer_name     TEXT,
+    marketer_name         TEXT,
+    rx_classification     TEXT,
+    short_display_name    TEXT,
+    package_summary       TEXT,
+    usage_scope           TEXT NOT NULL CHECK (usage_scope IN ('production','demo')),
+    lifecycle_status      TEXT NOT NULL DEFAULT 'active' CHECK (lifecycle_status IN ('active','inactive')),
+    review_status         TEXT NOT NULL DEFAULT 'unverified'
+                          CHECK (review_status IN ('verified','unverified','needs_review')),
+    dedupe_fingerprint    TEXT NOT NULL,
+    incomplete_fields_json TEXT CHECK (incomplete_fields_json IS NULL OR json_valid(incomplete_fields_json)),
+    warnings_json          TEXT CHECK (warnings_json IS NULL OR json_valid(warnings_json)),
+    source_updated_at      TEXT,
+    current_source_record_row_id TEXT REFERENCES drug_source_records(id),
+    created_at             TEXT NOT NULL,
+    updated_at             TEXT NOT NULL,
+    UNIQUE (source_id, source_record_id)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_presentations_brand_search
+    ON drug_presentations (brand_name_search);
+CREATE INDEX IF NOT EXISTS idx_drug_presentations_generic_search
+    ON drug_presentations (generic_name_search);
+CREATE INDEX IF NOT EXISTS idx_drug_presentations_scope_status
+    ON drug_presentations (usage_scope, lifecycle_status, review_status);
+
+CREATE TABLE IF NOT EXISTS drug_source_records (
+    id               TEXT PRIMARY KEY,
+    source_id        TEXT NOT NULL REFERENCES drug_sources(id),
+    import_run_id    TEXT NOT NULL REFERENCES drug_import_runs(id),
+    source_record_id TEXT NOT NULL,
+    raw_sha256       TEXT NOT NULL,
+    raw_json         TEXT NOT NULL CHECK (json_valid(raw_json)),
+    ingest_status    TEXT NOT NULL CHECK (ingest_status IN ('imported','needs_review','excluded')),
+    errors_json      TEXT CHECK (errors_json IS NULL OR json_valid(errors_json)),
+    presentation_id  TEXT REFERENCES drug_presentations(id),
+    created_at       TEXT NOT NULL,
+    UNIQUE (source_id, source_record_id, raw_sha256)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_source_records_current
+    ON drug_source_records (source_id, source_record_id, created_at DESC);
+
+-- A raw row is immutable and de-duplicated, while this link records that the
+-- exact same raw record participated in every later source release/import run.
+CREATE TABLE IF NOT EXISTS drug_import_run_records (
+    id                   TEXT PRIMARY KEY,
+    import_run_id        TEXT NOT NULL REFERENCES drug_import_runs(id) ON DELETE CASCADE,
+    record_ordinal       INTEGER NOT NULL,
+    source_record_row_id TEXT NOT NULL REFERENCES drug_source_records(id),
+    source_record_id     TEXT NOT NULL,
+    ingest_status        TEXT NOT NULL CHECK (ingest_status IN ('imported','needs_review','excluded','quarantined')),
+    errors_json          TEXT CHECK (errors_json IS NULL OR json_valid(errors_json)),
+    presentation_id      TEXT REFERENCES drug_presentations(id),
+    created_at           TEXT NOT NULL,
+    UNIQUE (import_run_id, record_ordinal)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_import_run_records_source_row
+    ON drug_import_run_records (source_record_row_id, import_run_id);
+
+CREATE TABLE IF NOT EXISTS drug_ingredients (
+    id          TEXT PRIMARY KEY,
+    name_raw    TEXT NOT NULL,
+    name_norm   TEXT NOT NULL UNIQUE,
+    name_search TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS drug_presentation_ingredients (
+    presentation_id TEXT NOT NULL REFERENCES drug_presentations(id) ON DELETE CASCADE,
+    ingredient_id   TEXT NOT NULL REFERENCES drug_ingredients(id),
+    ordinal         INTEGER NOT NULL,
+    strength_raw    TEXT,
+    strength_value  REAL,
+    strength_unit   TEXT,
+    basis_raw       TEXT,
+    PRIMARY KEY (presentation_id, ordinal)
+);
+
+CREATE TABLE IF NOT EXISTS drug_aliases (
+    id               TEXT PRIMARY KEY,
+    presentation_id  TEXT NOT NULL REFERENCES drug_presentations(id) ON DELETE CASCADE,
+    alias_raw        TEXT NOT NULL,
+    alias_norm       TEXT NOT NULL,
+    alias_search     TEXT NOT NULL,
+    alias_type       TEXT NOT NULL DEFAULT 'brand',
+    language         TEXT NOT NULL DEFAULT '',
+    script           TEXT,
+    review_status    TEXT NOT NULL DEFAULT 'unverified'
+                     CHECK (review_status IN ('verified','unverified','needs_review')),
+    source_record_id TEXT,
+    created_at       TEXT NOT NULL,
+    UNIQUE (presentation_id, alias_norm, alias_type, language)
+);
+CREATE INDEX IF NOT EXISTS idx_drug_aliases_search ON drug_aliases (alias_search);
+
+CREATE TABLE IF NOT EXISTS drug_packages (
+    id               TEXT PRIMARY KEY,
+    presentation_id  TEXT NOT NULL REFERENCES drug_presentations(id) ON DELETE CASCADE,
+    description      TEXT,
+    quantity_value   REAL,
+    quantity_unit    TEXT,
+    package_form     TEXT,
+    source_record_id TEXT,
+    created_at       TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS events (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,  -- 유일한 INTEGER PK(D9 예외)
     event_type      TEXT NOT NULL,
@@ -213,10 +419,102 @@ def get_conn(db_path: str | Path | None = None) -> sqlite3.Connection:
     return conn
 
 
+def _ensure_column(
+    conn: sqlite3.Connection, table: str, column: str, definition: str
+) -> None:
+    """기존 SQLite 파일에 additive column만 추가한다.
+
+    테이블/컬럼/definition은 이 모듈의 상수만 전달한다. 사용자 입력을 받지 않는다.
+    SQLite의 제한적인 ALTER TABLE을 벗어나는 재작성·재번호화는 하지 않는다.
+    """
+    columns = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+    if column not in columns:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+
 def init_db(db_path: str | Path | None = None) -> None:
     conn = get_conn(db_path)
     try:
         conn.executescript(SCHEMA_SQL)
+        _ensure_column(conn, "prescription_items", "drug_input_raw", "TEXT")
+        _ensure_column(
+            conn,
+            "prescription_items",
+            "drug_match_state",
+            "TEXT NOT NULL DEFAULT 'free_text' "
+            "CHECK (drug_match_state IN ('free_text','selected','selected_then_modified'))",
+        )
+        _ensure_column(
+            conn,
+            "prescription_items",
+            "drug_catalog_snapshot_json",
+            "TEXT CHECK (drug_catalog_snapshot_json IS NULL OR json_valid(drug_catalog_snapshot_json))",
+        )
+        _ensure_column(
+            conn,
+            "prescription_items",
+            "drug_selection_warning_json",
+            "TEXT CHECK (drug_selection_warning_json IS NULL OR json_valid(drug_selection_warning_json))",
+        )
+        _ensure_column(
+            conn,
+            "prescription_items",
+            "administration_route",
+            "TEXT CHECK (administration_route IN "
+            "('oral','ophthalmic','otic','nasal','inhalation','topical','rectal',"
+            "'vaginal','transdermal','intravenous','intramuscular','subcutaneous','other') "
+            "OR administration_route IS NULL)",
+        )
+        _ensure_column(conn, "drug_import_runs", "records_sha256", "TEXT")
+        _ensure_column(conn, "drug_import_runs", "accessed_at", "TEXT")
+        _ensure_column(
+            conn,
+            "drug_import_runs",
+            "source_snapshot_json",
+            "TEXT CHECK (source_snapshot_json IS NULL OR json_valid(source_snapshot_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_runs",
+            "license_snapshot_json",
+            "TEXT CHECK (license_snapshot_json IS NULL OR json_valid(license_snapshot_json))",
+        )
+        _ensure_column(
+            conn,
+            "drug_import_runs",
+            "approval_snapshot_json",
+            "TEXT CHECK (approval_snapshot_json IS NULL OR json_valid(approval_snapshot_json))",
+        )
+        _ensure_column(conn, "drug_import_runs", "approval_registry_sha256", "TEXT")
+        _ensure_column(
+            conn,
+            "drug_presentations",
+            "current_source_record_row_id",
+            "TEXT REFERENCES drug_source_records(id)",
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (2, ?, ?, ?)""",
+            ("source-aware drug catalog", "drug-catalog-v2-additive", now_utc()),
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (3, ?, ?, ?)""",
+            (
+                "catalog provenance snapshots and import-run record links",
+                "drug-catalog-v3-provenance-additive",
+                now_utc(),
+            ),
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO schema_migrations
+               (version, name, checksum, applied_at) VALUES (4, ?, ?, ?)""",
+            (
+                "catalog database production/demo role",
+                "drug-catalog-v4-database-mode",
+                now_utc(),
+            ),
+        )
         # 2026-07: OD_NIGHT의 설정 계약을 저녁(E)에서 밤(H)으로 바로잡았다.
         # 구 데이터 중 H가 비어 있고 E만 있는 명백한 레거시 행만 이동한다. E/H가
         # 모두 채워진 모호한 수기 데이터는 임상 의미를 추측하지 않고 그대로 둔다.
@@ -383,7 +681,10 @@ def _issue_result(conn: sqlite3.Connection, presc: dict[str, Any], replayed: boo
 
 
 def _insert_items_tx(
-    conn: sqlite3.Connection, presc_id: str, items: list[dict[str, Any]]
+    conn: sqlite3.Connection,
+    presc_id: str,
+    pharmacy_id: str,
+    items: list[dict[str, Any]],
 ) -> int:
     """items를 prescription_items에 INSERT. 반환: max(duration_days)(만료 산정용).
     생성·수정(PUT) 공용 — 두 경로의 item 저장 규약이 갈라지지 않게 한다."""
@@ -393,25 +694,111 @@ def _insert_items_tx(
         duration = item.get("duration_days")
         if isinstance(duration, (int, float)):
             max_duration = max(max_duration, int(duration))
-        drug_id = item.get("drug_id")
-        if drug_id is not None:
-            # §4.3: drug_id는 존재 검증만, 실패해도 무시(자유 텍스트가 항상 유효 경로)
-            found = conn.execute("SELECT 1 FROM drugs WHERE id = ?", (drug_id,)).fetchone()
-            if found is None:
-                drug_id = None
+        drug_name_raw = str(item["drug_name_raw"]).strip()
+        drug_input_raw = item.get("drug_input_raw")
+        if not isinstance(drug_input_raw, str) or not drug_input_raw.strip():
+            drug_input_raw = drug_name_raw
+        else:
+            drug_input_raw = drug_input_raw.strip()
+
+        requested_drug_id = item.get("drug_id")
+        requested_state = item.get("drug_match_state")
+        if requested_state not in ("free_text", "selected", "selected_then_modified"):
+            # 구 클라이언트는 match_state를 보내지 않는다. 유효 ID가 있으면 선택으로,
+            # 아니면 자유 입력으로 해석하되 아래에서 반드시 서버 데이터로 재검증한다.
+            requested_state = "selected" if requested_drug_id else "free_text"
+
+        drug_id: str | None = None
+        drug_snapshot: dict[str, Any] | None = None
+        selection_warnings: list[str] = []
+        match_state = requested_state
+
+        if requested_state == "selected_then_modified":
+            # 선택 뒤 이름이 바뀐 경우 잘못된 카탈로그 연결을 남기지 않는다.
+            match_state = "selected_then_modified"
+            selection_warnings.append("catalog_link_cleared_after_name_edit")
+        elif requested_state == "selected" and requested_drug_id:
+            from app.drug_catalog import get_presentation_snapshot, normalize_identity
+
+            drug_snapshot = get_presentation_snapshot(conn, str(requested_drug_id))
+            if drug_snapshot is None:
+                # 신규 발급은 출처·scope가 검증된 v2 presentation만 선택으로 인정한다.
+                # legacy drugs는 기존 발급 snapshot을 읽기 위한 호환 계층일 뿐이며,
+                # 출처가 불명확한 ID를 production 선택으로 승격하지 않는다.
+                match_state = "free_text"
+                selection_warnings.append("catalog_id_not_found_free_text_preserved")
+            elif (
+                drug_snapshot.get("usage_scope") == "demo"
+                and pharmacy_id != DEMO_CATALOG_PHARMACY_ID
+            ):
+                # API 검색 범위와 저장 경계가 같아야 한다. 다른 약국이 demo ID를
+                # 직접 주입해도 처방은 중단하지 않고 자유 입력만 보존한다.
+                drug_snapshot = None
+                match_state = "free_text"
+                selection_warnings.append(
+                    "demo_catalog_not_available_for_pharmacy_free_text_preserved"
+                )
+            elif drug_snapshot.get("lifecycle_status") == "inactive":
+                drug_snapshot = None
+                match_state = "free_text"
+                selection_warnings.append(
+                    "inactive_catalog_link_cleared_free_text_preserved"
+                )
+            elif normalize_identity(drug_name_raw) != normalize_identity(
+                drug_snapshot.get("brand_name")
+            ):
+                # 클라이언트 상태가 오래됐거나 조작된 경우에도 수정된 표시명을 ID와
+                # 결합하지 않는다. 표시명은 유지하고 원본 선택 링크만 해제한다.
+                drug_snapshot = None
+                match_state = "selected_then_modified"
+                selection_warnings.append("catalog_name_mismatch_link_cleared")
+            else:
+                drug_id = str(requested_drug_id)
+                match_state = "selected"
+        elif requested_state == "selected":
+            match_state = "free_text"
+            selection_warnings.append("catalog_selection_missing_id_free_text_preserved")
+        elif requested_drug_id:
+            selection_warnings.append("catalog_id_ignored_for_free_text")
+
+        if drug_snapshot is not None:
+            review_status = drug_snapshot.get("review_status")
+            if review_status == "needs_review":
+                selection_warnings.append("catalog_record_needs_review")
+            elif review_status == "unverified":
+                selection_warnings.append("catalog_record_unverified")
+            if drug_snapshot.get("usage_scope") == "demo":
+                selection_warnings.append("demo_catalog_record")
+            if drug_snapshot.get("lifecycle_status") == "inactive":
+                selection_warnings.append("inactive_catalog_record")
+            if drug_snapshot.get("incomplete_fields"):
+                selection_warnings.append("catalog_record_incomplete")
+            unit_options = drug_snapshot.get("unit_options") or []
+            if unit_options and item.get("dose_unit") not in unit_options:
+                # 제형-단위 매핑은 처방 기본값이 아니다. 충돌을 기록할 뿐 입력을 바꾸지 않는다.
+                selection_warnings.append("dose_unit_conflicts_with_catalog_form")
+
         extra = item.get("extra_params")
         conn.execute(
             """INSERT INTO prescription_items
-               (id, prescription_id, position, drug_name_raw, drug_id, pattern_key,
-                dose_morning, dose_noon, dose_evening, dose_night, dose_unit, timing_food,
+               (id, prescription_id, position, drug_name_raw, drug_input_raw, drug_id,
+                drug_match_state, drug_catalog_snapshot_json, drug_selection_warning_json,
+                pattern_key,
+                dose_morning, dose_noon, dose_evening, dose_night, dose_unit,
+                administration_route, timing_food,
                 duration_days, total_quantity, prn_reason_key, prn_max_per_day,
                 prn_min_gap_hours, extra_params_json, note)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 new_id(), presc_id, item.get("position") or idx + 1,
-                item["drug_name_raw"], drug_id, item["pattern_key"],
+                drug_name_raw, drug_input_raw, drug_id, match_state,
+                json.dumps(drug_snapshot, ensure_ascii=False, sort_keys=True)
+                if drug_snapshot else None,
+                json.dumps(list(dict.fromkeys(selection_warnings)), ensure_ascii=False)
+                if selection_warnings else None,
+                item["pattern_key"],
                 doses.get("M") or 0, doses.get("N") or 0, doses.get("E") or 0, doses.get("H") or 0,
-                item.get("dose_unit") or "tablet", item.get("timing_food"),
+                item["dose_unit"], item.get("administration_route"), item.get("timing_food"),
                 duration, item.get("total_quantity"),
                 item.get("prn_reason_key"), item.get("prn_max_per_day"),
                 item.get("prn_min_gap_hours"),
@@ -452,7 +839,7 @@ def _insert_prescription_tx(
         ),
     )
 
-    max_duration = _insert_items_tx(conn, presc_id, items)
+    max_duration = _insert_items_tx(conn, presc_id, pharmacy_id, items)
 
     expires_at = compute_expires_at(created, max_duration)
     tok = _issue_token_tx(
@@ -527,21 +914,46 @@ def _drug_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "aliases": json.loads(d["aliases_json"]) if d["aliases_json"] else [],
         "caution_keys": json.loads(d["caution_keys_json"]) if d["caution_keys_json"] else [],
         "verified": d["verified"],
+        "route": None,
+        "release_modifier": None,
+        "manufacturer": None,
+        "marketing_company": None,
+        "name_type": "brand",
+        "review_status": "verified" if d["verified"] else "unverified",
+        "lifecycle_status": "active",
+        "usage_scope": "demo" if str(d.get("source") or "").startswith("legacy") else "production",
+        "unit_options": [d["default_dose_unit"]] if d["default_dose_unit"] else [],
+        "warnings": [],
+        "incomplete_fields": [],
+        # 내부 catalog caution은 약사 검색 정보다. 환자 노출은 별도 승인 필드만 허용한다.
+        "patient_display_generic": False,
+        "patient_caution_keys": [],
     }
 
 
 def _item_dict(row: sqlite3.Row, drug: dict[str, Any] | None) -> dict[str, Any]:
     d = dict(row)
+    snapshot = json.loads(d["drug_catalog_snapshot_json"]) \
+        if d.get("drug_catalog_snapshot_json") else None
+    selection_warnings = json.loads(d["drug_selection_warning_json"]) \
+        if d.get("drug_selection_warning_json") else []
     return {
         "id": d["id"],
         "position": d["position"],
         "drug_name_raw": d["drug_name_raw"],
+        "drug_input_raw": d.get("drug_input_raw") or d["drug_name_raw"],
         "drug_id": d["drug_id"],
-        "drug": drug,
+        "drug_match_state": d.get("drug_match_state") or (
+            "selected" if d["drug_id"] else "free_text"
+        ),
+        "drug_catalog_snapshot": snapshot,
+        "drug_selection_warnings": selection_warnings,
+        "drug": snapshot or drug,
         "pattern_key": d["pattern_key"],
         "doses": {"M": d["dose_morning"], "N": d["dose_noon"],
                   "E": d["dose_evening"], "H": d["dose_night"]},
         "dose_unit": d["dose_unit"],
+        "administration_route": d.get("administration_route"),
         "timing_food": d["timing_food"],
         "duration_days": d["duration_days"],
         "total_quantity": d["total_quantity"],
@@ -578,11 +990,22 @@ def _build_bundle(conn: sqlite3.Connection, presc_row: sqlite3.Row,
         "SELECT * FROM prescription_items WHERE prescription_id = ? ORDER BY position",
         (presc["id"],),
     ).fetchall():
+        row_data = dict(item_row)
         drug = None
-        if item_row["drug_id"]:
-            drug = _drug_dict(
-                conn.execute("SELECT * FROM drugs WHERE id = ?", (item_row["drug_id"],)).fetchone()
-            )
+        if row_data.get("drug_catalog_snapshot_json"):
+            # 발급 당시 약사가 확인한 immutable snapshot을 렌더한다. 이후 카탈로그 갱신은
+            # 이미 발급된 처방의 표시명·제형·출처 경고를 소급 변경하지 않는다.
+            drug = json.loads(row_data["drug_catalog_snapshot_json"])
+        elif item_row["drug_id"]:
+            from app.drug_catalog import get_presentation_snapshot
+
+            drug = get_presentation_snapshot(conn, item_row["drug_id"])
+            if drug is None:
+                drug = _drug_dict(
+                    conn.execute(
+                        "SELECT * FROM drugs WHERE id = ?", (item_row["drug_id"],)
+                    ).fetchone()
+                )
         items.append(_item_dict(item_row, drug))
 
     revised_at = conn.execute(
@@ -761,7 +1184,7 @@ def edit_prescription(
         conn.execute(
             "DELETE FROM prescription_items WHERE prescription_id = ?", (prescription_id,)
         )
-        max_duration = _insert_items_tx(conn, prescription_id, items)
+        max_duration = _insert_items_tx(conn, prescription_id, pharmacy_id, items)
 
         # 3) 헤더 버전 업 + 선택 헤더 필드 갱신 (토큰 불변 — D4)
         new_lang = payload.get("lang") if "lang" in payload else old_presc["lang"]
@@ -844,12 +1267,30 @@ def list_prescriptions(
 
 # ---------------------------------------------------------------- drugs / pharmacies
 
-def search_drugs(conn: sqlite3.Connection, q: str, limit: int = 8) -> list[dict[str, Any]]:
-    """§4.5: naive lower() LIKE — brand/generic/aliases. q 2자 미만은 빈 배열, limit 최대 20."""
+def search_drugs(
+    conn: sqlite3.Connection, q: str, limit: int = 8, *, include_demo: bool = False
+) -> list[dict[str, Any]]:
+    """출처 승인 범위를 지키는 자동완성 검색.
+
+    기본은 production-only다. v2 catalog가 없는 구 DB의 legacy 행은 provenance scope를
+    판별할 수 없으므로 demo 컨텍스트에서만 LIKE fallback을 허용한다.
+    """
     q = (q or "").strip()
     if len(q) < 2:
         return []
     limit = max(1, min(int(limit), 20))
+    from app.drug_catalog import search_catalog
+
+    catalog_count = conn.execute(
+        "SELECT COUNT(*) AS n FROM drug_presentations"
+    ).fetchone()["n"]
+    if catalog_count:
+        return search_catalog(conn, q, limit=limit, include_demo=include_demo)
+
+    if not include_demo:
+        return []
+
+    # 명시적 demo 컨텍스트에서만 구 설치의 입력 흐름을 위한 fallback을 허용한다.
     needle = f"%{q.lower()}%"
     prefix = f"{q.lower()}%"
     rows = conn.execute(
@@ -867,52 +1308,55 @@ def search_drugs(conn: sqlite3.Connection, q: str, limit: int = 8) -> list[dict[
 
 
 def import_drugs(conn: sqlite3.Connection, drugs: list[dict[str, Any]]) -> int:
-    """drugs 테이블 upsert. 자연키 (brand_name, strength, form) — 재실행해도 id 보존(멱등).
-    각 dict: brand_name(필수), generic_name, strength, form, aliases(list),
-    caution_keys(list), source(str), verified, default_* 3종."""
-    n = 0
-    now = now_utc()
-    try:
-        for d in drugs:
-            aliases = json.dumps(d.get("aliases") or [], ensure_ascii=False)
-            cautions = json.dumps(d.get("caution_keys") or [], ensure_ascii=False)
-            existing = conn.execute(
-                """SELECT id FROM drugs
-                   WHERE brand_name = ? AND IFNULL(strength,'') = ? AND IFNULL(form,'') = ?""",
-                (d["brand_name"], d.get("strength") or "", d.get("form") or ""),
-            ).fetchone()
-            if existing:
-                conn.execute(
-                    """UPDATE drugs SET generic_name=?, default_pattern_key=?,
-                       default_timing_food=?, default_dose_unit=?, aliases_json=?,
-                       caution_keys_json=?, source=?, verified=? WHERE id=?""",
-                    (
-                        d.get("generic_name"), d.get("default_pattern_key"),
-                        d.get("default_timing_food"), d.get("default_dose_unit"),
-                        aliases, cautions, d.get("source"), d.get("verified", 0),
-                        existing["id"],
-                    ),
-                )
-            else:
-                conn.execute(
-                    """INSERT INTO drugs
-                       (id, brand_name, generic_name, strength, form, default_pattern_key,
-                        default_timing_food, default_dose_unit, aliases_json,
-                        caution_keys_json, source, verified, created_at)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (
-                        new_id(), d["brand_name"], d.get("generic_name"), d.get("strength"),
-                        d.get("form"), d.get("default_pattern_key"),
-                        d.get("default_timing_food"), d.get("default_dose_unit"),
-                        aliases, cautions, d.get("source"), d.get("verified", 0), now,
-                    ),
-                )
-            n += 1
-        conn.commit()
-        return n
-    except Exception:
-        conn.rollback()
-        raise
+    """구 seed/tests용 compatibility importer.
+
+    입력은 Tier 3 demo source로 격리하고 v2 importer를 통과시킨다. 이전 default_*
+    값은 복용 지시를 자동 결정할 수 있어 의도적으로 승계하지 않는다.
+    """
+    from app.drug_catalog import import_catalog
+
+    source = {
+        "slug": "legacy-db-import",
+        "name": "indoro compatibility/demo medicine seed",
+        "operator": "indoro",
+        "tier": 3,
+        "usage_scope": "demo",
+        "reuse_status": "demo_only",
+        "license_name": "Internal test/demo fixture only",
+        "license_url": None,
+        "attribution_text": "Demo data — not an approved production medicine source",
+        "source_url": None,
+        "legal_review_required": True,
+        "version": "compat-v1",
+    }
+    records: list[dict[str, Any]] = []
+    for d in drugs:
+        key = "|".join((
+            str(d.get("brand_name") or ""), str(d.get("strength") or ""),
+            str(d.get("form") or ""),
+        ))
+        source_record_id = d.get("source_record_id") or (
+            "legacy-" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:20]
+        )
+        records.append({
+            "source_record_id": str(source_record_id),
+            "name_type": d.get("name_type") or "brand",
+            "brand_name": d["brand_name"],
+            "generic_name": d.get("generic_name"),
+            "strength": d.get("strength"),
+            "form": d.get("form"),
+            "route": d.get("route"),
+            "manufacturer": d.get("manufacturer"),
+            "marketer": d.get("marketing_company") or d.get("marketer"),
+            "package": d.get("package"),
+            "aliases": d.get("aliases") or [],
+            "caution_keys": d.get("caution_keys") or [],
+            "review_status": "verified" if d.get("verified") else "needs_review",
+            "status": "inactive" if d.get("status") == "inactive" else "active",
+            "legacy_source_note": d.get("source"),
+        })
+    import_catalog(conn, source, records, dry_run=False)
+    return len(records)
 
 
 def upsert_pharmacy(conn: sqlite3.Connection, pharmacy: dict[str, Any]) -> None:

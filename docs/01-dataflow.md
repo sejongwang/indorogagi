@@ -4,7 +4,7 @@
 
 1. 관통 플로우: 약사 웹폼 입력(항목당 20~40초 목표) → `POST /api/prescriptions`(멱등) → 128-bit 토큰 URL을 **클라이언트가 QR 렌더** → 환자 스캔 → 1 RTT 서버렌더 HTML(hi/en 동봉, ≤80KB) → 가족 공유.
 2. M1 KPI는 이원화: **도달률**(token당 D+7 내 최초 유효 조회 ÷ 발급, 목표 30%)과 **자가 열람률**(발급 30분 후 재열람) — 둘 다 서버 이벤트만으로 계산. 보조로 **입력률(커버리지)** 을 운영 절차로 수집.
-3. 패턴·i18n·미디어 레지스트리는 DB가 아니라 **레포 내 설정 파일(YAML)** — "패턴 추가 = 파일 항목 추가". DB는 7테이블(pharmacies, prescriptions, items, revisions, access_tokens, drugs, events)로 축소.
+3. 패턴·i18n은 **레포 내 설정 파일(YAML)** 이 정본이다. SQLite에는 기존 처방 관통 흐름의 레거시 7테이블에 더해, 원본·출처·승인·검색을 분리한 v2 `drug_*` 카탈로그 테이블을 additive migration으로 둔다.
 4. 오프라인 발급은 A안 유지하되 경량화: **localStorage outbox + 클라 QR + 단건 POST 순차 재전송**(batch·service worker·IndexedDB 제거). 미존재 토큰은 200 대기 페이지.
 5. reissue는 전 섹션에서 **"새 처방 + 새 토큰, 구건 종결(1:1)"** 로 통일. purge는 revisions까지 널링하되 약명 원문은 보존(잔존물 목록에 정직하게 명시).
 6. QR 페이로드는 쿼리 없는 `https://{domain}/p/{token}` 만(버전 산정은 V4-M 기준). 프린터 보유 약국은 **인쇄 QR이 기본 경로**, 화면 제시는 폴백.
@@ -26,7 +26,7 @@ flowchart LR
     end
     subgraph Server["서버 (뭄바이 리전)"]
         API["FastAPI"] --- DB[("SQLite (WAL)<br/>→ Postgres")]
-        API --- CFG["설정 파일<br/>patterns.yaml · i18n/*.yaml · assets.yaml"]
+        API --- CFG["설정 파일<br/>patterns.yaml · i18n.yaml"]
         API --- ST["정적 자산<br/>포스터/영상"]
     end
     subgraph Patient["환자 측"]
@@ -77,7 +77,7 @@ flowchart LR
 | D14 | 식전후 | **패턴과 독립 축(`timing_food`)** | 같은 BD라도 식전/식후가 갈리므로 결합하면 패턴 수 폭발 |
 | D15 | 뷰어 식별 | **`ivid` 쿠키(무의미 난수 128-bit, 1년) 하나만** — ip_hash·일별 솔트·suspect_self_scan·localStorage 미러링 미도입 | KPI가 token 단위라 지표 손실 0. CGNAT로 IP 기반 판별은 어차피 무력 |
 | D16 | 비콘 엔드포인트 | **`POST /api/events`, 항상 204, 환자 웹뷰 전용** | 계측 오류를 환자 웹뷰에 절대 되돌리지 않는다. 약사측 이벤트는 서버 기록으로 대체 |
-| D17 | 설정 데이터 위치 | **패턴·i18n·미디어 레지스트리 = 레포 내 YAML 파일, 기동 시 메모리 로드. 런타임 쓰기가 있는 `drugs`만 DB** | 3인 팀에 원격 SQLite 편집 경로가 없음. "행 추가" 가설은 "파일 항목 추가 + 재배포"로 동일 성립 |
+| D17 | 설정·카탈로그 위치 | **패턴·i18n은 레포 YAML을 기동 시 로드하고, 출처 추적 의약품 카탈로그는 SQLite v2 `drug_*` 테이블에 저장한다.** 레거시 `drugs`는 기존 데이터 호환용이며 신규 production 검색의 정본이 아니다 | 처방 규칙과 번역은 배포 버전에 고정하고, 갱신·원본·라이선스 추적이 필요한 의약품 데이터만 DB에서 관리 |
 | D18 | QR 렌더 | **클라 JS 단일 경로(온·오프라인 공용, ~5KB 인라인). 서버 qr_svg 미생성** | 렌더 경로 2개 = 스캔 가능성 검증 2번 + 응답마다 수 KB 낭비 |
 | D19 | 오프라인 업로드 | **batch API 삭제. outbox flush = 단건 POST 오래된 순 순차 재전송** | 단건 POST가 이미 멱등·수렴적이라 batch와 의미론 동일 |
 | D20 | M1 KPI | **도달률(30% 목표) + 자가 열람률 이원화. 입력시간은 항목당 active 기준** | 약사 대리 스캔·카운터 인터럽트·다약제 처방이 지표를 오염시키지 않게 |
@@ -222,10 +222,10 @@ sequenceDiagram
 
 ### 3.1 공통 규약
 
-- **DB 테이블은 7개뿐**: `pharmacies, prescriptions, prescription_items, prescription_revisions, access_tokens, drugs, events`. 패턴 정의·i18n 문자열·미디어 레지스트리는 **레포 내 설정 파일**(§3.4, D17) — 런타임에 아무도 쓰지 않는 데이터를 DB에 넣지 않는다.
+- **처방 관통 흐름의 레거시 핵심 테이블은 7개**: `pharmacies, prescriptions, prescription_items, prescription_revisions, access_tokens, drugs, events`. 여기에 출처 추적 의약품 검색을 위해 `drug_sources, drug_import_runs, drug_import_run_records, drug_source_records, drug_presentations, drug_ingredients, drug_presentation_ingredients, drug_aliases, drug_packages`와 마이그레이션 메타데이터를 additive하게 둔다. 패턴·i18n은 계속 레포 설정 파일이 정본이다.
 - PK는 **UUIDv7 TEXT**(D9). 예외: `events.id` INTEGER, `access_tokens.token` 자체가 PK.
 - 시각은 전부 TEXT ISO-8601 **UTC `Z`**, 앱 레이어가 값 주입(SQLite `CURRENT_TIMESTAMP` 미사용 — Postgres `timestamptz` 무손실 전환). 리포트 일자만 IST(+5:30) 해석.
-- bool = INTEGER 0/1, JSON = `*_json` TEXT + `json_valid()` CHECK. Alembic을 첫 커밋부터. `PRAGMA foreign_keys=ON`을 engine connect 이벤트에서 강제. `journal_mode=WAL`.
+- bool = INTEGER 0/1, JSON = `*_json` TEXT + `json_valid()` CHECK. 현재 프로토타입은 `schema_migrations`와 `init_db()`의 additive migration을 사용한다(Alembic 미도입). 모든 연결에 `PRAGMA foreign_keys=ON`, `journal_mode=WAL`을 강제한다.
 - ON DELETE: `prescription_items`·`access_tokens`·`prescription_revisions` → CASCADE.
 - **`events`는 FK를 갖지 않는다** — `token`·`prescription_id`·`pharmacy_id`는 자유 TEXT 컬럼. 이유: `view.pending`(미존재 토큰), `view.invalid`(오입력 코드), pre_sync 소급 대상은 모두 `access_tokens`에 **아직 없거나 영원히 없는** 토큰으로 INSERT되어야 하므로 FK로는 성립 불가. 유효 토큰과의 결합은 리포트 시점 LEFT JOIN, sync 커밋 시 `view.pending` 조회도 텍스트 매칭으로 수행. ERD의 점선은 논리 참조.
 - **패턴 수 표기 규약**: 코어 패턴 **8종** + CUSTOM 예외 슬롯 = patterns.yaml **9항목**. 미디어 자산(영상·음성)과 "8패턴 가설" 지표는 **코어 8종 기준**(CUSTOM은 자산 없음·주의 카드).
@@ -240,19 +240,28 @@ erDiagram
     prescriptions ||--o{ prescription_revisions : "수정 이력"
     prescriptions ||--|| access_tokens : "토큰 1:1 (D5)"
     drugs |o..o{ prescription_items : "옵션 참조"
+    drug_presentations |o..o{ prescription_items : "신규 카탈로그 선택"
+    drug_sources ||--o{ drug_import_runs : "승인된 임포트"
+    drug_import_runs ||--o{ drug_import_run_records : "실행별 원본 연결"
+    drug_source_records ||--o{ drug_import_run_records : "불변 원본 재사용"
     pharmacies |o..o{ events : "논리 참조 (FK 아님)"
     access_tokens |o..o{ events : "논리 참조 (FK 아님)"
 
     pharmacies { TEXT id PK  TEXT name  TEXT area  TEXT pincode  TEXT ui_lang  TEXT default_patient_lang  INTEGER has_printer  INTEGER is_active  TEXT created_at }
     prescriptions { TEXT id PK  TEXT pharmacy_id FK  TEXT client_input_id  TEXT patient_label  TEXT lang  TEXT note  TEXT status  INTEGER version  TEXT entry_method  TEXT origin  INTEGER input_duration_ms  INTEGER active_input_ms  TEXT issued_at_client  TEXT reissue_of  TEXT created_at }
-    prescription_items { TEXT id PK  TEXT prescription_id FK  INTEGER position  TEXT drug_name_raw  TEXT drug_id FK  TEXT pattern_key  REAL dose_morning  REAL dose_noon  REAL dose_evening  REAL dose_night  TEXT dose_unit  TEXT timing_food  INTEGER duration_days  REAL total_quantity  TEXT prn_reason_key  REAL prn_max_per_day  REAL prn_min_gap_hours  TEXT extra_params_json  TEXT note }
+    prescription_items { TEXT id PK  TEXT prescription_id FK  INTEGER position  TEXT drug_name_raw  TEXT drug_input_raw  TEXT drug_id FK  TEXT drug_match_state  TEXT drug_catalog_snapshot_json  TEXT pattern_key  REAL dose_morning  REAL dose_noon  REAL dose_evening  REAL dose_night  TEXT dose_unit  TEXT timing_food  INTEGER duration_days  REAL total_quantity  TEXT prn_reason_key  REAL prn_max_per_day  REAL prn_min_gap_hours  TEXT extra_params_json  TEXT note }
     prescription_revisions { TEXT id PK  TEXT prescription_id FK  INTEGER version  TEXT payload_json  TEXT edit_reason  TEXT created_at }
     access_tokens { TEXT token PK  TEXT prescription_id FK "UNIQUE"  TEXT short_code  TEXT origin  TEXT expires_at  TEXT revoked_at  TEXT first_viewed_at  INTEGER scan_count  TEXT created_at }
     drugs { TEXT id PK  TEXT brand_name  TEXT generic_name  TEXT strength  TEXT form  TEXT default_pattern_key  TEXT default_timing_food  TEXT default_dose_unit  TEXT aliases_json  TEXT caution_keys_json  TEXT source  INTEGER verified  TEXT created_at }
+    drug_sources { TEXT id PK  TEXT slug  INTEGER tier  TEXT usage_scope  TEXT reuse_status }
+    drug_import_runs { TEXT id PK  TEXT source_id FK  TEXT version  TEXT input_sha256  TEXT records_sha256  TEXT source_snapshot_json  TEXT approval_snapshot_json }
+    drug_import_run_records { TEXT id PK  TEXT import_run_id FK  TEXT source_record_row_id FK  TEXT ingest_status }
+    drug_source_records { TEXT id PK  TEXT source_id FK  TEXT source_record_id  TEXT raw_sha256  TEXT raw_json }
+    drug_presentations { TEXT id PK  TEXT source_id FK  TEXT source_record_id  TEXT brand_name_raw  TEXT generic_name_raw  TEXT strength_raw  TEXT dosage_form_code  TEXT route_code  TEXT usage_scope  TEXT lifecycle_status  TEXT review_status }
     events { INTEGER id PK  TEXT event_type  TEXT ts  TEXT client_event_id  INTEGER client_ts  TEXT pharmacy_id  TEXT prescription_id  TEXT token  TEXT viewer_id  TEXT src  TEXT ua_class  INTEGER is_bot  INTEGER is_internal  TEXT props_json }
 ```
 
-`prescription_items.pattern_key`·`drugs.default_pattern_key`는 DB FK가 아니라 **patterns.yaml 키 참조** — 검증은 서버가 기동 시 로드한 설정으로 수행(§4.3).
+`prescription_items.pattern_key`는 DB FK가 아니라 **patterns.yaml 키 참조**이며 서버가 검증한다. 레거시 `drugs.default_*` 컬럼은 호환 때문에 남아 있지만 신규 출처 추적 자동완성은 이를 처방 기본값으로 사용하지 않는다. 전체 카탈로그 관계는 [08-india-drug-data-foundation.md](08-india-drug-data-foundation.md)에 정리했다.
 
 ### 3.3 테이블 정의 (요점)
 
@@ -274,26 +283,25 @@ erDiagram
 
 **prescription_items** — M/N/E/H 4슬롯 분해 저장(3슬롯 관행 "1-0-1" + QID·HS를 스키마 변경 없이 커버). `drug_name_raw`가 **진실의 원천**, `drug_id`는 장식(enrichment). `timing_food` 독립 축(D14): `before_food|after_food|with_food|empty_stomach|NULL`. `total_quantity`는 Σ슬롯×일수 자동 산출 후 약사 수정 허용(서버는 경고만).
 
-- **`dose_unit` enum(설정 데이터로 확정)**: `tablet, capsule, ml, drop, puff, sachet, application` 7종 + i18n `unit.*` 키 + 아이콘 asset_key를 시드에 포함. 시럽은 REAL 슬롯 값을 활용해 `doses: {M:5, E:5}, dose_unit:"ml"`처럼 표현하고(계량컵/스푼 아이콘 병행), 검증 규칙에 "`dose_unit=ml`이면 `total_quantity` 단위도 ml(병 아님)"을 명시. **tablet 하드코딩 금지** — 시럽이 '1 गोली'로 렌더되는 것은 안전 사고다.
+- **`dose_unit` enum(설정 데이터로 확정)**: `tablet, capsule, ml, measuring_spoon, drop, puff, inhalation, sachet, packet, application, suppository, injection, patch, spray` 14종 + hi/en 라벨 + 자체 SVG. `drop`은 route가 확인된 카탈로그 스냅샷이 있을 때 eye/ear/oral/nasal 라벨을 병기하지만 저장 단위는 바꾸지 않는다. `measuring_spoon`은 표시된 5 ml 의약품용 계량 스푼이며 가정용 티스푼으로 대체하지 않는다. **tablet 하드코딩 금지** — 제형과 단위의 충돌은 경고하고 최종 선택은 약사가 한다.
 - `extra_params_json`이 패턴 고유 파라미터 슬롯(`{"day_of_week":"sun"}`, PRN의 `{"dose_per_use":1}`, CUSTOM의 `{"instructions":"...","verbal_counseling_given":true}`) — 새 패턴이 새 컬럼을 요구하지 않게 하는 확장 지점.
 - **웹뷰 카드 대조 수단**: 각 item 카드는 `position` 번호를 **색+숫자 이중 부호화**(1=파랑, 2=주황…)로 크게 표시한다. 인도 조제 관행상 라벨 없는 종이봉투·절단 스트립이 흔하고 저문해 환자는 문자열 대조가 불가하므로, 약사가 조제 시 각 봉투에 같은 번호를 유성펜으로 기입하는 절차(§2.1)와 짝을 이룬다. 이 절차는 파일럿 서면 합의·교육 자료에 명시(§10-10).
 
-**drugs** — 유일한 "설정성 DB 테이블"(런타임 쓰기 = 승격 루프가 있으므로 DB 잔류). 시드 픽스처 5~10종(**코어 8패턴 + CUSTOM 예시** 커버). `source: seed|pharmacy|curated`, `default_pattern_key` 등 프리필이 자동완성의 가치. 승격 루프: `SELECT lower(trim(drug_name_raw)), count(*) FROM prescription_items WHERE drug_id IS NULL GROUP BY 1 ORDER BY 2 DESC` — 인도 체류 중 매일 밤 상위부터 등록. 소급 매칭해도 표시 문자열은 raw라 환자 화면 불변.
+**drugs** — 기존 처방·초기 fixture와의 호환을 위한 레거시 projection이다. 신규 운영 검색은 출처 추적 `drug_*` 카탈로그를 사용하고, production 컨텍스트에서 이 테이블로 fail-open하지 않는다. `default_pattern_key`, `default_timing_food`, `default_dose_unit`가 레거시 행에 있어도 자동완성 선택은 패턴·용량·단위·식전후·기간을 채우지 않는다. 미매칭 자유 입력의 빈도는 후보 검토 자료일 뿐 운영 카탈로그로 자동 승격하지 않는다.
 
 **access_tokens** — 처방과 **1:1**(`prescription_id` UNIQUE). `short_code`는 NULL 허용(오프라인 건은 sync 시 발급), 전 기간 UNIQUE. §5 참조.
 
 **events** — append-only, FK 없음(§3.1), `client_event_id` UNIQUE(비콘 재전송 중복 제거). 인덱스: `(event_type, ts)`, `(token)`, `(pharmacy_id, ts)`. 공통 컬럼 `ua_class`(android_chrome/android_webview/ios/other — 원본 UA 미저장), `is_bot`, `is_internal`. ~~ip_hash~~는 v0 미기록(D15 — 컬럼 예약만 하지 않고 아예 없음, 필요 시 추가는 events가 개방 스키마라 저비용).
 
-### 3.4 설정 파일 3종 (구 DB 테이블 대체 — D17)
+### 3.4 현재 설정 파일 2종 (구 DB 테이블 대체 — D17)
 
 | 파일 | 내용 | 대체한 것 |
 |---|---|---|
-| `config/patterns.yaml` | 코어 8 + CUSTOM = 9항목. 항목당 `key, schedule_type(daily\|weekly\|alternate_days\|once\|prn\|custom), slots, display_rules(defaults 포함), icon_key, video_key, audio_key, sort_order, is_active` | dosing_patterns 테이블 |
-| `config/i18n/{hi,en}.yaml` | 네임스페이스 `ui.* / pattern.{key}.name/.instruction/.voice_script / timing.* / unit.* / prn.* / caution.*`. 결측 폴백: 요청 언어 → hi → en → 키 노출(+기동 시 결측 리포트) | i18n_strings 테이블 |
-| `config/assets.yaml` | `(asset_key, kind, lang, variant)` → `path, mime, duration_sec, size, checksum`. `lang='any'`(아이콘), `variant='std'\|'low'`. 폴백 체인: 요청(lang,variant) → `std` → `any` → `hi` | media_assets 테이블 |
+| `config/patterns.yaml` | 코어 8 + CUSTOM = 9항목. 항목당 `schedule_type, slots, digits, sort_order, is_active, name`. `slots`와 `digits`는 패턴 구조·대조 라벨이며 1회 복용량 기본값이 아니다 | dosing_patterns 테이블 |
+| `config/i18n.yaml` | 슬롯·식전후·14개 복용 단위·PRN·UI 문자열의 hi/en 라벨. 필수 네임스페이스와 단위 결측은 기동 검증에서 실패 | i18n_strings 테이블 |
 
 - 서버 기동 시 로드·검증(키 참조 무결성 포함 — 깨진 참조는 기동 실패로 조기 발견). `GET /api/patterns`의 ETag = 파일 해시.
-- "패턴 추가 = 행 추가" 가설은 **"파일에 항목 추가 + 재배포"** 로 동일하게 성립(코드 수정 아님). 훅 H6/H10/H11(기계가독 slot 스펙, i18n 카탈로그 분리, 자산 레지스트리+폴백)도 파일 형태로 그대로 유지된다.
+- "패턴 추가 = 행 추가" 가설은 **"파일에 항목 추가 + 재배포"** 로 동일하게 성립(코드 수정 아님). 현재 픽토그램은 템플릿의 자체 SVG 심볼을 사용하며, 별도 `assets.yaml` 미디어 레지스트리는 구현하지 않았다.
 - 비개발자 편집이 필요해지는 시점(지역어 확장·현지 운영자)에 DB로 승격 — §9.2.
 
 **패턴 시드 9항목** (코어 8 + CUSTOM):
@@ -358,7 +366,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 }
 ```
 
-- 아이콘은 **`icon_key`만 payload에 담고, Jinja 렌더 시 해당 키의 SVG를 `<symbol>`로 문서에 인라인**한다(`<use>` 재사용) — 아이콘이 별도 HTTP 요청이 되면 §4.8 "외부 요청은 포스터 1장뿐"·§7.2 요청 수 예산과 모순. assets.yaml의 icon 자산은 "서버 렌더 시 인라인 소스"다.
+- 아이콘은 Jinja 환자 템플릿에 정의한 자체 SVG `<symbol>`을 `<use>`로 재사용한다. 현재 별도 `assets.yaml` 레지스트리는 없고, 핵심 복약 픽토그램은 외부 이미지 요청이나 이모지에 의존하지 않는다.
 - item 1은 자동완성 매칭, item 2는 자유입력 미매칭 — **렌더 경로가 완전히 동일**. `drug_name_raw` + 패턴 해석만으로 인포그래픽·영상이 전부 나오는 것이 이 스키마의 핵심 성질이다. 단, 저문해 환자의 실물 대조는 문자열이 아니라 **카드 번호 ↔ 봉투 기입 번호**(색+숫자, §3.3)가 담당한다 — 라벨 없는 봉투가 표준인 조제 관행에서 문자열 일치는 보조 수단이다.
 - 예시 지역을 델리로 표기했다 — **파일럿 지역과 1차 언어는 결합 결정**(§10-1)이며, 비힌디 권역(예: Bengaluru/칸나다)으로 확정되면 hi 자산 16개의 언어를 해당 주 언어로 교체한다(스키마·파일 구조는 H9~H11로 이미 수용).
 
@@ -401,7 +409,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 | `POST /api/prescriptions/{id}/reissue` | 폐기 후 신규 처방·신규 토큰 (구 토큰 410, D5) | 약사 |
 | `GET /api/prescriptions/{id}/qr` | 재방문용 url 반환(qr_svg 없음 — 클라 렌더, D18) + `qr.redisplayed` 계측. `?from=issue` 최초 화면은 호출하지 않음 | 약사 |
 | `POST /api/prescriptions/{id}/scan-failure` | 스캔 실패 사유 원탭 기록 → `events[scan.failed]` | 약사 |
-| `GET /api/drugs?q=` | 약명 자동완성 — naive `lower()` LIKE, 인덱스·캐시 헤더 없음(시드 수십 행) | 약사 |
+| `GET /api/drugs?q=` | v2 의약품 자동완성 — 상품 exact/prefix → 검수된 별칭 → 성분 exact/prefix → token/substring 순. 함량·제형·경로·검토 상태를 분리 표시하고 inactive와 허용되지 않은 demo를 제외 | 약사 |
 | `GET /api/patterns` | 패턴 정의 단일 소스(patterns.yaml + i18n + 자산 키 병합, ETag=파일 해시). **폼 버튼도 이 응답으로 렌더 — 클라 하드코딩 금지** | 약사·서버 |
 | `GET /p/{token}` | 환자 복약 안내 HTML | 환자·가족 |
 | `GET /c/{short_code}` · `GET /c?code=` | 코드 입력 → 정규화 → 302 `/p/{token}?src=code` (폼 GET 제출의 쿼리 형태 수용) | 환자·가족 |
@@ -427,7 +435,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
       "drug_id": null,                    // 자동완성 채택 시에만
       "pattern_key": "TDS",
       "doses": { "M": 1, "N": 1, "E": 1, "H": 0 },
-      "dose_unit": "tablet",              // §3.3 enum 7종
+      "dose_unit": "tablet",              // §3.3 enum 14종
       "timing_food": "after_food",
       "duration_days": 5,
       "total_quantity": 15,
@@ -446,7 +454,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 }
 ```
 
-검증: `pattern_key`는 patterns.yaml 활성 항목에 존재해야 하며, `slots` 밖 슬롯 dose는 0, `daily`는 슬롯 합>0, PRN은 `extra_params.dose_per_use>0`, `prn_max_per_day>0`, `prn_min_gap_hours>0` 전부 필수, weekly는 `day_of_week` 필수, CUSTOM은 `instructions` + `verbal_counseling_given=true` 필수, `dose_unit`은 enum 7종. `drug_id`는 존재 검증만, 실패해도 무시(자유 텍스트가 항상 유효 경로). `total_quantity` 불일치는 경고만. **검증 로직 자체가 패턴 설정 파일을 읽는다** — 패턴 추가가 코드 수정이 되지 않게.
+검증: `pattern_key`는 patterns.yaml 활성 항목에 존재해야 하며, `slots` 밖 슬롯 dose는 0, `daily`는 슬롯 합>0, PRN은 `extra_params.dose_per_use>0`, `prn_max_per_day>0`, `prn_min_gap_hours>0` 전부 필수, weekly는 `day_of_week` 필수, CUSTOM은 `instructions` + `verbal_counseling_given=true` 필수, `dose_unit`은 enum 14종. `drug_id`는 서버가 다시 조회하며 미존재·다른 약국의 demo·inactive·이름 불일치이면 연결을 제거하고 자유 입력 원문을 보존한다. 카탈로그는 복용량·횟수·단위·기간을 자동 결정하지 않는다. `total_quantity` 불일치는 경고만. **검증 로직 자체가 패턴 설정 파일을 읽는다** — 패턴 추가가 코드 수정이 되지 않게.
 
 **201 응답** (멱등 replay는 200 + `"replayed": true`, 동일 token — 재시도가 새 토큰을 만들면 환자에게 링크가 두 개 생긴다):
 
@@ -470,7 +478,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 
 ### 4.5 `GET /api/drugs?q=`
 
-`q` 2자 미만은 빈 배열, limit 기본 8·최대 20. brand/generic/aliases 대소문자 무시 매칭 — **naive `lower()` LIKE로 충분**(시드 5~10행 + 파일럿 누적 수백 행, 표현식 인덱스·p95 목표·캐시 헤더는 drugs가 현지 데이터로 수백 행을 넘는 시점의 항목 — §9.2). **0건이어도 항상 200 + 빈 배열** — 이 엔드포인트는 어떤 실패로도 입력 흐름을 막지 않는다(DB-optional의 API 표현).
+`q` 2자 미만은 빈 배열, limit 기본 8·최대 20. v2 `drug_presentations`·`drug_aliases`의 정규화 필드를 대상으로 상품명 exact, 상품명 prefix, 별칭 exact/prefix, 성분 exact/prefix, token, 3자 이상 substring을 결정적으로 순위화한다. `500mg`, `500 mg`, `500-mg`는 같은 검색 토큰으로 찾되 SR/ER/CR, 함량, 제형, eye/ear/oral route는 병합하지 않는다. edit-distance fuzzy matching은 유사 의약품 오선택 위험 때문에 사용하지 않는다. `inactive`는 제외하고 demo source는 허용된 약국 컨텍스트에서만 포함한다. **0건이어도 200 + 빈 배열이며 자유 입력을 막지 않는다.** 카탈로그 선택은 M/N/E/H, 복용량, 단위, 식전/식후, 기간, PRN 값을 채우지 않는다.
 
 ### 4.6 `GET /p/{token}` — 환자 웹뷰
 
@@ -485,6 +493,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 - 언어: `?lang=` 없으면 `prescriptions.lang`으로 렌더(§3.5). 공유 버튼이 생성하는 URL은 `/p/{token}?lang={현재 언어}&src=share`.
 - 캐시: HTML `Cache-Control: private, no-cache` + ETag(재검증 실패 시 보유 사본 표시 허용 — 무보다 낫다). 대기/410 페이지는 `no-store`. 정적 자산은 해시 파일명 + `max-age=31536000, immutable`.
 - 헤더: `Referrer-Policy: no-referrer`, `X-Robots-Tag: noindex, nofollow, noarchive`. 만료 D-3부터 "곧 만료" 배지.
+- 환자 렌더는 live `drug_presentations`를 다시 조회하지 않고 `prescription_items.drug_catalog_snapshot_json` 또는 약사가 입력한 자유 원문을 사용한다. 제조사·출처·승인 해시·내부 카탈로그 ID는 환자 HTML, URL, QR에 노출하지 않는다.
 
 ### 4.7 `POST /api/events` — 비콘 (환자 웹뷰 전용)
 
@@ -615,7 +624,7 @@ GROUP BY 1, 2 ORDER BY 2, 1;
 - **목표의 공식 단위는 "항목당"이다.** 인도 외래 처방은 평균 2.7~3종이므로 처방 전체 60~120초는 정상이다 — 전체 시간을 20~40초와 비교하면 다약제 처방이 전부 "미달"로 오집계된다.
 - 클라 측정 2종: **gross**(`input_duration_ms`, 폼 오픈→제출, 단조시계)와 **active**(`active_input_ms`, keydown/tap 타임스탬프 버킷 합산으로 30초+ 무입력 구간 제외 — 코드 20줄 수준) + `idle_gaps_count`. 카운터 인터럽트(다른 손님·전화·조제)가 있는 실사용 패턴에서 "입력이 느린 것"과 "카운터가 바쁜 것"을 분리한다.
 - **KPI = `active_input_ms / n_items`의 약국별·일자별 p50/p90, 목표 구간 20~40초.** gross−active 차이는 "카운터 혼잡 프록시"로 별도 보고. 처방 전체 gross는 "약사 점유 시간"으로 카운터 병목 판단에 사용.
-- 첫 주에 `used_autocomplete_count` 교차 분석으로 **자동완성 히트 항목 vs 풀타이핑 항목의 시간 차를 분리 측정** — 시드 5~10종 상태에서는 풀타이핑이 기본이라 초기 수치는 낙관 목표 대비 높게 나올 것을 전제로 해석한다.
+- `used_autocomplete_count` 교차 분석으로 **자동완성 히트 항목 vs 자유 입력 항목의 시간 차를 분리 측정**한다. 현재 production은 NPPA formulation 11건뿐이므로 실제 브랜드 처방은 자유 입력이 기본일 수 있고, isolated demo 16건의 적중률을 운영 카탈로그 성능으로 해석하지 않는다.
 
 **열람 도구**: `/admin/metrics?key=...` 서버 렌더 표 **단일 경로**(약국×일자 도달률·자가 열람률, 입력시간 분포, src 분해, CUSTOM 비율, scan.failed 사유 분포, 커버리지 병기, 영상 재생률) — 현지에서 즉시 조회 가능해야 하므로 이쪽으로 통일. nightly Python 리포트는 admin 페이지 쿼리를 재사용할 수 있을 때만(§9.2).
 
@@ -725,7 +734,7 @@ HTTP 캐시만으론 오프라인 내비게이션 비보장, 환자측 service w
 
 여섯 확장(a 계정 클레임, b 가족 관리자, c 알람, d OCR, e 지역어, f 익명 데이터 사업) 전부 v0 파이프라인의 **가장자리에 부착**되며 코어를 절개하는 항목은 없다. 단, **H2(토큰 1급 레코드)와 H5(스케줄 정규화)는 v0 저장 시점에 결정되는 속성이라 소급 불가** — 최우선.
 
-### 9.1 v0에 반영할 최소 훅 (본 문서에 전부 반영됨)
+### 9.1 v0 최소 훅과 현재 구현 상태
 
 | # | 훅 | 반영 위치 | 전제 확장 | 미반영 시 비용 |
 |---|---|---|---|---|
@@ -738,8 +747,8 @@ HTTP 캐시만으론 오프라인 내비게이션 비보장, 환자측 service w
 | H7 | 처방 생성 payload를 단일 JSON 스키마(`PrescriptionDraft`)로 문서화, 폼 = 스키마의 뷰 | API 계약 §4.3 | d | OCR 조준점 부재 → 폼·API 이중 개조 |
 | H8 | `entry_method`(현재 `'manual'`) + 입력시간과 조인 가능 | prescriptions | d | OCR 도입 효과 측정 불가 |
 | H9 | 언어 = BCP-47 코드 전 계층 통일, 언어별 컬럼 금지 | 스키마·API·이벤트·파일 | e | 언어 추가 = 스키마 수술 |
-| H10 | UI 문자열 i18n 카탈로그 분리, Jinja 하드코딩 금지 | **i18n/*.yaml** | e | 언어 추가 = 템플릿 전수 수정 |
-| H11 | 자산 레지스트리 `(asset_key, kind, lang, variant)` + 폴백 체인 | **assets.yaml** | e | 자산 누락 = 웹뷰 오류, 부분 출시 불가 |
+| H10 | UI 문자열 i18n 카탈로그 분리, Jinja 하드코딩 최소화 | **config/i18n.yaml** | e | 언어 추가 = 템플릿 전수 수정 |
+| H11 | 자산 레지스트리 `(asset_key, kind, lang, variant)` + 폴백 체인 | **후속 미구현. 현재 핵심 아이콘은 템플릿 자체 SVG** | e | 실제 음성·영상 자산 도입 전 레지스트리 필요 |
 | H12 | events: append-only, 개방 event_type + props JSON, 공통 차원 고정, **FK 없음** | events | f (+M1 공용) | 이벤트 추가마다 ALTER |
 | H13 | events에 자유 텍스트(약명·별칭) 복제 금지 — 리포트 시점 조인만 | events 규율 | f, DPDP | 데이터셋 익명화 불능 오염 |
 | H14 | 온보딩에 area/pincode·has_printer 수집 + `drug_id` nullable 유지 | pharmacies, items | f | 지역·약물 차원 백필 불가 |
@@ -759,12 +768,12 @@ HTTP 캐시만으론 오프라인 내비게이션 비보장, 환자측 service w
 | **서버측 QR 렌더(qrcode 라이브러리)** | 클라 단일 경로(D18) | 감열 프린터 연동이 서버 렌더를 요구할 때 |
 | **라우트별 rate limit 확대(/p·약국 API·drugs·events)** | `/c` 실패 경로 외에는 보안·안정성 기여 없음(D22) | 실패율 알람 반복, 약국 10곳 초과 |
 | **ip_hash·일별 솔트·suspect_self_scan 실시간 플래그** | CGNAT로 무력 자인, 소비자 없음. 사후 SQL 검수로 대체 | 연락처 수집 개시 또는 봇 트래픽 실측 |
-| **커서 페이징·drugs 표현식 인덱스·p95 목표·캐시 헤더** | 대상 데이터 수백 행 — 측정 가능한 효과 없음 | drugs 수백 행 초과 |
+| **FTS5/Postgres 검색 인덱스·p95 성능 게이트** | 현재 production 11건·isolated demo 포함 27건은 결정적 메모리 순위화가 더 단순 | 승인 레코드 5만 건 접근 또는 실제 p95 100ms 초과 |
 | **무게 예산 CI 게이트·nightly 리포트** | CI가 없고, 열람 경로는 /admin/metrics 하나로 충분 | CI 구축 후 / admin 쿼리 재사용 가능 시 |
 | **purge 자동화(스케줄러)** | 최초 실행이 첫 발급 +60일 — 파일럿 중 돌 일 없음. 수동 스크립트로 준비 | **D+50 백로그(날짜 명기)** |
-| **설정 파일 3종의 DB 승격 + 어드민 편집 UI** | 3인 팀에 원격 DB 편집 경로가 없음(D17) | 비개발자 편집 수요(지역어 확장·현지 운영자) |
+| **설정 파일 2종의 DB 승격 + 어드민 편집 UI** | 3인 팀에 원격 DB 편집 경로가 없음(D17) | 비개발자 편집 수요(지역어 확장·현지 운영자) |
 | 분석 웨어하우스·ETL·차등정보보호·동의 관리 인프라 | M1 지표는 SQLite 쿼리로 충분 | 데이터 사업 LOI |
-| 의약품 DB 전면 구축·온톨로지 | DB-optional 확정, 시드 5–10종으로 관통 검증 | 현지 데이터 확보 후 |
+| 전국 상품명 DB·범용 의료 온톨로지 | 현재 v2는 출처 추적 가능한 최소 식별 카탈로그만 구현 | 적법한 전국 데이터 라이선스와 현지 운영 요구 확보 후 |
 | Postgres 이전·멀티테넌시 | 약국 2곳엔 SQLite 충분, Alembic+타입 규약이 이전 안전성 보장 | 약국 수십 곳 |
 | 토큰 "보안 강화"(기기 바인딩·일회용·단기 만료) | 공유·클레임을 파괴하는 역훅 | 원칙적으로 계속 하지 않음 |
 | CAPTCHA·WAF·HMAC URL | 파트너 2곳 규모에서 비용 > 효익 | 실패율 알람 반복 |

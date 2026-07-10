@@ -34,6 +34,7 @@ def _item(
     qty: float,
     *,
     unit: str = "tablet",
+    administration_route: str | None = None,
     extra_params: dict | None = None,
     prn_reason_key: str | None = None,
     prn_max_per_day: float | None = None,
@@ -46,6 +47,7 @@ def _item(
         "pattern_key": pattern,
         "doses": doses,
         "dose_unit": unit,
+        "administration_route": administration_route,
         "timing_food": food,
         "duration_days": days,
         "total_quantity": qty,
@@ -119,7 +121,7 @@ def build_scenarios() -> dict[str, dict]:
                 _item(
                     4, "Demo Lubricating Eye Drops Preservative-Free Multi-Dose Bottle 10 ml", "QID",
                     {"M": 1, "N": 1, "E": 1, "H": 1}, None, 7, 28,
-                    unit="drop",
+                    unit="drop", administration_route="ophthalmic",
                 ),
                 _item(
                     5, "Demo SOS Pain Tablet", "PRN", z.copy(), "after_food", 5, 10,
