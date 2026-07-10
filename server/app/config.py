@@ -14,8 +14,26 @@ import yaml
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
-# §3.3 dose_unit enum 7종 / D14 timing_food 4종 — 검증 기준
-DOSE_UNITS = ("tablet", "capsule", "ml", "drop", "puff", "sachet", "application")
+# §3.3 dose_unit contract. ``drop`` intentionally remains one stored unit;
+# the selected catalogue route may clarify it as oral/eye/ear at render time.
+# A marked measuring spoon is distinct from ``ml`` so the UI never implies that
+# a household teaspoon is an acceptable measuring device.
+DOSE_UNITS = (
+    "tablet",
+    "capsule",
+    "ml",
+    "measuring_spoon",
+    "drop",
+    "puff",
+    "inhalation",
+    "sachet",
+    "packet",
+    "application",
+    "suppository",
+    "injection",
+    "patch",
+    "spray",
+)
 TIMING_FOOD = ("before_food", "after_food", "with_food", "empty_stomach")
 
 _cache: dict[str, Any] | None = None
@@ -41,7 +59,7 @@ def _validate(cfg: dict[str, Any]) -> None:
             raise RuntimeError(f"i18n.yaml: 네임스페이스 {ns!r} 결측")
     for unit in DOSE_UNITS:
         if unit not in i18n["dose_units"]:
-            raise RuntimeError(f"i18n.yaml: dose_units.{unit} 결측 (enum 7종 — §3.3)")
+            raise RuntimeError(f"i18n.yaml: dose_units.{unit} 결측 (§3.3 dose_unit contract)")
     for tf in TIMING_FOOD:
         if tf not in i18n["timing_food"]:
             raise RuntimeError(f"i18n.yaml: timing_food.{tf} 결측 (D14)")

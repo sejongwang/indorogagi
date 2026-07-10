@@ -81,10 +81,93 @@
     var I18N = META.i18n;
 
     /* 라벨 접근자 — 약사측 UI는 영어 고정(병기 없음) */
-    function unitEn(u) { return (I18N.dose_units[u] || { en: u }).en; }
+    function unitEn(u, it) {
+      if (!u) return "Select unit";
+      var base = (I18N.dose_units[u] || { en: u }).en;
+      if (u !== "drop" || !it || !it.administration_route) return base;
+      var route = String(it.administration_route).toLowerCase();
+      var aliases = { eye: "ophthalmic", ocular: "ophthalmic", ear: "otic", intranasal: "nasal" };
+      route = aliases[route] || route;
+      var routeLabels = I18N.dose_unit_route_labels && I18N.dose_unit_route_labels.drop;
+      return routeLabels && routeLabels[route] ? routeLabels[route].en : base;
+    }
     function timingEn(t) { return t ? (I18N.timing_food[t] || { en: t }).en : "Not set"; }
     function dayEn(k) { return (I18N.days_of_week[k] || { en: k }).en; }
     function patOf(it) { return META.patterns[it.pattern_key] || null; }
+    function compactParts(parts, sep) {
+      return parts.filter(function (part) { return part != null && String(part).trim(); }).join(sep || " · ");
+    }
+    function drugField(d, names) {
+      for (var i = 0; d && i < names.length; i++) {
+        if (d[names[i]] != null && String(d[names[i]]).trim()) return d[names[i]];
+      }
+      return "";
+    }
+    function drugBrand(d) { return drugField(d, ["brand_name", "display_name", "name"]); }
+    function drugGeneric(d) { return drugField(d, ["generic_name", "generic_display", "ingredient_display"]); }
+    function drugStrength(d) { return drugField(d, ["strength", "strength_display", "strength_raw"]); }
+    function drugForm(d) { return drugField(d, ["form", "dosage_form", "dosage_form_display", "dosage_form_code"]); }
+    function drugRoute(d) { return drugField(d, ["route", "route_display", "route_code"]); }
+    function drugMaker(d) { return drugField(d, ["manufacturer", "manufacturer_name", "marketing_company", "marketer"]); }
+    function drugReview(d) { return String(drugField(d, ["review_status", "review_state", "catalog_status"]) || "").toLowerCase(); }
+    function drugScope(d) { return String(drugField(d, ["usage_scope", "data_scope"]) || "").toLowerCase(); }
+    function drugLifecycle(d) { return String(drugField(d, ["lifecycle_status", "active_status"]) || "").toLowerCase(); }
+    function drugWarnings(d) {
+      var out = [], raw = d && (d.warnings || d.selection_warnings || d.warning_codes);
+      if (typeof raw === "string") raw = [raw];
+      if (Array.isArray(raw)) raw.forEach(function (w) {
+        var txt = typeof w === "string" ? w : (w && (w.message || w.label || w.code));
+        if (txt && out.indexOf(String(txt)) < 0) out.push(String(txt));
+      });
+      var missing = d && d.incomplete_fields;
+      if (Array.isArray(missing) && missing.length) out.push("Incomplete catalog record: " + missing.join(", "));
+      return out;
+    }
+    function detailDrugWarnings(d) {
+      var review = drugReview(d), scope = drugScope(d);
+      return drugWarnings(d).filter(function (warning) {
+        var text = warning.toLowerCase();
+        if (review === "needs_review" && text.indexOf("needs review") >= 0) return false;
+        if (review === "unverified" && text.indexOf("pharmacist-verified") >= 0) return false;
+        if (scope === "demo" && text.indexOf("demo catalog record") >= 0) return false;
+        return true;
+      });
+    }
+    function unitCandidates(d) {
+      var raw = d && (d.unit_candidates || d.unit_options || d.dose_unit_candidates || d.suggested_units || d.default_unit_candidates);
+      if (typeof raw === "string") raw = [raw];
+      if (!Array.isArray(raw)) return [];
+      return raw.map(function (u) { return typeof u === "string" ? u : (u && (u.code || u.unit)); })
+        .filter(function (u, i, arr) { return u && arr.indexOf(u) === i; });
+    }
+    function catalogMeta(d) {
+      return compactParts([drugGeneric(d), drugStrength(d), drugForm(d), drugRoute(d)]);
+    }
+    function unitNeedsCheck(it) {
+      var candidates = it && it.drug_match_state === "selected" ? unitCandidates(it.drug) : [];
+      return Boolean(it && it.dose_unit) && candidates.length > 0 && candidates.indexOf(it.dose_unit) < 0;
+    }
+    function unitSafetyHint(it) {
+      if (it.dose_unit === "measuring_spoon") {
+        return "Use only a medicine-measuring spoon marked 5 ml, never a household teaspoon. Confirm the spoon measure against the prescription.";
+      }
+      if (it.dose_unit === "drop" && it.drug_match_state === "selected") {
+        var route = String(drugRoute(it.drug) || "").toLowerCase();
+        var aliases = { eye: "ophthalmic", ocular: "ophthalmic", ear: "otic", intranasal: "nasal" };
+        route = aliases[route] || route;
+        var labels = I18N.dose_unit_route_labels && I18N.dose_unit_route_labels.drop;
+        if (labels && labels[route]) {
+          return "Catalog route candidate: " + labels[route].en + ". Choose the route yourself and confirm it against the prescription.";
+        }
+      }
+      if (it.dose_unit === "inhalation") {
+        return "Inhalation is a counted unit; do not substitute puff or ml. Confirm the prescription.";
+      }
+      if (it.dose_unit === "injection") {
+        return "The catalog does not set injection route or volume. Confirm both from the prescription.";
+      }
+      return "";
+    }
 
     /* 약사 관용 축약 라벨 — [알려진 한계] 설정 카탈로그(abbr_en)로 이전 예정(와이어프레임 주석 승계).
        미등록 pattern_key는 name.en 폴백 — 카탈로그 추가 시 undefined 렌더 방지. */
@@ -116,7 +199,7 @@
         return "1/wk" + (dw ? " (" + dayEn(dw).slice(0, 3) + ")" : "");
       }
       if (p.schedule_type === "once") return "1×";
-      return digitsShort(it) + (it.dose_unit === "ml" ? " ml" : "");
+      return digitsShort(it) + " " + unitEn(it.dose_unit, it);
     }
     function autoTotal(it) {            /* Σ슬롯×일수 — prn/custom은 수동 */
       var p = patOf(it);
@@ -151,12 +234,14 @@
     var M = null;
     var submitting = false;
     function freshItem(pos, inheritFrom) {
-      return { position: pos, drug_name_raw: "", drug_id: null, drug: null, pattern_key: null,
-        doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: "tablet", timing_food: null,
-        duration_days: inheritFrom ? inheritFrom.duration_days : null, total_quantity: 0,
+      return { position: pos, drug_name_raw: "", drug_input_raw: "", drug_id: null, drug: null,
+        drug_match_state: "free_text", pattern_key: null,
+        doses: { M: 0, N: 0, E: 0, H: 0 }, dose_unit: null,
+        administration_route: null, timing_food: null,
+        duration_days: null, total_quantity: 0,
         prn_reason_key: null, prn_max_per_day: null, prn_min_gap_hours: null,
         extra_params: null, note: null,
-        _inheritFrom: inheritFrom ? inheritFrom.position : null, _totalEdited: false, _noteOpen: false };
+        _inheritFrom: null, _totalEdited: false, _noteOpen: false };
     }
     function initModel() {
       /* lang 프리필: 정식으론 pharmacies.default_patient_lang — 페이지 GET엔 약국 헤더가 없어
@@ -243,7 +328,7 @@
         h += '<div class="zone"><span class="field-label">PRN (only when needed)</span>' +
           '<div class="qty-row" style="margin-bottom:10px;"><span class="t-supporting t-secondary">Dose each time <b>(required)</b></span>' +
           '<div class="stepper"><button class="stepper-btn" type="button" data-act="prndose" data-d="-1" aria-label="decrease dose each time">−</button><output class="stepper-value">' + fmtN(perUse || 0) + '</output><button class="stepper-btn" type="button" data-act="prndose" data-d="1" aria-label="increase dose each time">+</button></div>' +
-          '<span class="t-supporting t-secondary">' + unitEn(it.dose_unit) + '</span></div>' +
+          '<span class="t-supporting t-secondary">' + unitEn(it.dose_unit, it) + '</span></div>' +
           (doseErr ? '<span class="field-error">' + svgErr() + esc(doseErr.msg) + "</span>" : "") +
           '<label class="field"><span class="field-help" style="margin:0 0 4px;">Reason</span>' +
           '<select class="input" data-in="prnreason"><option value=""' + (it.prn_reason_key ? "" : " selected") + ">Select reason…</option>" +
@@ -276,7 +361,7 @@
       var p = patOf(it);
       var isStat = p && p.schedule_type === "once";
       var manualQty = !p || p.schedule_type === "prn" || p.schedule_type === "custom" || it._totalEdited;
-      var qtyUnit = unitEn(it.dose_unit);
+      var qtyUnit = unitEn(it.dose_unit, it);
 
       /* 필드 인라인로 못 붙인 잔여 에러(서버 422의 임의 path 포함) — 카드 상단에 나열 */
       var known = ["drug_name_raw", "extra_params.day_of_week", "extra_params.dose_per_use", "extra_params.instructions", "extra_params.verbal_counseling_given"];
@@ -298,17 +383,39 @@
 
       /* 약명 — 유일한 타이핑 필드. 2자부터 자동완성(fetch /api/drugs, 300ms 디바운스),
          미스·미채택도 동일 경로 발급(DB-optional §4.5) */
+      var acId = "acPop-" + i;
+      var acStatusId = "acStatus-" + i;
       h += '<div class="fgroup ac-wrap"><label class="field"><span class="field-label">Drug name</span>' +
-        '<input class="input' + (err ? " is-invalid" : "") + '" type="text" data-in="name" data-i="' + i + '" value="' + esc(it.drug_name_raw) + '" placeholder="Type brand or generic name" autocomplete="off">' +
+        '<input class="input' + (err ? " is-invalid" : "") + '" type="text" data-in="name" data-i="' + i + '" value="' + esc(it.drug_name_raw) + '" placeholder="Type brand or generic name" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="' + acId + '" aria-describedby="' + acStatusId + '">' +
         (err ? '<span class="field-error">' + svgErr() + esc(err.msg) + "</span>" : "") +
         (!navigator.onLine ? '<span class="field-help">Autocomplete off while offline — type the full name</span>' : "") +
         "</label>" +
-        (it.drug_id && it.drug ? '<span class="inline-note">Matched: ' + esc(it.drug.generic_name || "") + " " + esc(it.drug.strength || "") + " · defaults applied</span>" : "") +
-        '<div class="ac-pop" id="acPop" hidden></div></div>';
+        (it.drug && it.drug_match_state !== "free_text"
+          ? '<div class="ac-match' + (
+              it.drug_match_state === "selected_then_modified" ||
+              drugReview(it.drug) !== "verified" ||
+              drugScope(it.drug) !== "production" ||
+              drugLifecycle(it.drug) !== "active" ||
+              drugWarnings(it.drug).length
+                ? " is-warning" : ""
+            ) + '" role="status">' +
+            '<b>' + (it.drug_match_state === "selected_then_modified" ? "Name edited after catalog selection" : "Catalog match — instructions unchanged") + '</b>' +
+            (catalogMeta(it.drug) ? '<span>' + esc(catalogMeta(it.drug)) + '</span>' : "") +
+            (drugMaker(it.drug) ? '<span>Made or marketed by ' + esc(drugMaker(it.drug)) + '</span>' : "") +
+            ((drugReview(it.drug) === "needs_review" || drugReview(it.drug) === "unverified")
+              ? '<span><b>' + (drugReview(it.drug) === "needs_review" ? "Needs review" : "Unverified catalog record") + '</b> — compare every detail with the paper prescription.</span>' : "") +
+            (drugScope(it.drug) === "demo" ? '<span><b>Demo catalog record</b> — not an approved production source.</span>' : "") +
+            (drugLifecycle(it.drug) === "inactive" ? '<span><b>Inactive catalog record</b> — do not rely on this match without review.</span>' : "") +
+            (it.drug_match_state === "selected_then_modified" ? '<span>The catalog link is cleared. The original typed query is preserved for audit; the edited name is what the patient will see.</span>' : "") +
+            detailDrugWarnings(it.drug).map(function (w) { return '<span>' + esc(w) + '</span>'; }).join("") +
+            '</div>'
+          : '<span class="inline-note">Free text is allowed. Catalog results never set dose, timing, or duration.</span>') +
+        '<span class="ac-sr-status" id="' + acStatusId + '" aria-live="polite"></span>' +
+        '<div class="ac-pop" id="' + acId + '" role="listbox" aria-label="Medicine catalog results" hidden></div></div>';
 
       /* 최근 약 레일: 80% 범위 외(로컬 캐시 설계 미확정) — 자동완성·칩·승계만으로 20~40초 동선 유지 */
 
-      /* 패턴 칩 그리드 — 서버 config 임베드(pattern_order · sort_order 순), 칩 탭 = 용량 기본값 채움 */
+      /* 패턴 칩 그리드 — 슬롯만 활성화하며 복용량은 약사가 직접 입력한다. */
       h += '<div class="fgroup"><span class="field-label">Dose pattern</span><div class="chip-row">' +
         META.pattern_order.map(function (k) {
           return '<button class="chip" type="button" data-act="pat" data-k="' + k + '" aria-pressed="' + (it.pattern_key === k) + '">' + patternLabel(k) + ' <span class="chip-sub">' + patternSub(k) + "</span></button>";
@@ -316,11 +423,32 @@
 
       h += '<div class="fgroup"><span class="field-label">Dose per slot</span>' + doseGrid(it) + "</div>";
 
-      /* 단위 7종 칩 — 기본 tablet, 항상 노출(숨은 기본값 금지 — 시럽 사고 방지 §3.3) */
-      h += '<div class="fgroup"><span class="field-label">Unit</span><div class="chip-row">' +
+      /* 지원 dose_unit 칩 — 선택 전 기본값 없음(숨은 tablet 기본값 금지). */
+      var suggestedUnits = it.drug_match_state === "selected" ? unitCandidates(it.drug) : [];
+      var safetyHint = unitSafetyHint(it);
+      h += '<div class="fgroup"><span class="field-label">Unit</span>' +
+        (suggestedUnits.length
+          ? '<span class="ac-unit-hint' + (unitNeedsCheck(it) ? " is-warning" : "") + '"><b>Catalog candidates to check:</b> ' +
+            suggestedUnits.map(function (u) { return esc(unitEn(u, it)); }).join(", ") +
+            '. Choose the unit yourself and confirm it against the prescription.' +
+            (unitNeedsCheck(it) ? ' <b>The selected unit differs.</b>' : "") + '</span>'
+          : "") +
+        (safetyHint ? '<span class="ac-unit-hint is-warning"><b>Unit safety check:</b> ' + esc(safetyHint) + '</span>' : "") +
+        '<div class="chip-row">' +
         Object.keys(I18N.dose_units).map(function (u) {
-          return '<button class="chip" type="button" data-act="unit" data-u="' + u + '" aria-pressed="' + (it.dose_unit === u) + '">' + I18N.dose_units[u].en + "</button>";
+          return '<button class="chip" type="button" data-act="unit" data-u="' + u + '" aria-pressed="' + (it.dose_unit === u) + '">' + esc(unitEn(u, it)) + "</button>";
         }).join("") + "</div></div>";
+
+      /* drop은 단위만으로 경로를 추측할 수 없으므로 약사가 별도로 확정한다. */
+      if (it.dose_unit === "drop") {
+        var dropRoutes = ["oral", "ophthalmic", "otic", "nasal"];
+        h += '<div class="fgroup"><span class="field-label">Drop route <span class="t-supporting t-secondary">required</span></span>' +
+          '<span class="field-help">Catalog route is only a candidate. Confirm the prescription.</span><div class="chip-row">' +
+          dropRoutes.map(function (route) {
+            var label = (I18N.administration_routes[route] || { en: route }).en;
+            return '<button class="chip" type="button" data-act="route" data-route="' + route + '" aria-pressed="' + (it.administration_route === route) + '">' + esc(label) + "</button>";
+          }).join("") + "</div></div>";
+      }
 
       /* 식전후 — 패턴과 독립 축(D14), 4종 + Not set(NULL) */
       h += '<div class="fgroup"><span class="field-label">Food timing</span><div class="chip-row">' +
@@ -330,7 +458,7 @@
         '<button class="chip" type="button" data-act="timing" data-t="" aria-pressed="' + (it.timing_food == null) + '">Not set</button>' +
         "</div></div>";
 
-      /* 기간 — 프리셋 칩 + 스테퍼. 첫 항목 기본값 없음, 2번째부터 직전 값 승계. STAT은 비활성 */
+      /* 기간 — 프리셋 칩 + 스테퍼. 항목 간 자동 승계 없음. STAT은 비활성 */
       h += '<div class="fgroup"><span class="field-label">Duration (days)' + (isStat ? ' <span class="t-supporting t-secondary">single dose — off</span>' : "") + "</span>" +
         '<div class="duration-row' + (isStat ? " dim" : "") + '">' +
         I18N.duration_presets.map(function (d) {
@@ -382,54 +510,130 @@
     function renderAll() { renderHeader(); renderItems(); renderBottom(); renderBanner(); }
 
     /* ---------- 자동완성 — GET /api/drugs?q= (300ms 디바운스 · AbortController) ---------- */
-    var AC = { timer: null, ctrl: null, list: [] };
+    var AC = { timer: null, ctrl: null, list: [], active: -1, owner: null, query: "", failed: false };
+    function acPop(i) { return document.getElementById("acPop-" + i); }
+    function acInput(i) { return document.querySelector('[data-in="name"][data-i="' + i + '"]'); }
+    function acStatus(i, msg) {
+      var el = document.getElementById("acStatus-" + i);
+      if (el) el.textContent = msg || "";
+    }
+    function setACActive(i, next) {
+      var pop = acPop(i);
+      var input = acInput(i);
+      if (!pop || pop.hidden || !input) return;
+      var options = pop.querySelectorAll('[role="option"]');
+      if (!options.length) return;
+      AC.active = ((next % options.length) + options.length) % options.length;
+      Array.prototype.forEach.call(options, function (opt, index) {
+        var active = index === AC.active;
+        opt.classList.toggle("is-active", active);
+        opt.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      input.setAttribute("aria-activedescendant", options[AC.active].id);
+      options[AC.active].scrollIntoView({ block: "nearest" });
+      acStatus(i, (AC.active < AC.list.length ? drugBrand(AC.list[AC.active]) : "Use free-text name") + ", option " + (AC.active + 1) + " of " + options.length);
+    }
     function scheduleAC(i) {
       if (AC.timer) clearTimeout(AC.timer);
+      AC.owner = i;
+      AC.active = -1;
       AC.timer = setTimeout(function () { fetchAC(i); }, 300);
     }
     function fetchAC(i) {
-      var pop = $("#acPop");
+      var pop = acPop(i);
       if (!pop || M.expanded !== i) return;
-      if (!navigator.onLine) { pop.hidden = true; return; }          /* 오프라인: 조용히 비활성 */
+      if (!navigator.onLine) { closeAC(i); acStatus(i, "Autocomplete unavailable offline. Free text remains available."); return; }
       var q = (M.items[i].drug_name_raw || "").trim();
-      if (q.length < 2) { pop.hidden = true; return; }               /* 2자부터(§4.5) */
+      if (q.length < 2) { closeAC(i); acStatus(i, "Type at least 2 characters to search the catalog."); return; } /* 2자부터(§4.5) */
       if (AC.ctrl) AC.ctrl.abort();
       AC.ctrl = new AbortController();
-      fetch("/api/drugs?q=" + encodeURIComponent(q) + "&limit=8", { signal: AC.ctrl.signal })
+      AC.query = q;
+      AC.failed = false;
+      acStatus(i, "Searching the medicine catalog.");
+      fetch("/api/drugs?q=" + encodeURIComponent(q) + "&limit=8", {
+        signal: AC.ctrl.signal,
+        headers: { "X-Pharmacy-Id": pharmacyId() }
+      })
         .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (hits) { AC.list = hits || []; renderAC(i, q); })
+        .then(function (hits) {
+          AC.list = Array.isArray(hits) ? hits : ((hits && (hits.items || hits.results)) || []);
+          AC.active = -1;
+          renderAC(i, q);
+        })
         .catch(function (e) {                                        /* 실패도 흐름 미차단(DB-optional) */
           if (e && e.name === "AbortError") return;
           AC.list = [];
+          AC.active = -1;
+          AC.failed = true;
           renderAC(i, q);
         });
     }
     function renderAC(i, q) {
-      var pop = $("#acPop");
+      var pop = acPop(i);
       if (!pop || M.expanded !== i) return;
       var cur = (M.items[i].drug_name_raw || "").trim();
-      if (cur !== q || q.length < 2) { pop.hidden = true; return; }  /* 응답 도착 전 입력 변경 무시 */
-      var rows = AC.list.map(function (d) {
-        return '<button class="ac-row" type="button" data-act="adopt" data-di="' + esc(d.id) + '">' +
-          '<span class="ac-main">' + esc(d.brand_name) + "</span>" +
-          '<span class="ac-sub">' + esc(d.generic_name || "") + " · " + esc(d.strength || "") + " · " + esc(d.form || "") + "</span></button>";
+      if (cur !== q || q.length < 2) { closeAC(i); return; }         /* 응답 도착 전 입력 변경 무시 */
+      var rows = AC.list.map(function (d, index) {
+        var review = drugReview(d);
+        var maker = drugMaker(d);
+        var warning = review === "needs_review" ? "Needs review" : (review === "unverified" ? "Unverified" : "");
+        var scope = drugScope(d) === "demo" ? "Demo data" : "";
+        var inactive = drugLifecycle(d) === "inactive" ? "Inactive" : "";
+        var tertiary = compactParts([maker, warning, scope, inactive]);
+        return '<button class="ac-row" id="acOption-' + i + "-" + index + '" role="option" aria-selected="false" tabindex="-1" type="button" data-act="adopt" data-ai="' + index + '">' +
+          '<span class="ac-main">' + esc(drugBrand(d) || "Unnamed catalog record") + "</span>" +
+          (catalogMeta(d) ? '<span class="ac-sub">' + esc(catalogMeta(d)) + "</span>" : '<span class="ac-sub ac-warning">Details incomplete — verify against the prescription</span>') +
+          (tertiary ? '<span class="ac-tertiary' + ((warning || inactive) ? " ac-warning" : "") + '">' + esc(tertiary) + "</span>" : "") +
+          "</button>";
       });
       /* 자유입력 확정 행 상시 — "등록 안 된 약" 차단 문구 금지(DB-optional §4.5) */
-      rows.push('<button class="ac-row ac-new" type="button" data-act="acnew">' +
+      rows.push('<button class="ac-row ac-new" id="acOption-' + i + "-" + AC.list.length + '" role="option" aria-selected="false" tabindex="-1" type="button" data-act="acnew">' +
         '<span class="ac-main">Use “' + esc(q) + '” as new drug name</span>' +
-        '<span class="ac-sub">' + (AC.list.length ? "Not the one above?" : "Not in list") + " — issuing works the same</span></button>");
+        '<span class="ac-sub">' + (AC.failed ? "Catalog search unavailable." : (AC.list.length ? "Not the one above?" : "Not in catalog.")) + " Free text remains available.</span></button>");
       pop.innerHTML = rows.join("");
       pop.hidden = false;
+      /* Keep every result, including the free-text fallback, reachable above the
+         fixed issue bar on small Android viewports. The list scrolls internally;
+         medicine names are never truncated to make it fit. */
+      var bottomBar = document.querySelector(".bottom-bar");
+      var barTop = bottomBar ? bottomBar.getBoundingClientRect().top : window.innerHeight;
+      var popTop = pop.getBoundingClientRect().top;
+      var available = Math.max(96, Math.floor(barTop - popTop - 8));
+      if (available < 160) {
+        /* On a 320px phone the field starts low in the document. Move the field
+           area up once so a long, distinguishing product name is readable; the
+           result list still remains anchored to the input. */
+        window.scrollBy(0, popTop - Math.max(72, Math.floor(window.innerHeight * 0.18)));
+        barTop = bottomBar ? bottomBar.getBoundingClientRect().top : window.innerHeight;
+        popTop = pop.getBoundingClientRect().top;
+        available = Math.max(96, Math.floor(barTop - popTop - 8));
+      }
+      pop.style.maxHeight = Math.min(360, available) + "px";
+      var input = acInput(i);
+      if (input) {
+        input.setAttribute("aria-expanded", "true");
+        input.removeAttribute("aria-activedescendant");
+      }
+      acStatus(i, AC.failed ? "Catalog search failed. Free-text option available." : AC.list.length + " catalog " + (AC.list.length === 1 ? "result" : "results") + ". Use arrow keys to review; free text is always available.");
     }
-    function closeAC() { var pop = $("#acPop"); if (pop) pop.hidden = true; }
+    function closeAC(i) {
+      if (i == null) i = AC.owner != null ? AC.owner : M.expanded;
+      var pop = acPop(i);
+      var input = acInput(i);
+      if (pop) pop.hidden = true;
+      if (input) {
+        input.setAttribute("aria-expanded", "false");
+        input.removeAttribute("aria-activedescendant");
+      }
+      AC.active = -1;
+    }
 
     /* ---------- 항목 조작 ---------- */
     function applyPattern(it, k) {
       it.pattern_key = k;
       var p = META.patterns[k];
       it.doses = { M: 0, N: 0, E: 0, H: 0 };
-      (p.slots || []).forEach(function (s) { it.doses[s] = 1; });    /* 칩 탭 = 기본값 완성 */
-      if (p.schedule_type === "once") it.duration_days = 1;
+      /* 패턴은 허용 슬롯만 정한다. 수량·기간·PRN 제한은 약사가 직접 확인한다. */
       if (p.schedule_type === "weekly") {
         if (!(it.extra_params && "day_of_week" in it.extra_params)) it.extra_params = { day_of_week: null };
       } else if (k === "PRN") {
@@ -440,21 +644,26 @@
         it.extra_params = null;
       }
       if (p.schedule_type === "prn") {
-        if (it.prn_max_per_day == null) it.prn_max_per_day = 2;
-        if (it.prn_min_gap_hours == null) it.prn_min_gap_hours = 6;
+        it.prn_max_per_day = null;
+        it.prn_min_gap_hours = null;
       } else { it.prn_reason_key = null; it.prn_max_per_day = null; it.prn_min_gap_hours = null; }
       recalc(it);
     }
     function adoptSeed(it, d) {
-      it.drug_name_raw = d.brand_name;
+      /* 입력 원문(종이 처방을 보고 처음 타이핑한 문자열)은 선택 후에도 보존한다.
+         선택 결과는 식별만 돕고 용량·빈도·식전후·기간을 절대 프리필하지 않는다. */
+      it.drug_input_raw = (it.drug_name_raw || "").trim();
+      it.drug_name_raw = drugBrand(d) || it.drug_input_raw;
       it.drug_id = d.id;
-      it.drug = { brand_name: d.brand_name, generic_name: d.generic_name, strength: d.strength, form: d.form };
-      /* 시드 default_* 3종은 전부 null(용법 제안 금지) — 값이 오면 프리필 */
-      if (d.default_pattern_key) applyPattern(it, d.default_pattern_key);
-      if (d.default_timing_food) it.timing_food = d.default_timing_food;
-      if (d.default_dose_unit) it.dose_unit = d.default_dose_unit;
-      recalc(it);
+      it.drug = clone(d);
+      it.drug_match_state = "selected";
       MET.auto++;                                                    /* used_autocomplete_count++ */
+    }
+    function useFreeText(it) {
+      it.drug_input_raw = it.drug_name_raw;
+      it.drug_id = null;
+      it.drug = null;
+      it.drug_match_state = "free_text";
     }
 
     /* ---------- 클라 사전 검증 (§4.3 미러 — 서버 422가 정본) ---------- */
@@ -465,6 +674,8 @@
         if (!(it.drug_name_raw || "").trim()) errs.push({ path: pre + "drug_name_raw", msg: "Drug name is required" });
         var p = patOf(it);
         if (!p) { errs.push({ path: pre + "pattern_key", msg: "Pick a dose pattern" }); return; }
+        if (!it.dose_unit) errs.push({ path: pre + "dose_unit", msg: "Choose the dose unit from the prescription" });
+        if (it.dose_unit === "drop" && !it.administration_route) errs.push({ path: pre + "administration_route", msg: "Choose oral, eye, ear, or nose for drops" });
         if (p.schedule_type === "daily") {
           if (sumDoses(it) <= 0) errs.push({ path: pre + "doses", msg: "Set at least one dose" });
           if (it.duration_days == null) errs.push({ path: pre + "duration_days", msg: "Set duration" });
@@ -509,7 +720,7 @@
     }
     function rowMeta(it) {
       var p = patOf(it) || {};
-      var u = unitEn(it.dose_unit);
+      var u = unitEn(it.dose_unit, it);
       var parts = [rowLead(it) + " " + u];
       if (p.schedule_type === "weekly") {
         var dw = it.extra_params && it.extra_params.day_of_week;
@@ -544,6 +755,16 @@
       }).join("");
       var warns = [];
       M.items.forEach(function (it) {
+        if (it.drug_match_state === "selected_then_modified") warns.push("Item " + it.position + ": drug name was edited after catalog selection — compare it with the paper prescription.");
+        if (it.drug && (drugReview(it.drug) === "needs_review" || drugReview(it.drug) === "unverified")) {
+          warns.push("Item " + it.position + ": " + (drugReview(it.drug) === "needs_review" ? "catalog record needs review" : "catalog record is unverified") + " — confirm name, strength, form, and route.");
+        }
+        if (it.drug && drugScope(it.drug) === "demo") warns.push("Item " + it.position + ": demo catalog record — not approved production source data.");
+        if (it.drug && drugLifecycle(it.drug) === "inactive") warns.push("Item " + it.position + ": inactive catalog record — re-check before issuing.");
+        detailDrugWarnings(it.drug).forEach(function (w) { warns.push("Item " + it.position + ": " + w); });
+        if (unitNeedsCheck(it)) warns.push("Item " + it.position + ": selected unit “" + unitEn(it.dose_unit, it) + "” differs from catalog candidates — confirm, do not auto-correct.");
+        var unitHint = unitSafetyHint(it);
+        if (unitHint) warns.push("Item " + it.position + ": " + unitHint);
         if (it.dose_unit === "ml") warns.push("Item " + it.position + " · " + it.drug_name_raw + ": total " + fmtN(it.total_quantity) + " ml — ml, not bottles");
         var a = autoTotal(it);
         if (a != null && it._totalEdited && a !== it.total_quantity) warns.push("Item " + it.position + ": total " + fmtN(it.total_quantity) + " differs from auto Σ " + fmtN(a) + " (allowed — server warns only)");
@@ -566,10 +787,13 @@
           return {
             position: it.position,
             drug_name_raw: (it.drug_name_raw || "").trim(),
+            drug_input_raw: (it.drug_input_raw || it.drug_name_raw || "").trim(),
             drug_id: it.drug_id,
+            drug_match_state: it.drug_match_state || "free_text",
             pattern_key: it.pattern_key,
             doses: it.doses,
             dose_unit: it.dose_unit,
+            administration_route: it.administration_route,
             timing_food: it.timing_food,
             duration_days: it.duration_days,
             total_quantity: it.total_quantity,
@@ -673,12 +897,13 @@
           renderAll();
           break;
         case "adopt":
-          v = btn.getAttribute("data-di");
-          var seed = null;
-          AC.list.forEach(function (d) { if (String(d.id) === v) seed = d; });
+          v = parseInt(btn.getAttribute("data-ai"), 10);
+          var seed = AC.list[v] || null;
           if (seed && it) { adoptSeed(it, seed); closeAC(); renderItems(); }
           break;
-        case "acnew": closeAC(); break;                              /* drug_id 없음 — raw가 정본 */
+        case "acnew":
+          if (it) { useFreeText(it); closeAC(); renderItems(); }
+          break;                                                     /* drug_id 없음 — raw가 정본 */
         case "pat": if (it) { applyPattern(it, btn.getAttribute("data-k")); renderItems(); } break;
         case "dose":
           if (it) {
@@ -687,7 +912,14 @@
             recalc(it); renderItems();
           }
           break;
-        case "unit": if (it) { it.dose_unit = btn.getAttribute("data-u"); renderItems(); } break;
+        case "unit":
+          if (it) {
+            it.dose_unit = btn.getAttribute("data-u");
+            if (it.dose_unit !== "drop") it.administration_route = null;
+            renderItems();
+          }
+          break;
+        case "route": if (it) { it.administration_route = btn.getAttribute("data-route"); renderItems(); } break;
         case "timing": if (it) { it.timing_food = btn.getAttribute("data-t") || null; renderItems(); } break;
         case "dur":
           if (it) { it.duration_days = parseInt(btn.getAttribute("data-d"), 10); it._inheritFrom = null; recalc(it); renderItems(); }
@@ -765,7 +997,28 @@
       if (!it) return;
       if (kind === "name") {
         it.drug_name_raw = el.value;
-        it.drug_id = null; it.drug = null;                           /* 타이핑 재개 = 채택 해제 */
+        if (it.drug_match_state === "selected" || it.drug_match_state === "selected_then_modified") {
+          /* 선택 뒤 이름을 수정하면 잘못된 카탈로그 연결을 유지하지 않는다. 최초 검색
+             원문은 drug_input_raw에 남고, 화면/환자 표시는 drug_name_raw가 정본이다. */
+          it.drug_id = null;
+          it.drug_match_state = "selected_then_modified";
+          var match = el.closest(".ac-wrap").querySelector(".ac-match");
+          if (match) {
+            match.classList.add("is-warning");
+            if (match.firstElementChild) match.firstElementChild.textContent = "Name edited after catalog selection";
+            if (!match.querySelector("[data-catalog-link-cleared]")) {
+              var cleared = document.createElement("span");
+              cleared.setAttribute("data-catalog-link-cleared", "true");
+              cleared.textContent = "The catalog link is cleared. The original typed query is preserved for audit; the edited name is what the patient will see.";
+              match.appendChild(cleared);
+            }
+          }
+        } else {
+          it.drug_input_raw = el.value;
+          it.drug_id = null;
+          it.drug = null;
+          it.drug_match_state = "free_text";
+        }
         scheduleAC(M.expanded);
       }
       if (kind === "note") it.note = el.value || null;
@@ -778,6 +1031,40 @@
       if (!it) return;
       if (el.getAttribute("data-in") === "prnreason") it.prn_reason_key = el.value || null;
       if (el.getAttribute("data-in") === "custom-verbal") { it.extra_params = it.extra_params || {}; it.extra_params.verbal_counseling_given = el.checked; }
+    });
+
+    /* WAI-ARIA combobox keyboard path. Focus stays in the text field; options are
+       announced through aria-activedescendant and remain 48px touch targets. */
+    document.addEventListener("keydown", function (e) {
+      var input = e.target.closest('[data-in="name"]');
+      if (!input) return;
+      var i = parseInt(input.getAttribute("data-i"), 10);
+      var pop = acPop(i);
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && pop && pop.hidden && AC.query === (M.items[i].drug_name_raw || "").trim()) {
+        renderAC(i, AC.query);
+        pop = acPop(i);
+      }
+      if (e.key === "ArrowDown" && pop && !pop.hidden) {
+        e.preventDefault();
+        setACActive(i, AC.active + 1);
+      } else if (e.key === "ArrowUp" && pop && !pop.hidden) {
+        e.preventDefault();
+        setACActive(i, AC.active < 0 ? pop.querySelectorAll('[role="option"]').length - 1 : AC.active - 1);
+      } else if (e.key === "Enter" && pop && !pop.hidden && AC.active >= 0) {
+        e.preventDefault();
+        var it = M.items[i];
+        if (AC.active < AC.list.length) adoptSeed(it, AC.list[AC.active]);
+        else useFreeText(it);
+        closeAC(i);
+        renderItems();
+        var nextInput = acInput(i);
+        if (nextInput) nextInput.focus();
+      } else if (e.key === "Escape" && pop && !pop.hidden) {
+        e.preventDefault();
+        closeAC(i);
+      } else if (e.key === "Tab") {
+        closeAC(i);
+      }
     });
 
     /* 오프라인 배너 + 자동완성 헬프 갱신 */

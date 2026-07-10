@@ -100,13 +100,13 @@ flowchart TD
 | 요소 | 바인딩 | 규칙·기본값 (20~40초 장치) |
 |---|---|---|
 | 번호 배지 | `prescription_items.position` | **색+숫자 이중 부호화**(1=파랑, 2=주황…) — 봉투 유성펜 번호와 동일(§2.1 ②'·§3.3). 항목 삭제 시 자동 재부여 + P3에서 번호 재확인이 안전망 |
-| 약명 입력 | `drug_name_raw` (정본) / `drug_id` (채택 시만) | **유일한 타이핑 필드.** 2자부터 `GET /api/drugs?q=`(디바운스 300ms, ≤8건: `brand_name — generic_name strength form`). 후보 채택 → `drug_id` 세트 + `default_pattern_key`·`default_timing_food`·`default_dose_unit` 프리필. **후보 0건·미채택도 동일 경로로 발급** — "등록 안 된 약" 류 차단 문구 금지(§4.5, DB-optional의 UI 표현) |
-| 최근 약 레일 | 로컬 캐시(이 기기 최근 제출의 `drug_name_raw`+`pattern_key`+`doses`+`dose_unit`+`timing_food`+`duration_days` 튜플 상위 8) | 칩 1탭 = **항목 전체 프리필**. 서버 변경 없음 — 파일럿 약국의 처방 반복성 활용 |
-| 패턴 칩 그리드 | `pattern_key` ← `GET /api/patterns` | 코어 8 + CUSTOM, `sort_order` 순, 라벨 = `icon_key` 아이콘 + 파생 표기(1-0-1). 칩 탭 → `patterns.yaml`의 `slots`·`display_rules` defaults로 용량 슬롯 자동 채움 |
-| 용량 슬롯 행 | `doses.M/N/E/H` (저장 시 `dose_morning…dose_night`) | 아침/점심/저녁/밤 4스테퍼(±, REAL — 0.5 지원). `slots` 밖 슬롯은 비활성=0 강제(§4.3 검증의 거울). 숫자 키보드 미사용 |
-| 단위 셀렉터 | `dose_unit` | enum 7종 칩. 기본 tablet이되 **항상 노출**(숨은 기본값 금지 — 시럽 '1 गोली' 사고 방지 §3.3), 자동완성 시 `default_dose_unit`로 교체. `ml` 선택 시 총량 라벨도 ml로 |
-| 식전후 칩 | `timing_food` | `before_food/after_food/with_food/empty_stomach` + "미지정"(NULL). 패턴과 독립 축(D14), 자동완성 시 프리필 |
-| 기간 | `duration_days` | 빈도 칩 3/5/7/10/15/30 + 스테퍼. 첫 항목은 기본값 없음(오입력 방지 > 탭 1회 절약), **2번째 항목부터 직전 값 승계** |
+| 약명 입력 | `drug_name_raw` (정본) / `drug_input_raw` / `drug_id` (채택 시만) / `drug_match_state` | **유일한 타이핑 필드.** 2자부터 `GET /api/drugs?q=`(디바운스 300ms, ≤8건: 상품명 → 성분·함량·제형·경로 → 필요 시 제조사/검토 상태). 후보 채택은 식별 스냅샷만 만들며 패턴·용량·식전후·단위·기간은 바꾸지 않는다. **후보 0건·미채택도 동일 경로로 발급** — 자유 입력은 항상 유효 |
+| 최근 약 레일 | 후속 미구현 | 카탈로그와 별개의 처방 템플릿 검증 없이는 제공하지 않는다. 최근 약명을 다시 검색하는 기능을 추가하더라도 패턴·복용량·단위·식전후·기간·PRN을 복사하지 않는다 |
+| 패턴 칩 그리드 | `pattern_key` ← `GET /api/patterns` | 코어 8 + CUSTOM, `sort_order` 순. 칩의 BD/TDS 같은 횟수 라벨과 `digits`는 처방전 대조용 약어이며 1회 복용량 기본값이 아니다. 칩 탭은 허용 시간대를 보여줄 뿐 각 슬롯의 **1회 복용량을 자동으로 1로 확정하지 않는다** |
+| 용량 슬롯 행 | `doses.M/N/E/H` (저장 시 `dose_morning…dose_night`) | 아침/점심/저녁/밤 4스테퍼(±, REAL — 0.5 지원). 패턴이 허용한 각 슬롯의 수량을 약사가 명시적으로 입력·확인한다. `slots` 밖 슬롯은 비활성=0 강제(§4.3 검증의 거울) |
+| 단위 셀렉터 | `dose_unit` | 14종 칩(`tablet, capsule, ml, measuring_spoon, drop, puff, inhalation, sachet, packet, application, suppository, injection, patch, spray`). 저장 전 약사가 하나를 명시적으로 선택한다. 카탈로그 제형·경로는 후보와 충돌 경고만 제공하고 자동 선택하지 않는다. `drop`은 저장 단위 하나를 유지하되 선택된 route가 있으면 eye/ear/oral/nasal 라벨로 명확히 표시한다. `measuring_spoon`은 표시된 5 ml 의약품용 계량 스푼이며 가정용 티스푼이 아니다 |
+| 식전후 칩 | `timing_food` | `before_food/after_food/with_food/empty_stomach` + "미지정"(NULL). 패턴·카탈로그와 독립 축(D14)이며 자동완성으로 채우지 않는다 |
+| 기간 | `duration_days` | 빈도 칩 3/5/7/10/15/30 + 스테퍼. 항목마다 기본값과 직전 항목 승계 없이 약사가 명시적으로 선택한다 |
 | 총량 뱃지 | `total_quantity` | Σ슬롯×일수 자동 산출, 탭 시 수정(서버는 경고만 — §3.3) |
 | 패턴 가변 영역 | `extra_params_json` / `prn_*` | WEEKLY_ONCE → 요일 칩 7(`day_of_week` 필수) · PRN → **1회량 `dose_per_use` 필수 스테퍼** + `prn_reason_key` 셀렉트 + `prn_max_per_day`·`prn_min_gap_hours` 스테퍼 · STAT_SINGLE → 1회분만, 기간 비활성 · CUSTOM → `instructions` textarea + **"구두로 설명했습니다" 체크 필수**(`verbal_counseling_given`) + "환자 화면엔 영상 대신 주의 카드" 고지(§3.4) |
 | 메모(선택) | `prescription_items.note` | 기본 접힘 |
@@ -116,7 +116,7 @@ flowchart TD
 **상태 변형**
 
 - 로딩: 패턴 칩은 ETag 캐시 즉시 렌더(네트워크 대기 없음).
-- 오프라인: 자동완성만 조용히 비활성(최근 약 레일은 로컬이라 생존), 상단 오프라인 배지, 제출 버튼 라벨 "오프라인 발급 — QR 즉시"로 변경(§2.3). `crypto` 미지원 기기는 제출 차단 + "복구 후 발급" 안내(C안 폴백).
+- 오프라인: 자동완성만 조용히 비활성하고 자유 입력은 유지한다. 상단 오프라인 배지, 제출 버튼 라벨 "오프라인 발급 — QR 즉시"로 변경(§2.3). `crypto` 미지원 기기는 제출 차단 + "복구 후 발급" 안내(C안 폴백).
 - 에러: 422 → `fields[].path`를 카드·필드에 매핑해 인라인 표시 + 해당 카드 자동 확장. 제출 타임아웃 → **동일 `client_input_id` 자동 재전송**(`retry_count`++) → 연속 실패 시 outbox 전환.
 - 빈 상태: 없음 — 폼 오픈 = 카드 1 자동 생성(탭 절약).
 - 인터럽트: 카드 접힘으로 문맥 보존, 30초+ 무입력은 active에서 자동 제외라 지표 미오염(§6.3).
@@ -125,13 +125,12 @@ flowchart TD
 
 **20~40초 설계 결정 (이 화면이 KPI의 본체)**
 
-1. **타이핑은 약명 1필드** — 나머지 전부 칩/스테퍼/프리필(키보드 최소화, 숫자 키보드 0회).
-2. 자동완성 채택 1탭 = 패턴·식전후·단위 3필드 동시 채움(`drugs.default_*` — 자동완성의 가치는 검색이 아니라 프리필).
-3. 최근 약 칩 1탭 = 항목 전체 완성(반복 처방 최속 경로).
-4. 패턴 칩이 용량 기본값을 채움 — "BD 탭 = 1-0-1 완성", 수정만 스테퍼.
-5. 선택 필드(`patient_label`·`note`)는 시야 밖(접힘) — 기본 동선에서 0초.
-6. 2번째 항목부터 `duration_days` 승계 + 카드 접힘 요약이 P2 대조 재료 — 확인 단계 추가 비용 상쇄.
-7. 첫 주 해석 전제: 시드 5~10종 상태에선 풀타이핑이 기본 — 초기 수치는 목표 대비 높게 나옴(§6.3), `used_autocomplete_count` 교차 분석으로 분리.
+1. **자유 텍스트 타이핑은 약명 중심** — 복약값은 칩/스테퍼로 빠르게 입력하되, 카탈로그나 패턴이 의료적으로 확정하지 않는다.
+2. 자동완성 채택 1탭 = 상품명·성분·함량·제형·경로를 묶은 식별 결과 선택. 패턴·복용량·식전후·단위·기간은 약사가 계속 직접 확인한다.
+3. 패턴 칩은 처방전의 시간대 구조를 빠르게 고르는 도구이며, 슬롯별 복용량은 약사가 각각 확인한다.
+4. 선택 필드(`patient_label`·`note`)는 시야 밖(접힘) — 기본 동선에서 0초.
+5. 카드 접힘 요약은 P2의 재확인 재료지만 다른 약의 복약값을 새 항목에 승계하지 않는다.
+6. 공식 production 데이터가 적은 단계에서는 자유 입력 비중이 높을 수 있으므로 `used_autocomplete_count`와 함께 입력시간을 해석한다.
 
 **계측 포인트**
 

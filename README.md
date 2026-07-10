@@ -4,7 +4,7 @@
 
 2026 아이디어 해커톤 인도 해외연수 지원 프로젝트 — KAIST 팀(김나연 · 김준휘 · 정영민).
 
-> **개발 단계 프로토타입입니다.** 실제 환자에게 배포된 의료 서비스가 아니며, 데이터·약국 정보는 모두 데모용 가공값입니다.
+> **개발 단계 프로토타입입니다.** 실제 환자에게 배포된 의료 서비스가 아닙니다. 처방·약국·합성 상품 데이터는 데모용이며, NPPA 공식 formulation 11건은 출처 추적 임포트 경로 검증에만 사용합니다. 어느 데이터도 복약 권고나 전국 상품 마스터를 뜻하지 않습니다.
 
 ## 이게 뭘 푸는가
 
@@ -14,10 +14,10 @@
 
 | 경로 | 내용 |
 |---|---|
-| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [모바일 시각 QA](docs/06-mobile-poster-visual-qa.md) |
+| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [의약품 데이터 기반](docs/08-india-drug-data-foundation.md), [카탈로그 운영](docs/09-drug-catalog-operations.md), [최신 인포그래픽 시각 QA](docs/07-infographic-poster-visual-qa.md) |
 | [`wireframes/`](wireframes/) | 초기 클릭형 와이어프레임. 환자 화면의 현재 정본은 `server/templates/patient.html` |
-| [`server/`](server/) | FastAPI + SQLite 관통 프로토타입. 시드 검색 → 발급 → 실제 QR → 모바일 복약 포스터가 동작 |
-| [`data/`](data/) | 인도 의약품 마스터 시드 627건(NLEM 2022 + 판매 상위 브랜드) — 자동완성 데이터. 수집 방법·한계는 [`data/drugs-README.md`](data/drugs-README.md) |
+| [`server/`](server/) | FastAPI + SQLite 관통 프로토타입. 출처 추적 카탈로그 검색 → 발급 → 실제 QR → 모바일 복약 포스터가 동작 |
+| [`data/`](data/) | NPPA 공식 formulation 11건과 프로젝트가 작성한 합성 demo fixture 16건. 라이선스가 불명확한 레거시 627건 파일은 제거. 출처·한계는 [`data/drugs-README.md`](data/drugs-README.md) |
 
 처음 보는 사람은 **`docs/01-dataflow.md`**(무엇을·왜)부터, 바로 돌려보고 싶으면 아래 **빠른 시작**으로.
 
@@ -30,7 +30,8 @@
 ```bash
 cd server
 uv sync                              # 의존성 설치
-uv run python scripts/seed_import.py # 의약품 시드 627건 임포트
+uv run python scripts/seed_import.py --dry-run --report-dir ../data/reports/production-dry
+uv run python scripts/seed_import.py --apply --report-dir ../data/reports/production
 uv run python scripts/demo.py        # 1약·3약·6약 + 대기/만료/폐기 데모 URL 출력
 uv run uvicorn app.main:app --port 8600
 ```
@@ -39,6 +40,17 @@ uv run uvicorn app.main:app --port 8600
 - 환자 복약 포스터: `demo.py`가 출력한 `patient URL` (뒤에 `?lang=en`으로 영어)
 - 영문 환자 UX 스토리보드: http://127.0.0.1:8600/static/ux-storyboard-en.html
 - 테스트: `uv run pytest -q`
+
+합성 상품명·제형·경로 자동완성까지 시연할 때만 별도 demo DB를 만든다. demo 패키지는 기본 production DB에 적용할 수 없다.
+
+```bash
+cd server
+uv run python scripts/seed_import.py --catalog-scope demo --dry-run \
+  --report-dir ../data/reports/demo-dry
+uv run python scripts/seed_import.py --catalog-scope demo --apply \
+  --db-path var/indoro-demo.db --report-dir ../data/reports/demo
+INDORO_DB_PATH=var/indoro-demo.db uv run uvicorn app.main:app --port 8600
+```
 
 > 폰으로 QR을 실제 스캔하려면 `--host 0.0.0.0`으로 띄우고 폰에서 `http://<이 PC의 LAN IP>:8600/rx/new`로 접속한다. QR은 요청 호스트 기준으로 URL을 인코딩하므로 `127.0.0.1`로 띄우면 폰에서 열리지 않는다.
 
@@ -54,8 +66,8 @@ python3 -m http.server 8493 --directory wireframes
 인도 방문 전 원격으로 가능한 트랙을 완료한 상태다.
 
 - **환자 화면**: 아침→점심→저녁→밤의 하루 흐름 포스터. 각 행동에 봉투 색+번호, 약명, 용량, 식전/식후, 기간을 함께 표시하고 약별 상세·공유는 아래에 둔다.
-- **의약품 시드**: 627건, 3단계 검증 완료(스팟체크 + 다성분 OTC 전수 재검증 + 금지 FDC 제거).
-- **서버 프로토타입**: 자동완성 → 확인 → 발급 → QR → 포스터 → 언어 전환·공유와 상태 화면까지 실동작(38개 테스트 통과).
-- **의도적 미구현(현지/후속 트랙)**: 현지 임상·언어 검증, 실제 음성/영상, 완전한 오프라인 큐, 일부 운영 화면(온보딩·목록·수정 UI), 배포. 서버의 [`README.md`](server/README.md)에 범위표가 있다.
+- **의약품 카탈로그**: 출처·버전·원본·검토 상태를 추적한다. NPPA 공식 formulation 11건만 production DB에 두고, 검색 UX 검증용 합성 fixture 16건은 별도 demo DB에 둔다. 상업 사이트 참고분이 섞인 기존 627건은 저장소와 importer에서 제거했다.
+- **서버 프로토타입**: 자동완성 → 확인 → 발급 → QR → 포스터 → 언어 전환·공유와 상태 화면까지 실동작하고 전체 pytest로 회귀 검증한다.
+- **의도적 미구현(현지/후속 트랙)**: 전국 상품명 데이터 라이선스, 현지 약사·법무·언어 검증, 실제 음성/영상, 완전한 오프라인 큐, 일부 운영 화면(온보딩·목록·수정 UI), 배포. 서버의 [`README.md`](server/README.md)에 범위표가 있다.
 
 다음: 팀 리뷰 → 파일럿 지역(1차 언어) 확정 → 현지 사용자 테스트.

@@ -115,9 +115,27 @@ def test_import_and_search_drugs(conn):
     assert conn.execute("SELECT COUNT(*) AS n FROM drugs").fetchone()["n"] == 2
 
     assert db.search_drugs(conn, "d") == []                      # 2자 미만
-    assert db.search_drugs(conn, "dolo")[0]["brand_name"] == "Dolo 650"
-    assert db.search_drugs(conn, "amoxicillin")[0]["brand_name"] == "Augmentin 625 Duo"
-    assert db.search_drugs(conn, "augmen")[0]["aliases"] == ["Augmentin"]  # aliases 매칭
+    assert db.search_drugs(conn, "dolo", include_demo=True)[0]["brand_name"] == "Dolo 650"
+    assert db.search_drugs(conn, "amoxicillin", include_demo=True)[0]["brand_name"] == "Augmentin 625 Duo"
+    assert db.search_drugs(conn, "augmen", include_demo=True)[0]["aliases"] == ["Augmentin"]  # aliases 매칭
+
+
+def test_legacy_search_fallback_is_never_exposed_to_production(conn):
+    # A migrated installation can temporarily have legacy rows but no v2 catalog.
+    # Their provenance scope is unknowable, so production search must fail closed.
+    conn.execute(
+        """INSERT INTO drugs
+           (id, brand_name, generic_name, aliases_json, source, verified, created_at)
+           VALUES ('legacy-only', 'Legacy Demo Only', 'Invented', '[]',
+                   'legacy-demo-seed', 0, ?)""",
+        (db.now_utc(),),
+    )
+    conn.commit()
+
+    assert db.search_drugs(conn, "Legacy Demo", include_demo=False) == []
+    assert db.search_drugs(conn, "Legacy Demo", include_demo=True)[0][
+        "usage_scope"
+    ] == "demo"
 
 
 def test_config_loads_and_validates():

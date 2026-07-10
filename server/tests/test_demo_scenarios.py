@@ -22,7 +22,10 @@ def test_complex_scenario_covers_units_prn_and_special_pattern():
     assert any(i["dose_unit"] == "tablet" and 0.5 in i["doses"].values() for i in items)
     assert any(i["dose_unit"] == "ml" for i in items)
     assert any(i["dose_unit"] == "capsule" for i in items)
-    assert any(i["dose_unit"] == "drop" for i in items)
+    assert any(
+        i["dose_unit"] == "drop" and i["administration_route"] == "ophthalmic"
+        for i in items
+    )
 
     prn = next(i for i in items if i["pattern_key"] == "PRN")
     assert prn["extra_params"] == {"dose_per_use": 1}

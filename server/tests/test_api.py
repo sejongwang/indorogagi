@@ -123,18 +123,22 @@ def test_prn_requires_and_persists_dose_and_limits(client, rx_payload):
 # ---------------------------------------------------------------- 4. drugs 검색 (§4.5)
 
 def test_drugs_search_contract(client):
-    """'do' → Dolo 포함, 1자 → 빈 배열, 0건도 항상 200 + 빈 배열."""
-    r = client.get("/api/drugs", params={"q": "do"})
+    """데모 약국의 'do' → Dolo 포함, 1자/0건도 항상 200 + 빈 배열."""
+    r = client.get("/api/drugs", params={"q": "do"}, headers=PHARMACY_HEADERS)
     assert r.status_code == 200
     results = r.json()
     assert isinstance(results, list)
     assert any("Dolo" in d["brand_name"] for d in results)
 
-    r1 = client.get("/api/drugs", params={"q": "d"})  # 2자 미만
+    r1 = client.get(
+        "/api/drugs", params={"q": "d"}, headers=PHARMACY_HEADERS
+    )  # 2자 미만
     assert r1.status_code == 200
     assert r1.json() == []
 
-    r0 = client.get("/api/drugs", params={"q": "zzqqxx"})  # 0건도 200 — 입력 흐름을 막지 않음
+    r0 = client.get(
+        "/api/drugs", params={"q": "zzqqxx"}, headers=PHARMACY_HEADERS
+    )  # 0건도 200 — 입력 흐름을 막지 않음
     assert r0.status_code == 200
     assert r0.json() == []
 

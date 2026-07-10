@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source_slug": "nppa-antidiabetes-formulations-2026-03",
+  "filename": "nppa-anti-diabetes-2026-03.pdf",
+  "url": "https://www.nppa.gov.in/storage/uploads/pdf/2845-fb-posts-anti-diabetes-a2491c25ce7e20c9200884e1f92cf68a.pdf",
+  "content_type": "application/pdf",
+  "content_length": 401697,
+  "sha256": "fd23814ae3a0009a0d8d6e14d079ff3e72605edfae6041e3529ccd988f311e62",
+  "etag": "\"62121-651236a5cf6ba\"",
+  "last_modified": "Wed, 06 May 2026 10:13:30 GMT",
+  "verified_at": "2026-07-10",
+  "review_contract": "A hash change requires a new version, manual row comparison, pharmacist/data-governance review, and approval-registry update."
+}
