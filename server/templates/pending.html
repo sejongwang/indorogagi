@@ -15,15 +15,16 @@ body {
   margin: 0 auto; max-width: 480px; min-height: 100dvh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 16px; padding: 24px;
-  background: #f1f1f1; color: #171717;
-  font-family: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
-  font-size: 1.0625rem; line-height: 1.65; text-align: center;
+  overflow-x: hidden; background: #fffaf0; color: #17211d;
+  font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif;
+  font-size: 1.0625rem; line-height: 1.72; text-align: center;
 }
 p { margin: 0; overflow-wrap: break-word; }
 .big { font-size: 1.25rem; font-weight: 700; }
 .sub { color: #737373; font-size: 0.875rem; }
-.ico { width: 56px; height: 56px; color: #737373; }
-.card { background: #ffffff; border: 1px solid #ebebeb; border-radius: 0.75rem; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.ico { width: 56px; height: 56px; color: #0b3b2c; }
+.card { background: #fffef9; border: 2px solid #0b3b2c; border-top: 10px solid #c96a16; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.retry { min-height: 52px; margin-top: 8px; padding: 10px 16px; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: #0b3b2c; border-radius: 7px; font-weight: 800; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -32,6 +33,7 @@ p { margin: 0; overflow-wrap: break-word; }
   <p class="big">{{ UI.pending.title.hi }}</p>
   <p class="big">{{ UI.pending.title.en }}</p>
   <p>{{ UI.pending.body.hi }}<br>{{ UI.pending.body.en }}</p>
+  <a class="retry" href="">{{ UI.pending.retry.hi }} · {{ UI.pending.retry.en }}</a>
   <p class="sub">{{ UI.pending.ask.hi }}<br>{{ UI.pending.ask.en }}</p>
 </div>
 </body>

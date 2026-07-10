@@ -1,10 +1,9 @@
-"""환자측 HTML 라우터 — /p/{token}, /c/{short_code}, /c?code= (docs/01 §4.6, §2.5).
+"""환자측 HTML 라우터 — /p/{token}, /c/{short_code}, /c?code=, /privacy.
 
 규약: 어떤 경우에도 JSON을 반환하지 않는다(§4.1). 미존재 토큰은 200 대기 페이지(D8),
 revoked/expired는 410 HTML. 언어는 ?lang= 우선, 없으면 prescriptions.lang(D12).
 
-S1 렌더 정본은 wireframes/patient/s1-landing.html — 그 JS 빌더(buildTT·buildCard·
-mxCell·pictos·dayDots)를 이 모듈의 뷰모델 빌더 + templates/patient.html로 이식했다.
+환자 화면은 하루 행동 흐름 포스터(아침→점심→저녁→밤)를 서버 렌더한다.
 UI 문구는 전부 config/i18n.yaml `ui:` 네임스페이스(Jinja 하드코딩 금지).
 """
 from __future__ import annotations
@@ -32,8 +31,16 @@ _BOT_RE = re.compile(
     re.IGNORECASE,
 )
 
-# 픽토그램 심볼 매핑 (s1-landing.html PICTO/SLOTICO/TFICO와 동형)
-_PICTO = {"tablet": "p-tab", "capsule": "p-cap", "ml": "p-spoon", "drop": "i-drop"}
+# 픽토그램 심볼 매핑. 7개 dose_unit 모두 고유한 자체 SVG를 사용한다.
+_PICTO = {
+    "tablet": "p-tab",
+    "capsule": "p-cap",
+    "ml": "p-spoon",
+    "drop": "p-drop",
+    "puff": "p-puff",
+    "sachet": "p-sachet",
+    "application": "p-application",
+}
 _SLOT_ICO = {"M": "i-slot-m", "N": "i-slot-n", "E": "i-slot-e", "H": "i-slot-h"}
 _TF_ICO = {
     "before_food": "i-tf-before",
@@ -122,35 +129,24 @@ def _pictos(unit: str, q: float) -> list[str]:
     return ids
 
 
-def _mx_cell(unit: str, q: float) -> dict[str, Any]:
-    """매트릭스 셀: 글리프×수량(≤2), 3개 이상 ×N, ml은 스푼+숫자, 0은 – (mxCell 이식)."""
-    if not q:
-        return {"off": True}
-    if unit == "ml":
-        return {"off": False, "glyphs": ["p-spoon"], "sub": {"kind": "ml", "q": _qf(q)}}
-    gid = "p-dot" if unit == "tablet" else _PICTO.get(unit, "p-generic")  # 매트릭스는 꽉 찬 점
-    if q > 2.5:
-        return {"off": False, "glyphs": [gid], "sub": {"kind": "x", "q": _qf(q)}}
-    n = int(q)
-    ids = [gid] * n
-    if q - n >= 0.5:
-        ids.append("p-tab-half" if unit == "tablet" else gid)
-    return {"off": False, "glyphs": ids, "sub": None}
-
-
-def _day_dots(n: Any) -> int:
-    """하루=한 칸(≤15일만 — 그 이상은 숫자만)."""
-    return int(n) if isinstance(n, (int, float)) and 1 <= n <= 15 else 0
-
-
 def _fmt2(pair: dict[str, str], **kw: Any) -> dict[str, str]:
     return {lang: pair[lang].format(**{k: (v[lang] if isinstance(v, dict) else v) for k, v in kw.items()}) for lang in LANGS}
 
 
 # ---------------------------------------------------------------- 뷰모델 빌더
 
+def _dose_view(unit: str, q: float, unit_pair: dict[str, str], ui: dict[str, Any]) -> dict[str, Any]:
+    """아이콘만으로 뜻을 전달하지 않도록 그림·숫자·단위 라벨을 한 묶음으로 만든다."""
+    return {
+        "unit_key": unit,
+        "q": _qf(q),
+        "glyphs": _pictos(unit, q),
+        "unit": ui["dose_units_short"].get(unit) or unit_pair,
+    }
+
+
 def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, Any]]:
-    """buildTT·buildCard의 데이터 절반 — DOM은 patient.html 몫."""
+    """약별 상세와 시간대별 행동 흐름이 함께 쓰는 서버 렌더 뷰모델."""
     i18n = cfg["i18n"]
     ui = i18n["ui"]
     s1 = ui["s1"]
@@ -175,38 +171,32 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
             "pattern_name": name,
             "unit": unit,
             "unit_pair": unit_pair,
-            "strip": None,
-            "cells": None,
+            "doses": doses,
+            "detail_doses": [],
             "weekly_day": None,
             "every_week": None,
             "prn": None,
             "custom_instr": None,
             "food": None,
-            "ml_per": None,
+            "special_dose": None,
             "duration_days": it["duration_days"],
-            "dots": _day_dots(it["duration_days"]),
-            "total_q": _qf(it["total_quantity"]),
+            "total_q": _qf(it["total_quantity"]) if it["total_quantity"] else None,
             "cautions": [],
             "note": it["note"],
-            "has_media": st != "custom",  # CUSTOM은 음성·영상·스트립 비렌더(§3.4)
         }
         if drug and drug.get("generic_name"):
             v["enrich"] = " · ".join(x for x in (drug["generic_name"], drug.get("strength")) if x)
 
-        if st == "daily":
-            v["cells"] = [_mx_cell(unit, doses.get(s) or 0) for s in cfg["slot_order"]]
-        if st in ("daily", "weekly", "once"):
-            strip = []
-            for s in cfg["slot_order"]:
-                d = doses.get(s) or 0
-                strip.append({
-                    "on": d > 0,
-                    "ico": _SLOT_ICO[s],
-                    "glyphs": _pictos(unit, d) if d > 0 else [],
-                    "q": _qf(d),
-                    "label": i18n["slots"][s],
+        for slot in cfg["slot_order"]:
+            q = float(doses.get(slot) or 0)
+            if q > 0:
+                v["detail_doses"].append({
+                    "key": slot,
+                    "ico": _SLOT_ICO[slot],
+                    "label": i18n["slots"][slot],
+                    "dose": _dose_view(unit, q, unit_pair, ui),
                 })
-            v["strip"] = strip
+
         if st == "weekly":
             dw = (it["extra_params"] or {}).get("day_of_week")
             day = i18n["days_of_week"].get(dw) or {"hi": "", "en": ""}
@@ -217,6 +207,9 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
                 "reason": i18n["prn_reasons"].get(it["prn_reason_key"]),
                 "max_per_day": _qf(it["prn_max_per_day"]) if it["prn_max_per_day"] else None,
                 "min_gap_hours": _qf(it["prn_min_gap_hours"]) if it["prn_min_gap_hours"] else None,
+                # 신규 발급은 API가 두 제한을 필수화한다. 기존 DB 행은 유지하되,
+                # 누락을 숨기지 않고 환자가 약국에 확인하도록 표시한다.
+                "limits_missing": not it["prn_max_per_day"] or not it["prn_min_gap_hours"],
             }
         if st == "custom":
             v["custom_instr"] = (it["extra_params"] or {}).get("instructions") or ""
@@ -226,48 +219,29 @@ def _item_views(bundle: dict[str, Any], cfg: dict[str, Any]) -> list[dict[str, A
                 "label": i18n["timing_food"].get(it["timing_food"])
                 or {"hi": it["timing_food"], "en": it["timing_food"]},
             }
-        if unit == "ml":
-            v["ml_per"] = _qf(max((doses.get(s) or 0) for s in cfg["slot_order"]))
 
         # 주의 배지: drug_id 매칭 시만. 카탈로그 결측 라벨은 키 노출 폴백(§3.4)
         for ck in (drug or {}).get("caution_keys") or []:
             label = (i18n.get("caution") or {}).get(ck)
             v["cautions"].append(label or {"hi": f"caution.{ck}", "en": f"caution.{ck}"})
 
-        # 시간표 특수 행(비-daily) 사전 계산
+        # 고정 일과 밖의 항목(주 1회·1회·PRN·CUSTOM)은 별도 행동 블록으로 렌더한다.
         if st != "daily":
             if st in ("weekly", "once"):
-                q = doses.get("M") or 1
-                chip: dict[str, Any] = {
-                    "kind": "qty",
-                    "glyphs": _pictos(unit, q),
-                    "q": _qf(q),
-                    "unit_short": ui["dose_units_short"].get(unit) or unit_pair,
-                }
+                q = next((float(doses.get(s) or 0) for s in cfg["slot_order"] if doses.get(s)), 1.0)
+                v["special_dose"] = _dose_view(unit, q, unit_pair, ui)
             elif st == "prn":
-                chip = {"kind": "sos"}
-            else:
-                chip = {"kind": "warn"}
+                q = (it["extra_params"] or {}).get("dose_per_use")
+                if isinstance(q, (int, float)) and not isinstance(q, bool) and q > 0:
+                    v["special_dose"] = _dose_view(unit, float(q), unit_pair, ui)
             label = (
                 _fmt2(s1["weekly_row"], day=v["weekly_day"]) if st == "weekly"
                 else s1["custom_row"] if st == "custom"
                 else name
             )
-            v["special"] = {"icon": _SPECIAL_ICO.get(st, "i-warn"), "label": label, "chip": chip}
+            v["special"] = {"icon": _SPECIAL_ICO.get(st, "i-warn"), "label": label}
         views.append(v)
     return views
-
-
-def _share_digits(v: dict[str, Any], it: dict[str, Any], s1: dict[str, Any]) -> dict[str, str]:
-    """공유 메시지 숫자열(shareDigits 이식) — 카드에서는 제거된 숫자열이 여기에만 남는다."""
-    if v["stype"] == "daily":
-        s = "-".join(_qf(it["doses"].get(k) or 0) for k in ("M", "N", "E", "H"))
-        if v["unit"] == "ml":
-            s += " ml"
-        return {"hi": s, "en": s}
-    return s1["share_digits"].get(
-        {"weekly": "weekly", "once": "once", "prn": "prn"}.get(v["stype"], "custom")
-    )
 
 
 def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
@@ -298,22 +272,41 @@ def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
 
     views = _item_views(bundle, cfg)
 
-    # C2 공유 — 메시지 자체가 오프라인 사본(§7.3-②), patient_label 미포함(§8.1)
-    base = f"{request.url.scheme}://{request.url.netloc}"
-    share_lines = []
-    for v, it in zip(views, bundle["items"]):
-        share_lines.append({
-            "position": v["position"],
-            "name": v["name_raw"],
-            "digits": _share_digits(v, it, s1),
-            "days": v["duration_days"],
+    # 포스터의 중심: 아침→점심→저녁→밤. 각 복용 행동 안에 봉투 번호·약명·
+    # 복용량·식사 관계·기간을 함께 넣어 사용자가 표의 행/열을 재조합하지 않게 한다.
+    day_slots = []
+    for slot in cfg["slot_order"]:
+        actions = []
+        for v in views:
+            q = float(v["doses"].get(slot) or 0)
+            if v["stype"] != "daily" or q <= 0:
+                continue
+            actions.append({
+                "position": v["position"],
+                "hue": v["hue"],
+                "name_raw": v["name_raw"],
+                "dose": _dose_view(v["unit"], q, v["unit_pair"], ui),
+                "food": v["food"],
+                "duration_days": v["duration_days"],
+            })
+        day_slots.append({
+            "key": slot,
+            "ico": _SLOT_ICO[slot],
+            "label": i18n["slots"][slot],
+            "actions": actions,
         })
-    txt = [f"{s1['guide'][lang]} — {pharmacy.get('name', '')}"]
-    for ln in share_lines:
-        txt.append(
-            f"{ln['position']}. {ln['name']} — {ln['digits'][lang]} — {ln['days']} {s1['days'][lang]}"
-        )
-    txt.append(f"{base}/p/{token}?lang={lang}&src=share")
+
+    # 첫 화면에서 실제 약명까지 보이게 한다. 시간 리본의 숫자만으로는 저문해
+    # 사용자가 "언제 무엇을" 3초 안에 확인하기 어렵기 때문에, 첫 비어 있지 않은
+    # 일과 슬롯을 포스터 제목 바로 아래에 한 번 더 짧게 요약한다.
+    first_slot = next((slot for slot in day_slots if slot["actions"]), None)
+    specials = [v for v in views if v["stype"] != "daily"]
+
+    # C2 공유 — wa.me URL에는 약명·용법·patient_label을 넣지 않고 불투명 토큰 링크만 보낸다.
+    # 핵심 복약 정보의 오프라인 보관은 화면 스크린샷으로 안내한다.
+    base = f"{request.url.scheme}://{request.url.netloc}"
+    share_page = f"{base}/p/{token}?lang={lang}&src=share"
+    txt = [s1["guide"][lang], share_page]
     wa_href = "https://wa.me/?text=" + quote("\n".join(txt), safe="")
 
     # C1 토글 링크 — 서버 재렌더(JS 불요). src는 code/share만 보존(계측 연속성)
@@ -331,9 +324,10 @@ def _build_ctx(request: Request, bundle: dict[str, Any], cfg: dict[str, Any],
         "presc": presc,
         "trust": trust,
         "views": views,
-        "matrix_rows": [v for v in views if v["stype"] == "daily"],
-        "specials": [v for v in views if v["stype"] != "daily"],
-        "share_lines": share_lines,
+        "day_slots": day_slots,
+        "first_slot": first_slot,
+        "first_special": specials[0] if not first_slot and specials else None,
+        "specials": specials,
         "share_url_base": f"{base}/p/{token}",
         "wa_href": wa_href,
         "copy_url": f"{base}/p/{token}?lang={lang}&src=share",
@@ -455,6 +449,14 @@ def home(request: Request) -> Response:
     templates = request.app.state.templates
     ui = request.app.state.config["i18n"]["ui"]
     return templates.TemplateResponse(request, "home.html", {"UI": ui}, headers=_NO_STORE)
+
+
+@router.get("/privacy")
+def privacy(request: Request) -> Response:
+    """환자 링크의 최소 개인정보 안내. 민감정보·토큰을 문맥에 주입하지 않는다."""
+    templates = request.app.state.templates
+    ui = request.app.state.config["i18n"]["ui"]
+    return templates.TemplateResponse(request, "privacy.html", {"UI": ui}, headers=_NO_STORE)
 
 
 @router.get("/c/{code}")

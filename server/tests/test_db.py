@@ -125,6 +125,34 @@ def test_config_loads_and_validates():
     assert cfg["pattern_order"][0] == "OD_MORNING"
     assert len(cfg["pattern_order"]) == 9
     assert cfg["patterns"]["TDS"]["slots"] == ["M", "N", "E"]
+    assert cfg["patterns"]["OD_NIGHT"]["slots"] == ["H"]
+    assert cfg["patterns"]["OD_NIGHT"]["digits"] == "0-0-0-1"
     assert cfg["patterns"]["TDS"]["name"]["hi"] == "दिन में 3 बार"
     assert cfg["i18n"]["dose_units"]["tablet"]["hi"] == "गोली"
     assert cfg["i18n"]["duration_presets"] == [3, 5, 7, 10, 15, 30]
+
+
+def test_init_migrates_unambiguous_legacy_od_night_to_bedtime(tmp_path):
+    path = tmp_path / "legacy.db"
+    db.init_db(path)
+    c = db.get_conn(path)
+    try:
+        db.upsert_pharmacy(c, {"id": "ph-demo-001", "name": "Demo Pharmacy"})
+        p = payload("legacy-od-night")
+        p["items"][0].update({
+            "pattern_key": "OD_NIGHT",
+            "doses": {"M": 0, "N": 0, "E": 1, "H": 0},
+        })
+        issued = db.create_prescription(c, "ph-demo-001", p)
+    finally:
+        c.close()
+
+    db.init_db(path)
+    db.init_db(path)  # 재기동에도 멱등
+    c = db.get_conn(path)
+    try:
+        status, bundle = db.get_bundle_by_token(c, issued["token"])
+        assert status == "active"
+        assert bundle["items"][0]["doses"] == {"M": 0, "N": 0, "E": 0, "H": 1}
+    finally:
+        c.close()

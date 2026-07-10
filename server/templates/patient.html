@@ -1,650 +1,491 @@
-{#- ═══════════════════════════════════════════════════════════════════════
-  S1 복약 요약 랜딩 (환자측, 제품) — 정본: wireframes/patient/s1-landing.html
-  · DOM·CSS 동형 이식(개발 툴바·상태/색 스위처·인라인 픽스처 제거 — 데이터는 서버가 줌)
-  · 언어: 서버가 html[lang]·data-lang을 굽는다(D12). C1 토글 = ?lang= 링크(서버 재렌더, JS 불요)
-  · hi/en 텍스트 노드 이중화 span[lang] — 구조·SVG 단일, 토글 시 골격 이동 0
-  · 클라 JS 최소: beacon(sendBeacon→/api/events) + 음성/영상 placeholder 토글만
-  · 계측은 서버 권위(view.first/view.opened/ivid) — 라우터 patient.py에서 기록 완료
-═══════════════════════════════════════════════════════════════════════ -#}
+{# Mobile medication poster. Core instructions are server-rendered; JavaScript only enhances copy/event logging. #}
 {%- macro he(p) -%}<span lang="hi">{{ p.hi }}</span><span lang="en">{{ p.en }}</span>{%- endmacro -%}
-{%- macro ico(id, cls="ico") -%}<svg class="{{ cls }}" aria-hidden="true"><use href="#{{ id }}"/></svg>{%- endmacro -%}
-{%- macro picts(ids) -%}{%- for g in ids -%}<svg class="pict"><use href="#{{ g }}"/></svg>{%- endfor -%}{%- endmacro -%}
+{%- macro ico(id, cls="icon") -%}<svg class="{{ cls }}" aria-hidden="true"><use href="#{{ id }}"/></svg>{%- endmacro -%}
+{%- macro picts(ids) -%}{%- for id in ids -%}<svg class="dose-pict" aria-hidden="true"><use href="#{{ id }}"/></svg>{%- endfor -%}{%- endmacro -%}
 <!doctype html>
 <html lang="{{ lang }}" data-lang="{{ lang }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{#- §8.2: title·og 고정 문구 — patient_label·약명 미포함(프리뷰 봇 노출 방지) #}
 <title>{{ UI.page_title }}</title>
 <meta property="og:title" content="{{ UI.page_title }}">
 <link rel="icon" href="data:,">
 <style>
-/* S1 인라인 CSS — s1-landing.html 증류본(제품 동형: 외부 스타일시트 0) */
 :root {
-  --font-family-body: system-ui, "Noto Sans Devanagari", "Noto Sans", sans-serif;
-  --font-weight-normal: 400;
-  --font-weight-bold: 700;
-  --font-size-xs: 0.625rem;
-  --font-size-sm: 0.75rem;
-  --font-size-base: 0.875rem;
-  --font-size-lg: 1.0625rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-
-  --color-background-body: #f1f1f1;
-  --color-background-surface: #ffffff;
-  --color-background-card: #ffffff;
-  --color-background-muted: #f1f1f1;
-  --color-accent: #262626;
-  --color-accent-muted: #f1f1f1;
-  --color-on-accent: #ffffff;
-  --color-on-dark: #ffffff;
-  --color-text-primary: #171717;
-  --color-text-secondary: #737373;
-  --color-text-disabled: #a3a3a3;
-  --color-text-accent: #262626;
-  --color-icon-primary: #171717;
-  --color-icon-secondary: #737373;
-  --color-icon-disabled: #a3a3a3;
-  --color-border: #ebebeb;
-  --color-border-emphasized: #d4d4d4;
-  --color-skeleton: #ebebeb;
-  --color-overlay-pressed: #0000001A;
-  --color-success: #007004;
-  --color-success-muted: #c5e5c0;
-  --color-error: #a50c25;
-  --color-error-muted: #facecb;
-  --color-warning: #745b00;
-  --color-warning-muted: #f8da9d;
-
-  --color-icon-blue: #00458c;
-  --color-icon-orange: #6e3500;
-  --color-icon-green: #0c5700;
-  --color-icon-purple: #700084;
-  --color-icon-red: #89001a;
-  --color-icon-teal: #005348;
-  --color-icon-pink: #83004b;
-  --color-icon-cyan: #00505f;
-  --color-icon-yellow: #584400;
-  --color-icon-gray: #525252;
-
-  --radius-inner: 0.375rem;
-  --radius-element: 0.625rem;
-  --radius-container: 0.75rem;
-  --radius-full: 9999px;
-  --shadow-low: 0 2px 4px oklch(0 0 0 / 5%), 0 4px 8px oklch(0 0 0 / 10%);
+  color-scheme: light only;
+  --paper: #fffaf0;
+  --paper-strong: #fff1d2;
+  --ink: #17211d;
+  --muted: #5b665f;
+  --green: #14533f;
+  --green-dark: #0b3b2c;
+  --green-pale: #e4f1e8;
+  --saffron: #c96a16;
+  --yellow: #f4c85a;
+  --line: #d8d3c4;
+  --white: #fffef9;
+  --danger: #8a1f25;
+  --focus: #c96a16;
 }
-
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; color-scheme: light only; }
+html { -webkit-text-size-adjust: 100%; background: #e7e2d7; }
 body {
   margin: 0 auto;
+  min-width: 0;
   max-width: 480px;
   min-height: 100dvh;
-  background: var(--color-background-body);
-  color: var(--color-text-primary);
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-lg);
+  overflow-x: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif;
+  font-size: 17px;
   line-height: 1.65;
-  box-shadow: 0 0 0 1px var(--color-border);
 }
-h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
-img, svg, video { max-width: 100%; }
-b, strong { font-weight: var(--font-weight-bold); }
-a { color: var(--color-text-accent); }
-
-/* 언어 토글(D12) — 구조·SVG 단일, 텍스트 노드만 이중화 */
-html[data-lang="hi"] [lang="en"] { display: none; }
-html[data-lang="en"] [lang="hi"] { display: none; }
-
-.screen { padding: 8px 12px 40px; }
-.stack { display: flex; flex-direction: column; gap: 12px; }
-.screen.stack { gap: 8px; }
-.hstack { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.min0 { min-width: 0; }
-.t-secondary { color: var(--color-text-secondary); }
-.t-supporting { font-size: var(--font-size-sm); line-height: 1.6; }
-.num-lg { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
-.ico { width: 20px; height: 20px; flex: none; display: block; }
-.ico24 { width: 24px; height: 24px; flex: none; display: block; }
-.ico-14 { width: 14px; height: 14px; flex: none; display: block; }
-.k-ico { width: 20px; height: 20px; flex: none; color: var(--color-icon-secondary); }
-hr.divider { border: 0; border-top: 1px solid var(--color-border); margin: 0; }
-
-.topbar {
-  position: sticky; top: 0; z-index: 30;
-  display: flex; align-items: center; gap: 8px;
-  min-height: 52px; padding: 2px 12px;
-  background: var(--color-background-surface);
-  border-bottom: 1px solid var(--color-border);
+html[data-lang="hi"] body { line-height: 1.72; }
+html[data-lang="hi"] [lang="en"], html[data-lang="en"] [lang="hi"] { display: none; }
+h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
+button, a, summary { font: inherit; }
+a { color: inherit; }
+.icon { width: 24px; height: 24px; display: block; flex: none; }
+.icon-lg { width: 36px; height: 36px; display: block; flex: none; }
+.page { min-width: 0; }
+.masthead {
+  color: #fff;
+  background: var(--green-dark);
+  border-bottom: 8px solid var(--saffron);
+  padding: 14px 14px 16px;
 }
-.logo-ph {
-  padding: 6px 10px; flex: none;
-  background: var(--color-skeleton);
-  border: 1.5px dashed var(--color-border-emphasized);
-  border-radius: var(--radius-inner);
-  font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.4;
+.mast-top { display: flex; align-items: flex-start; gap: 10px; }
+.pharmacy-mark {
+  width: 44px; height: 44px; flex: none;
+  display: grid; place-items: center;
+  color: var(--green-dark); background: var(--yellow);
+  border-radius: 50%; border: 2px solid #fff8;
 }
-.lang-toggle {
-  margin-left: auto;
-  display: flex; align-items: stretch;
-  border: 1px solid var(--color-border-emphasized);
-  border-radius: var(--radius-full);
-  background: var(--color-background-surface);
-  overflow: hidden;
+.trust-copy { min-width: 0; flex: 1; }
+.eyebrow { font-size: .76rem; line-height: 1.65; opacity: .86; font-weight: 700; letter-spacing: .02em; }
+.pharmacy-name { font-size: 1.18rem; line-height: 1.6; font-weight: 850; }
+.pharmacy-area { font-size: .82rem; line-height: 1.65; opacity: .9; }
+.lang-switch {
+  display: grid; grid-template-columns: 1fr 1fr;
+  margin-top: 12px; border: 1px solid #ffffff80; border-radius: 8px; overflow: hidden;
 }
-.lang-toggle a {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; min-width: 72px; padding: 4px 14px;
-  text-decoration: none; color: var(--color-text-primary);
-  font-weight: var(--font-weight-bold); font-size: var(--font-size-base); line-height: 1.6;
+.lang-switch a {
+  min-height: 48px; padding: 8px 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; font-size: .9rem; font-weight: 800;
 }
-.lang-toggle a + a { border-left: 1px solid var(--color-border); }
-html[data-lang="hi"] .lang-toggle a[data-lang-opt="hi"],
-html[data-lang="en"] .lang-toggle a[data-lang-opt="en"] {
-  background: var(--color-accent); color: var(--color-on-accent);
+.lang-switch a + a { border-left: 1px solid #ffffff80; }
+html[data-lang="hi"] .lang-switch a[data-lang-opt="hi"],
+html[data-lang="en"] .lang-switch a[data-lang-opt="en"] { color: var(--green-dark); background: var(--yellow); }
+.trust-line { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 10px; font-size: .76rem; line-height: 1.65; }
+.trust-line span { display: inline-flex; align-items: center; gap: 5px; }
+.trust-line .icon { width: 17px; height: 17px; }
+.trust-flag { margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; background: #fff3; border: 1px solid #fff6; font-size: .76rem; font-weight: 800; }
+.rx-note {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px; color: #412a00; background: var(--yellow);
+  border-bottom: 1px solid #ad7300; font-size: .88rem; font-weight: 750;
 }
-
-.card {
-  background: var(--color-background-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-container);
-  padding: 12px;
+.rx-note .icon { margin-top: 3px; }
+.hero { padding: 20px 14px 14px; background: var(--paper-strong); border-bottom: 2px solid var(--green-dark); }
+.hero-kicker { color: #ad4f08; font-size: .82rem; font-weight: 900; letter-spacing: .04em; }
+.hero h1 { margin-top: 4px; font-size: clamp(1.7rem, 8vw, 2.2rem); line-height: 1.35; color: var(--green-dark); letter-spacing: -.02em; }
+html[data-lang="hi"] .hero h1 { line-height: 1.6; }
+.hero-sub { margin-top: 5px; color: var(--muted); font-size: .95rem; }
+.first-glance {
+  margin-top: 12px; padding: 10px; color: var(--ink); background: #fff;
+  border: 2px solid var(--green-dark); border-left: 7px solid var(--saffron);
 }
-.sec-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); line-height: 1.6; }
-
-.trust-cap { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
-.trust-name { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); line-height: 1.4; }
-.trust-line { display: flex; gap: 8px; align-items: flex-start; font-size: var(--font-size-base); line-height: 1.65; }
-.trust-line .k-ico { margin-top: 2px; }
-.trust-flags { display: flex; flex-wrap: wrap; gap: 6px; }
-.flag {
-  display: none;
-  align-items: center; gap: 5px;
-  padding: 3px 10px; border-radius: var(--radius-full);
-  border: 1px solid var(--color-border-emphasized);
-  font-size: var(--font-size-sm); line-height: 1.6; color: var(--color-text-secondary);
-  background: transparent;
+.first-glance-head { display: flex; align-items: center; gap: 8px; color: var(--green-dark); font-size: .83rem; line-height: 1.65; font-weight: 900; }
+.first-glance-head .icon { width: 28px; height: 28px; }
+.first-glance-actions { margin-top: 7px; display: flex; flex-direction: column; gap: 7px; }
+.first-glance-action { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: center; }
+.first-glance-badge {
+  width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%;
+  color: #fff; background: var(--badge-bg, #4f5960); font-size: .9rem; line-height: 1; font-weight: 950;
 }
-.flag-expiring { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-muted); }
-.flag.is-on { display: inline-flex; }  /* 데이터 파생: version>1 · D-3 */
-.note-text { font-size: var(--font-size-base); }
-
-.match-strip { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; }
-.match-strip .k-ico { width: 24px; height: 24px; margin-top: 2px; color: var(--color-icon-primary); }
-.match-strip p { font-size: var(--font-size-base); line-height: 1.65; }
-
-.tt-hint { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 2px; }
-.tt-row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; padding: 4px 0; align-items: start; }
-.tt-row:last-child { padding-bottom: 0; }
-.tt-row + .tt-row { border-top: 1px solid var(--color-border); }
-.tt-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
-.tt-slot .ico24 { width: 26px; height: 26px; color: var(--color-icon-primary); }
-.tt-slot-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
-.tt-sp-label { font-weight: var(--font-weight-bold); line-height: 1.6; margin-bottom: 6px; font-size: var(--font-size-base); }
-.tt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.tt-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  min-height: 48px; padding: 4px 10px;
-  border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-full);
-  background: var(--color-background-surface);
-  text-decoration: none; color: var(--color-text-primary); line-height: 1.5;
-  touch-action: manipulation;
+.first-glance-name { font-size: .9rem; line-height: 1.65; font-weight: 900; overflow-wrap: anywhere; }
+.first-glance-dose { color: var(--green-dark); font-size: .78rem; line-height: 1.65; font-weight: 850; }
+.packet-rule {
+  margin-top: 13px; display: flex; align-items: center; gap: 10px;
+  border-top: 2px dashed #ad8c4b; padding-top: 11px; font-weight: 800; font-size: .92rem;
 }
-.tt-chip:active { background: var(--color-overlay-pressed); }
-.tt-chip b { font-size: var(--font-size-xl); font-variant-numeric: tabular-nums; }
-.tt-chip .u { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
-
-/* 약×시간 매트릭스 — 행=약(색+숫자 배지), 열=M→N→E→H 고정, 셀=알약 글리프×수량 */
-.mx-head, .mx-row { display: grid; grid-template-columns: minmax(0, 2.5fr) repeat(4, 1fr); gap: 2px; align-items: center; }
-.mx-head { padding-bottom: 6px; }
-.mx-h { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.mx-h .ico22 { width: 22px; height: 22px; color: var(--color-icon-primary); }
-.mx-hl { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.5; text-align: center; }
-.mx-row { min-height: 56px; padding: 8px 0; border-top: 1px solid var(--color-border); text-decoration: none; color: var(--color-text-primary); touch-action: manipulation; }
-.mx-row:active { background: var(--color-overlay-pressed); }
-.mx-name { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: var(--font-weight-bold); line-height: 1.4; }
-.mx-name b { min-width: 0; overflow-wrap: break-word; }
-.mx-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 0; }
-.mx-g { display: inline-flex; align-items: center; justify-content: center; gap: 2px; flex-wrap: wrap; }
-.mx-cell .pict { width: 17px; height: 17px; color: var(--color-icon-primary); }
-.mx-sub { font-size: var(--font-size-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mx-sub b { color: var(--color-text-primary); }
-.mx-off { color: var(--color-text-disabled); font-weight: var(--font-weight-normal); }
-
-/* 항목 색+숫자 배지 — position n = hue-n 고정. 색은 보조 부호, 숫자가 정본 */
-.badge-item {
-  --badge-bg: var(--color-icon-gray);
-  display: inline-flex; align-items: center; justify-content: center; flex: none;
-  width: 40px; height: 40px; border-radius: var(--radius-full);
-  background: var(--badge-bg); color: var(--color-on-dark);
-  font-size: var(--font-size-lg); font-weight: var(--font-weight-bold);
-  font-variant-numeric: tabular-nums;
+.packet-rule .icon-lg { color: var(--saffron); }
+.day-ribbon {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--white); border-bottom: 1px solid var(--line);
 }
-.badge-item--sm { width: 28px; height: 28px; font-size: var(--font-size-base); }
-.hue-1  { --badge-bg: var(--color-icon-blue); }
-.hue-2  { --badge-bg: var(--color-icon-orange); }
-.hue-3  { --badge-bg: var(--color-icon-green); }
-.hue-4  { --badge-bg: var(--color-icon-purple); }
-.hue-5  { --badge-bg: var(--color-icon-red); }
-.hue-6  { --badge-bg: var(--color-icon-teal); }
-.hue-7  { --badge-bg: var(--color-icon-pink); }
-.hue-8  { --badge-bg: var(--color-icon-cyan); }
-.hue-9  { --badge-bg: var(--color-icon-yellow); }
-.hue-10 { --badge-bg: var(--color-icon-gray); }
-
-.item-card { scroll-margin-top: 76px; }
-.item-card:target {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2.5px var(--color-accent), var(--shadow-low);
-}
-.card-head { display: flex; gap: 10px; align-items: flex-start; }
-.drug-name { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); line-height: 1.5; overflow-wrap: anywhere; }
-.enrich { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
-.pat-line { font-weight: var(--font-weight-bold); line-height: 1.65; }
-.k-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; line-height: 1.65; font-size: var(--font-size-base); }
-.dotsep { color: var(--color-text-secondary); }
-
-.btn {
-  appearance: none; -webkit-appearance: none;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 48px; padding: 10px 16px;
-  border: 1px solid transparent; border-radius: var(--radius-element);
-  background: var(--color-accent-muted); color: var(--color-text-primary);
-  font-weight: var(--font-weight-bold); font-size: var(--font-size-lg); line-height: 1.5;
-  text-align: center; text-decoration: none;
-  cursor: pointer; touch-action: manipulation;
-}
-.btn:active { filter: brightness(0.94); }
-.btn-primary { display: flex; width: 100%; min-height: 56px; background: var(--color-accent); color: var(--color-on-accent); }
-.btn-block { display: flex; width: 100%; }
-.btn-audio { display: flex; width: 100%; min-height: 56px; border-color: var(--color-border-emphasized); }
-.btn-audio[aria-pressed="true"] { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
-.btn-sub { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.75; }
-.btn-audio .lbl-stop { display: none; }
-.btn-audio[aria-pressed="true"] .lbl-listen { display: none; }
-.btn-audio[aria-pressed="true"] .lbl-stop { display: inline-flex; align-items: center; gap: 6px; }
-
-.slot-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-.slot-cell {
+.day-stop {
+  min-width: 0; min-height: 96px; padding: 9px 3px 8px;
   display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 8px 2px; border-radius: var(--radius-inner);
-  background: var(--color-background-muted);
-  text-align: center; min-width: 0;
+  text-align: center; text-decoration: none; border-right: 1px solid var(--line);
 }
-.slot-cell.is-off { background: transparent; opacity: 0.35; }
-.slot-ico { width: 28px; height: 28px; color: var(--color-icon-primary); }
-.slot-cell.is-off .slot-ico { color: var(--color-icon-disabled); }
-.slot-qty { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); line-height: 1.2; font-variant-numeric: tabular-nums; }
-.slot-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6; }
-
-.pict-row { display: inline-flex; align-items: center; justify-content: center; gap: 3px; }
-.pict { width: 18px; height: 18px; color: var(--color-icon-primary); flex: none; }
-.pict-row--sm .pict { width: 14px; height: 14px; }
-.slot-cell .pict-row { min-height: 24px; }
-.slot-cell .pict { width: 22px; height: 22px; }
-.slot-cell.is-off .pict { color: var(--color-icon-disabled); }
-
-.food-strip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--color-background-muted); border-radius: var(--radius-inner); font-weight: var(--font-weight-bold); }
-.food-strip .k-ico { width: 30px; height: 30px; flex: none; }
-
-.day-dots { display: inline-flex; flex-wrap: wrap; gap: 3px; max-width: 152px; vertical-align: middle; }
-.day-dots i { width: 8px; height: 8px; border-radius: 2px; background: var(--color-icon-secondary); }
-
-.prn-block, .custom-block {
-  background: var(--color-warning-muted);
-  border-radius: var(--radius-element);
-  padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 6px;
+.day-stop:last-child { border-right: 0; }
+.day-stop .icon { width: 30px; height: 30px; color: var(--green); }
+.day-label { font-size: .75rem; line-height: 1.65; font-weight: 850; }
+.packet-dots { min-height: 24px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 3px; }
+.packet-dot {
+  width: 23px; height: 23px; display: grid; place-items: center;
+  border-radius: 50%; color: #fff; background: var(--badge-bg, #4f5960);
+  font-size: .72rem; line-height: 1; font-weight: 900;
 }
-.prn-block .k-ico, .custom-block .k-ico { color: var(--color-warning); }
-.custom-instr {
-  background: var(--color-background-surface);
-  border: 1px dashed var(--color-border-emphasized);
-  border-radius: var(--radius-inner);
-  padding: 8px 10px;
-  font-size: var(--font-size-base); line-height: 1.65;
-  user-select: text;
+.no-dot { color: var(--muted); font-size: .72rem; }
+.section-band {
+  padding: 10px 14px; color: #fff; background: var(--green);
+  font-size: 1.05rem; line-height: 1.65; font-weight: 900; letter-spacing: .01em;
 }
-
-.ph {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  min-height: 64px; padding: 12px;
-  background: var(--color-skeleton);
-  border: 1.5px dashed var(--color-border-emphasized);
-  border-radius: var(--radius-element);
-  color: var(--color-text-secondary); font-size: var(--font-size-base);
-  text-align: center; overflow-wrap: anywhere;
-  text-decoration: none;
+.daily-flow { background: var(--white); }
+.time-block { scroll-margin-top: 8px; display: grid; grid-template-columns: 72px minmax(0, 1fr); border-bottom: 2px solid var(--green-dark); }
+.time-head {
+  padding: 13px 5px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  text-align: center; color: var(--green-dark); background: var(--green-pale); border-right: 2px solid var(--green-dark);
 }
-.ph--video { aspect-ratio: 16 / 9; width: 100%; }
-.ph-play { width: 44px; height: 44px; color: var(--color-icon-primary); }
-.ph-size { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
-.ph--video .lbl-playing { display: none; }
-.ph--video.is-playing .lbl-play { display: none; }
-.ph--video.is-playing .lbl-playing { display: inline; }
-
-.share-preview {
-  background: var(--color-background-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-element);
-  padding: 10px 12px;
-  font-size: var(--font-size-base); line-height: 1.7;
-  overflow-wrap: anywhere; user-select: text;
+.time-head .icon-lg { width: 40px; height: 40px; }
+.time-head h2 { font-size: .88rem; line-height: 1.65; }
+.time-actions { min-width: 0; }
+.dose-row { min-width: 0; padding: 12px 10px; }
+.dose-row + .dose-row { border-top: 1px dashed #b7b0a0; }
+.dose-main { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 9px; align-items: start; }
+.packet-wrap { text-align: center; }
+.packet-badge {
+  width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%; color: #fff; background: var(--badge-bg, #4f5960);
+  border: 3px solid #fff; outline: 2px solid var(--badge-bg, #4f5960);
+  font-size: 1.35rem; line-height: 1; font-weight: 950; font-variant-numeric: tabular-nums;
 }
-.lbl-copy { display: inline-flex; align-items: center; gap: 6px; }
-#btn-copy .lbl-done { display: none; align-items: center; gap: 6px; color: var(--color-success); }
-#btn-copy.is-done .lbl-copy { display: none; }
-#btn-copy.is-done .lbl-done { display: inline-flex; }
-
-.media-toast {
-  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-  z-index: 40;
-  display: flex; align-items: center; gap: 8px;
-  max-width: min(90vw, 432px);
-  padding: 12px 16px;
-  background: var(--color-accent); color: var(--color-on-accent);
-  border-radius: var(--radius-element);
-  box-shadow: var(--shadow-low);
-  font-size: var(--font-size-lg); line-height: 1.6; font-weight: var(--font-weight-bold);
+.packet-label { margin-top: 4px; display: block; color: var(--muted); font-size: .75rem; line-height: 1.65; font-weight: 800; }
+.drug-name { font-size: 1.03rem; line-height: 1.65; font-weight: 900; overflow-wrap: anywhere; }
+.dose-fact { margin-top: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; color: var(--green-dark); }
+.dose-picts { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.dose-pict { width: 25px; height: 25px; color: var(--green-dark); }
+.dose-number { font-size: 1.42rem; line-height: 1.2; font-weight: 950; font-variant-numeric: tabular-nums; }
+.dose-unit { font-size: .9rem; font-weight: 850; }
+.action-meta { margin: 9px 0 0 57px; display: flex; flex-direction: column; gap: 6px; }
+.meal-order, .duration-line {
+  display: flex; align-items: center; gap: 7px; min-width: 0;
+  font-size: .83rem; line-height: 1.65; font-weight: 800;
 }
-.media-toast .ico { color: var(--color-on-accent); }
-.media-toast[hidden] { display: none; }
-
-.caution-line .k-ico { color: var(--color-warning); }
-.caution-line b { overflow-wrap: anywhere; }
-
-.foot { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.7; }
-.foot a { color: inherit; display: inline-block; padding: 14px 4px; }
-
-@media print { body { box-shadow: none; } }
+.meal-order { color: #7a3a00; }
+.meal-order .icon { width: 34px; height: 34px; }
+.duration-line { color: var(--muted); }
+.duration-line .icon { width: 20px; height: 20px; }
+.empty-time { min-height: 104px; display: flex; align-items: center; padding: 16px 11px; color: var(--muted); font-size: .82rem; line-height: 1.65; }
+.hue-1 { --badge-bg: #165d94; } .hue-2 { --badge-bg: #98490c; }
+.hue-3 { --badge-bg: #2a6a33; } .hue-4 { --badge-bg: #704087; }
+.hue-5 { --badge-bg: #9a2932; } .hue-6 { --badge-bg: #087268; }
+.hue-7 { --badge-bg: #8a3263; } .hue-8 { --badge-bg: #216879; }
+.hue-9 { --badge-bg: #735f00; } .hue-10 { --badge-bg: #4f5960; }
+.special-zone { background: #fff7df; border-bottom: 2px solid var(--green-dark); }
+.special-item { padding: 13px 14px; }
+.special-item + .special-item { border-top: 1px dashed #ad8c4b; }
+.special-head { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 10px; align-items: center; }
+.special-title { font-size: .98rem; line-height: 1.65; font-weight: 900; }
+.special-label { display: flex; align-items: center; gap: 6px; color: var(--danger); font-size: .88rem; line-height: 1.6; font-weight: 900; }
+.special-facts { margin: 9px 0 0 58px; display: flex; flex-direction: column; gap: 7px; }
+.limit-box { padding: 9px 10px; border-left: 5px solid var(--danger); background: #fff; font-size: .88rem; line-height: 1.6; }
+.limit-box strong { font-size: 1.22rem; }
+.limit-box.caution { display: flex; align-items: flex-start; gap: 8px; }
+.limit-box.caution .icon { margin-top: 2px; flex: none; }
+.details-section { background: var(--white); border-bottom: 2px solid var(--green-dark); padding-bottom: 8px; }
+.details-intro { padding: 10px 14px; color: var(--muted); font-size: .86rem; }
+.medicine-detail { margin: 0 10px 8px; border: 1px solid var(--line); background: #fff; }
+.medicine-detail summary {
+  min-height: 58px; padding: 8px 10px; cursor: pointer; list-style: none;
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 9px; align-items: center;
+}
+.medicine-detail summary::-webkit-details-marker { display: none; }
+.medicine-detail summary::after { content: "+"; color: var(--green); font-size: 1.45rem; font-weight: 900; }
+.medicine-detail[open] summary::after { content: "−"; }
+.detail-badge { width: 38px; height: 38px; outline-width: 1px; border-width: 2px; font-size: 1.05rem; }
+.detail-name { min-width: 0; font-size: .92rem; line-height: 1.65; font-weight: 900; overflow-wrap: anywhere; }
+.detail-open { display: block; color: var(--muted); font-size: .72rem; line-height: 1.65; font-weight: 700; }
+.detail-body { border-top: 1px solid var(--line); padding: 11px 12px 13px; display: flex; flex-direction: column; gap: 9px; }
+.detail-dose { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.detail-dose .icon { color: var(--green); }
+.detail-dose b { min-width: 76px; font-size: .84rem; }
+.detail-fact { display: flex; align-items: flex-start; gap: 8px; font-size: .85rem; line-height: 1.6; }
+.detail-fact .icon { margin-top: 2px; color: var(--green); }
+.caution { padding: 8px 10px; color: var(--danger); background: #fff0ed; border-left: 5px solid var(--danger); font-weight: 850; }
+.share-section { background: var(--paper-strong); border-bottom: 8px solid var(--saffron); padding: 13px 14px 16px; }
+.share-section h2 { color: var(--green-dark); font-size: 1.2rem; line-height: 1.65; }
+.share-actions { margin-top: 10px; display: grid; gap: 8px; }
+.button {
+  min-height: 52px; padding: 10px 13px; border: 2px solid var(--green-dark); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  text-decoration: none; cursor: pointer; font-weight: 900; line-height: 1.65;
+}
+.button-primary { color: #fff; background: var(--green-dark); }
+.button-secondary { color: var(--green-dark); background: #fff; }
+.button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.copy-done { display: none; }
+#copy-button.is-done .copy-default { display: none; }
+#copy-button.is-done .copy-done { display: inline-flex; align-items: center; gap: 8px; }
+.share-preview { margin-top: 9px; border: 1px solid #bfae7f; background: #fff; }
+.share-preview summary { min-height: 48px; padding: 8px 10px; cursor: pointer; font-size: .82rem; font-weight: 850; }
+.preview-body { border-top: 1px solid var(--line); padding: 9px 10px; font-size: .76rem; line-height: 1.6; overflow-wrap: anywhere; }
+.preview-body p + p { margin-top: 4px; }
+.screenshot-tip { margin-top: 11px; display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font-size: .82rem; }
+.footer { padding: 20px 14px 28px; color: #fff; background: var(--green-dark); font-size: .78rem; line-height: 1.7; }
+.footer p + p { margin-top: 7px; }
+.footer a { min-height: 48px; display: inline-flex; align-items: center; font-weight: 850; }
+@media (max-width: 340px) {
+  body { font-size: 16px; }
+  .masthead, .hero { padding-left: 10px; padding-right: 10px; }
+  .section-band, .share-section { padding-left: 10px; padding-right: 10px; }
+  .time-block { grid-template-columns: 64px minmax(0, 1fr); }
+  .dose-row { padding-left: 8px; padding-right: 7px; }
+  .dose-main { grid-template-columns: 44px minmax(0, 1fr); gap: 7px; }
+  .packet-badge { width: 42px; height: 42px; }
+  .action-meta { margin-left: 51px; }
+  .day-label { font-size: .75rem; }
+}
+@media print {
+  html, body { background: #fff; max-width: none; }
+  .lang-switch, .share-section { display: none; }
+}
 </style>
 </head>
 <body>
-
-<header class="topbar">
-  <span class="logo-ph">logo · indoro</span>
-  <span class="spacer" style="flex:1"></span>
-  {#- C1: 자기표기(국기 금지) — 1탭 = ?lang= 서버 재렌더. JS 없어도 성립(D12) #}
-  <nav class="lang-toggle" aria-label="Language">
-    <a href="{{ lang_links.hi }}" data-lang-opt="hi" aria-current="{{ 'true' if lang == 'hi' else 'false' }}">हिन्दी</a>
-    <a href="{{ lang_links.en }}" data-lang-opt="en" aria-current="{{ 'true' if lang == 'en' else 'false' }}">English</a>
-  </nav>
-</header>
-
-<main class="screen stack">
-
-  {#- ═ 신뢰 헤더 — pharmacies.name·area, created_at(IST), expires_at(D-day), 배지(version>1·D-3) #}
-  <section class="card stack" style="gap:4px" aria-labelledby="pharm-name">
-    <p class="trust-cap">{{ he(T.from_pharmacy) }}</p>
-    <h1 class="trust-name" id="pharm-name">{{ pharmacy.name }}</h1>
-    {% if pharmacy.area %}<p class="t-supporting t-secondary">{{ pharmacy.area }}</p>{% endif %}
-    <p class="trust-line">{{ ico("i-cal", "k-ico") }}<span>{{ he(trust.issued) }}</span></p>
-    <p class="trust-line">{{ ico("i-clock", "k-ico") }}<span><span lang="hi">{{ trust.valid.hi }} — <b>{{ trust.days_left }}</b> {{ T.days.hi }}</span><span lang="en">{{ trust.valid.en }} — <b>{{ trust.days_left }}</b> {{ T.days.en }}</span></span></p>
-    {% if trust.edited or trust.expiring %}
-    <p class="trust-flags">
-      {% if trust.edited %}<span class="flag is-on">{{ ico("i-note", "ico-14") }}{{ he(trust.edited) }}</span>{% endif %}
-      {% if trust.expiring %}<span class="flag flag-expiring is-on">{{ ico("i-warn", "ico-14") }}{{ he(trust.expiring) }}</span>{% endif %}
-    </p>
-    {% endif %}
-    {% if presc.patient_label %}<p class="t-supporting t-secondary">{{ he(T.for_label) }}: {{ presc.patient_label }}</p>{% endif %}
-    {% if presc.note %}<p class="trust-line">{{ ico("i-note", "k-ico") }}<span class="note-text">{{ presc.note }}</span></p>{% endif %}
-  </section>
-
-  {#- ═ 봉투 대조 안내 스트립 — 유성펜 번호 기입 절차의 화면측 짝 #}
-  <section class="card match-strip">
-    {{ ico("i-envelope", "k-ico") }}
-    <p>{{ he(T.match_envelope) }}</p>
-  </section>
-
-  {#- ═ 하루 시간표: 약×시간 매트릭스(daily) + 특수 행(비-daily) — buildTT 이식 #}
-  <section class="card" aria-labelledby="tt-title">
-    <h2 class="sec-title" id="tt-title">{{ he(T.tt_title) }}</h2>
-    <p class="tt-hint">{{ he(T.tt_hint) }}</p>
-    <div id="tt-body">
-      {% if matrix_rows %}
-      <div class="mx-head" aria-hidden="true">
-        <span></span>
-        {% for s in slot_order %}<span class="mx-h">{{ ico(slot_ico[s], "ico22") }}<span class="mx-hl">{{ he(L.slots[s]) }}</span></span>{% endfor %}
+<div class="page">
+  <header class="masthead">
+    <div class="mast-top">
+      <span class="pharmacy-mark">{{ ico("i-clinic", "icon-lg") }}</span>
+      <div class="trust-copy">
+        <p class="eyebrow">{{ he(T.from_pharmacy) }}</p>
+        <p class="pharmacy-name">{{ pharmacy.name }}</p>
+        {% if pharmacy.area %}<p class="pharmacy-area">{{ pharmacy.area }}</p>{% endif %}
       </div>
-      {% for r in matrix_rows %}
-      <a class="mx-row" href="#item-{{ r.position }}">
-        <span class="mx-name"><span class="badge-item badge-item--sm hue-{{ r.hue }}">{{ r.position }}</span><b>{{ r.name_raw }}</b></span>
-        {%- for c in r.cells %}
-        {% if c.off %}<span class="mx-cell mx-off">–</span>
-        {%- else %}<span class="mx-cell"><span class="mx-g" aria-hidden="true">{{ picts(c.glyphs) }}</span>{% if c.sub %}<span class="mx-sub">{% if c.sub.kind == "ml" %}<b>{{ c.sub.q }}</b> ml{% else %}×{{ c.sub.q }}{% endif %}</span>{% endif %}</span>{% endif %}
-        {%- endfor %}
-      </a>
-      {% endfor %}
-      {% endif %}
-      {% for v in specials %}
-      <div class="tt-row is-special">
-        <div class="tt-slot">{{ ico(v.special.icon, "ico24") }}</div>
-        <div>
-          <p class="tt-sp-label">{{ he(v.special.label) }}</p>
-          <div class="tt-chips">
-            <a class="tt-chip" href="#item-{{ v.position }}"><span class="badge-item badge-item--sm hue-{{ v.hue }}">{{ v.position }}</span>
-              {%- if v.special.chip.kind == "qty" -%}
-                {%- if v.special.chip.glyphs %}<span class="pict-row pict-row--sm" aria-hidden="true">{{ picts(v.special.chip.glyphs) }}</span>{% endif -%}
-                <b>{{ v.special.chip.q }}</b><span class="u">{{ he(v.special.chip.unit_short) }}</span>
-              {%- elif v.special.chip.kind == "sos" -%}<b>SOS</b>
-              {%- else -%}{{ ico("i-warn", "ico-14") }}{%- endif -%}
-            </a>
+    </div>
+    <nav class="lang-switch" aria-label="{{ T.language_label[lang] }}">
+      <a href="{{ lang_links.hi }}" data-lang-opt="hi" hreflang="hi">हिन्दी</a>
+      <a href="{{ lang_links.en }}" data-lang-opt="en" hreflang="en">English</a>
+    </nav>
+    <div class="trust-line">
+      <span>{{ ico("i-cal") }}{{ he(trust.issued) }}</span>
+      <span>{{ ico("i-check") }}{{ he(trust.valid) }}</span>
+    </div>
+    {% if trust.edited %}<p class="trust-flag">{{ ico("i-note") }}{{ he(trust.edited) }}</p>{% endif %}
+    {% if trust.expiring %}<p class="trust-flag">{{ ico("i-warn") }}{{ he(trust.expiring) }}</p>{% endif %}
+  </header>
+
+  {% if presc.note %}<aside class="rx-note">{{ ico("i-warn") }}<span>{{ presc.note }}</span></aside>{% endif %}
+
+  <main>
+    <section class="hero" aria-labelledby="poster-title">
+      <p class="hero-kicker">{{ he(T.poster_kicker) }}</p>
+      <h1 id="poster-title">{{ he(T.poster_title) }}</h1>
+      <p class="hero-sub">{{ he(T.poster_sub) }}</p>
+      {% if first_slot %}
+      <section class="first-glance" aria-label="{{ T.at_a_glance[lang] }}">
+        <p class="first-glance-head">{{ ico(first_slot.ico) }}<span>{{ he(T.at_a_glance) }} · {{ he(first_slot.label) }}</span></p>
+        <div class="first-glance-actions">
+          {% for a in first_slot.actions %}
+          <div class="first-glance-action">
+            <span class="first-glance-badge hue-{{ a.hue }}">{{ a.position }}</span>
+            <p><span class="first-glance-name">{{ a.name_raw }}</span><br><span class="first-glance-dose">{{ a.dose.q }} {{ he(a.dose.unit) }}</span></p>
           </div>
+          {% endfor %}
         </div>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
+      </section>
+      {% elif first_special %}
+      <section class="first-glance" aria-label="{{ T.at_a_glance[lang] }}">
+        <p class="first-glance-head">{{ ico(first_special.special.icon) }}<span>{{ he(T.at_a_glance) }} · {{ he(first_special.special.label) }}</span></p>
+        <div class="first-glance-actions"><div class="first-glance-action">
+          <span class="first-glance-badge hue-{{ first_special.hue }}">{{ first_special.position }}</span>
+          <p><span class="first-glance-name">{{ first_special.name_raw }}</span>{% if first_special.special_dose %}<br><span class="first-glance-dose">{{ first_special.special_dose.q }} {{ he(first_special.special_dose.unit) }}</span>{% endif %}</p>
+        </div></div>
+      </section>
+      {% endif %}
+      <div class="packet-rule">{{ ico("i-envelope", "icon-lg") }}<span>{{ he(T.match_envelope) }}</span></div>
+    </section>
 
-  {#- ═ 약 카드 리스트(S2) — position 오름차순, 전부 펼침(아코디언 금지). buildCard 이식 #}
-  <div id="cards-wrap" class="stack">
-    <h2 class="sec-title">{{ he(T.medicines) }} · {{ views | length }}</h2>
-    {% for v in views %}
-    <article class="card item-card stack" style="gap:10px" id="item-{{ v.position }}">
-      <header class="card-head">
-        <span class="badge-item hue-{{ v.hue }}">{{ v.position }}</span>
-        <div class="min0">
-          <h3 class="drug-name">{{ v.name_raw }}</h3>
-          {% if v.enrich %}<p class="enrich">{{ v.enrich }}</p>{% endif %}
-        </div>
-      </header>
-      {% if v.has_media %}
-      {#- 음성 버튼 — 항상 영상보다 위(§7.2). 실자산은 80% 범위 밖 placeholder(beacon만 실동작) #}
-      <button class="btn btn-audio" type="button" data-act="audio" data-pattern="{{ v.pattern_key }}" aria-pressed="false">
-        {{ ico("i-speaker") }}
-        <span class="lbl-listen">{{ he(T.listen) }}</span>
-        <span class="lbl-stop">{{ he(T.stop) }}</span>
-        <span class="btn-sub">~120KB</span>
-      </button>
-      {% endif %}
-      <p class="pat-line">{{ he(v.pattern_name) }}</p>
-      {% if v.strip %}
-      <div class="slot-strip">
-        {% for c in v.strip %}
-        <div class="slot-cell{{ '' if c.on else ' is-off' }}">{{ ico(c.ico, "slot-ico") }}{% if c.glyphs %}<span class="pict-row" aria-hidden="true">{{ picts(c.glyphs) }}</span>{% endif %}<span class="slot-qty">{{ c.q }}</span><span class="slot-label">{{ he(c.label) }}</span></div>
-        {% endfor %}
-      </div>
-      {% endif %}
-      {% if v.every_week %}<p class="k-row">{{ ico("i-repeat", "k-ico") }}<b>{{ he(v.every_week) }}</b></p>{% endif %}
-      {% if v.prn %}
-      <div class="prn-block">
-        <p class="k-row">{{ ico("i-warn", "k-ico") }}<b>{{ he(T.prn_head) }}{% if v.prn.reason %} — {{ he(v.prn.reason) }}{% endif %}</b></p>
-        {% if v.prn.max_per_day %}<p>{{ he(T.prn_max) }} <b class="num-lg">{{ v.prn.max_per_day }}</b> {{ he(T.prn_times) }}</p>{% endif %}
-        {% if v.prn.min_gap_hours %}<p>{{ he(T.prn_gap) }} <b class="num-lg">{{ v.prn.min_gap_hours }}</b> {{ he(T.prn_hours) }}</p>{% endif %}
-      </div>
-      {% endif %}
-      {% if v.stype == "custom" %}
-      {#- CUSTOM: 영상·음성·스트립 없음 — 잘못된 패턴 영상이 무영상보다 위험(§3.4). 지시 원문 그대로 #}
-      <div class="custom-block">
-        <p class="k-row">{{ ico("i-warn", "k-ico") }}<b>{{ he(T.custom_head) }}</b></p>
-        <p class="custom-instr">{{ v.custom_instr }}</p>
-      </div>
-      {% endif %}
-      {% if v.food %}<p class="k-row food-strip">{{ ico(v.food.ico, "k-ico") }}{{ he(v.food.label) }}</p>{% endif %}
-      {% if v.ml_per %}{#- 단위 사고 방지(§3.3): ml는 회당·총량 모두 ml — गोली 렌더 금지 #}
-      <p class="k-row">{{ ico("p-spoon", "k-ico") }}{{ he(T.each_time) }} <b class="num-lg">{{ v.ml_per }}</b> ml</p>
-      {% endif %}
-      {% if v.duration_days or v.total_q %}
-      <p class="k-row">{% if v.duration_days %}{{ ico("i-cal", "k-ico") }}<b class="num-lg">{{ v.duration_days }}</b>{{ he(T.days) }}{% if v.dots %}<span class="day-dots" aria-hidden="true">{% for _ in range(v.dots) %}<i></i>{% endfor %}</span>{% endif %}{% endif %}{% if v.duration_days and v.total_q %}<span class="dotsep">·</span>{% endif %}{% if v.total_q %}{{ ico("i-pill", "k-ico") }}{{ he(T.total) }} <b class="num-lg">{{ v.total_q }}</b>{{ he(v.unit_pair) }}{% endif %}</p>
-      {% endif %}
-      {% if v.has_media %}
-      {#- 영상: 탭 전 0바이트(§7.2). 실자산·포스터는 80% 범위 밖 — 회색 placeholder #}
-      <a class="ph ph--video" href="#" data-act="video" data-pattern="{{ v.pattern_key }}">
-        {{ ico("i-play", "ph-play") }}
-        <span class="lbl-play">{{ he(T.watch_video) }}</span>
-        <span class="lbl-playing">{{ he(T.playing) }}</span>
-        <span class="ph-size">~3MB · 30s</span>
+    <nav class="day-ribbon" aria-label="{{ T.daily_order_label[lang] }}">
+      {% for slot in day_slots %}
+      <a class="day-stop" href="#time-{{ slot.key }}">
+        {{ ico(slot.ico) }}
+        <span class="day-label">{{ he(slot.label) }}</span>
+        <span class="packet-dots">
+          {% if slot.actions %}{% for a in slot.actions %}<span class="packet-dot hue-{{ a.hue }}">{{ a.position }}</span>{% endfor %}
+          {% else %}<span class="no-dot">—</span>{% endif %}
+        </span>
       </a>
-      {% endif %}
-      {% for c in v.cautions %}
-      <p class="k-row caution-line">{{ ico("i-warn", "k-ico") }}<b>{{ he(c) }}</b></p>
       {% endfor %}
-      {% if v.note %}<p class="k-row t-supporting t-secondary">{{ ico("i-note", "k-ico") }}{{ v.note }}</p>{% endif %}
-    </article>
-    {% endfor %}
-  </div>
+    </nav>
 
-  {#- ═ C2 가족 공유 — 공유 URL = /p/{token}?lang={현재 언어}&src=share (D12·§6.4). patient_label 미포함(§8.1) #}
-  <section class="card stack" id="share-sec" aria-labelledby="share-title">
-    <h2 class="sec-title" id="share-title">{{ he(T.share_title) }}</h2>
-    <a class="btn btn-primary" id="btn-share" data-act="share" target="_blank" rel="noopener noreferrer" href="{{ wa_href }}">
-      {{ ico("i-share") }}
-      {{ he(T.send_whatsapp) }}
-    </a>
-    <button class="btn btn-block" type="button" id="btn-copy" data-act="copy" data-url="{{ copy_url }}">
-      <span class="lbl-copy">{{ ico("i-copy") }}{{ he(T.copy_link) }}</span>
-      <span class="lbl-done">{{ ico("i-check") }}{{ he(T.copied) }}</span>
-    </button>
-    <p class="t-supporting t-secondary">{{ he(T.will_send) }}</p>
-    <div class="share-preview" id="share-preview">
-      <p>{{ he(T.guide) }} — {{ pharmacy.name }}</p>
-      {% for ln in share_lines %}
-      <p>{{ ln.position }}. {{ ln.name }} — {{ he(ln.digits) }} — {{ ln.days }} {{ he(T.days) }}</p>
+    <p class="section-band">{{ he(T.today_schedule) }}</p>
+    <div class="daily-flow">
+      {% for slot in day_slots %}
+      <section class="time-block" id="time-{{ slot.key }}" aria-labelledby="time-label-{{ slot.key }}">
+        <header class="time-head">{{ ico(slot.ico, "icon-lg") }}<h2 id="time-label-{{ slot.key }}">{{ he(slot.label) }}</h2></header>
+        <div class="time-actions">
+          {% if slot.actions %}
+          {% for a in slot.actions %}
+          <article class="dose-row">
+            <div class="dose-main">
+              <div class="packet-wrap"><span class="packet-badge hue-{{ a.hue }}">{{ a.position }}</span><span class="packet-label">{{ he(T.packet) }}</span></div>
+              <div>
+                <h3 class="drug-name">{{ a.name_raw }}</h3>
+                <div class="dose-fact"><span class="dose-picts">{{ picts(a.dose.glyphs) }}</span><strong class="dose-number">{{ a.dose.q }}</strong><span class="dose-unit">{{ he(a.dose.unit) }}</span></div>
+              </div>
+            </div>
+            <div class="action-meta">
+              {% if a.food %}<p class="meal-order">{{ ico(a.food.ico) }}<span>{{ he(a.food.label) }}</span></p>{% endif %}
+              {% if a.dose.unit_key == "ml" %}<p class="duration-line">{{ ico("p-spoon") }}<span>{{ he(T.measure_ml) }}</span></p>{% endif %}
+              {% if a.duration_days %}<p class="duration-line">{{ ico("i-cal") }}<span><strong>{{ a.duration_days }}</strong> {{ he(T.days) }}</span></p>{% endif %}
+            </div>
+          </article>
+          {% endfor %}
+          {% else %}<p class="empty-time">{{ he(T.no_medicine) }}</p>{% endif %}
+        </div>
+      </section>
       {% endfor %}
-      <p>{{ share_url_base }}?lang=<span lang="hi">hi</span><span lang="en">en</span>&amp;src=share</p>
     </div>
-    <hr class="divider">
-    {#- 스크린샷 보관 — 저사양 환경의 사실상 표준 오프라인 사본(§7.3-①) #}
-    <p class="k-row">{{ ico("i-camera", "k-ico") }}<b>{{ he(T.screenshot) }}</b></p>
-    <p class="t-supporting t-secondary">{{ he(T.screenshot_sub) }}</p>
-  </section>
 
-  {#- ═ 푸터: DPDP 한 줄 고지(§8.4) + /privacy(S6 — 80% 범위 밖 스텁 링크) + 약국명 재표기 #}
-  <footer class="foot">
+    {% if specials %}
+    <section class="special-zone" aria-labelledby="special-title">
+      <h2 class="section-band" id="special-title">{{ he(T.special_title) }}</h2>
+      {% for v in specials %}
+      <article class="special-item">
+        <div class="special-head">
+          <div class="packet-wrap"><span class="packet-badge hue-{{ v.hue }}">{{ v.position }}</span><span class="packet-label">{{ he(T.packet) }}</span></div>
+          <div><h3 class="special-title">{{ v.name_raw }}</h3><p class="special-label">{{ ico(v.special.icon) }}{{ he(v.special.label) }}</p></div>
+        </div>
+        <div class="special-facts">
+          {% for d in v.detail_doses %}<p class="duration-line special-time">{{ ico(d.ico) }}<strong>{{ he(d.label) }}</strong></p>{% endfor %}
+          {% if v.special_dose %}<div class="dose-fact">{% if v.stype == "prn" %}<strong>{{ he(T.each_time) }}:</strong>{% endif %}<span class="dose-picts">{{ picts(v.special_dose.glyphs) }}</span><strong class="dose-number">{{ v.special_dose.q }}</strong><span class="dose-unit">{{ he(v.special_dose.unit) }}</span></div>
+          {% elif v.stype == "prn" %}<p class="limit-box caution">{{ he(T.prn_dose_missing) }}</p>{% endif %}
+          {% if v.prn %}
+          <div class="limit-box">
+            <p><strong>{{ he(T.prn_head) }}</strong>{% if v.prn.reason %} — {{ he(v.prn.reason) }}{% endif %}</p>
+            {% if v.prn.max_per_day %}<p>{{ he(T.prn_max) }} <strong>{{ v.prn.max_per_day }}</strong> {{ he(T.prn_times) }}</p>{% endif %}
+            {% if v.prn.min_gap_hours %}<p>{{ he(T.prn_gap) }} <strong>{{ v.prn.min_gap_hours }}</strong> {{ he(T.prn_hours) }}</p>{% endif %}
+          </div>
+          {% if v.prn.limits_missing %}<p class="limit-box caution">{{ ico("i-warn") }}<span>{{ he(T.prn_limits_missing) }}</span></p>{% endif %}
+          {% endif %}
+          {% if v.custom_instr %}<p class="limit-box">{{ v.custom_instr }}</p>{% endif %}
+          {% if v.food %}<p class="meal-order">{{ ico(v.food.ico) }}<span>{{ he(v.food.label) }}</span></p>{% endif %}
+          {% if v.duration_days %}<p class="duration-line">{{ ico("i-cal") }}<span><strong>{{ v.duration_days }}</strong> {{ he(T.days) }}</span></p>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="details-section" aria-labelledby="details-title">
+      <h2 class="section-band" id="details-title">{{ he(T.details_title) }}</h2>
+      <p class="details-intro">{{ he(T.details_sub) }}</p>
+      {% for v in views %}
+      <details class="medicine-detail" id="item-{{ v.position }}">
+        <summary>
+          <span class="packet-badge detail-badge hue-{{ v.hue }}">{{ v.position }}</span>
+          <span class="detail-name">{{ v.name_raw }}<span class="detail-open">{{ he(T.open_details) }}</span></span>
+        </summary>
+        <div class="detail-body">
+          {% if v.enrich %}<p class="detail-fact">{{ ico("i-pill") }}<span>{{ v.enrich }}</span></p>{% endif %}
+          <p class="detail-fact">{{ ico("i-repeat") }}<strong>{{ he(v.pattern_name) }}</strong></p>
+          {% for d in v.detail_doses %}
+          <div class="detail-dose">{{ ico(d.ico) }}<b>{{ he(d.label) }}</b><span class="dose-picts">{{ picts(d.dose.glyphs) }}</span><strong class="dose-number">{{ d.dose.q }}</strong><span class="dose-unit">{{ he(d.dose.unit) }}</span></div>
+          {% endfor %}
+          {% if v.unit == "ml" %}<p class="detail-fact">{{ ico("p-spoon") }}<span>{{ he(T.measure_ml) }}</span></p>{% endif %}
+          {% if v.food %}<p class="detail-fact meal-order">{{ ico(v.food.ico) }}<span>{{ he(v.food.label) }}</span></p>{% endif %}
+          {% if v.duration_days %}<p class="detail-fact">{{ ico("i-cal") }}<span>{{ he(T.duration) }}: <strong>{{ v.duration_days }} {{ he(T.days) }}</strong></span></p>{% endif %}
+          {% if v.total_q %}<p class="detail-fact">{{ ico("i-package") }}<span>{{ he(T.total) }}: <strong>{{ v.total_q }} {{ he(v.unit_pair) }}</strong></span></p>{% endif %}
+          {% if v.prn %}<div class="limit-box"><p>{{ he(T.prn_head) }}{% if v.prn.reason %} — {{ he(v.prn.reason) }}{% endif %}</p>{% if v.prn.max_per_day %}<p>{{ he(T.prn_max) }} {{ v.prn.max_per_day }} {{ he(T.prn_times) }}</p>{% endif %}{% if v.prn.min_gap_hours %}<p>{{ he(T.prn_gap) }} {{ v.prn.min_gap_hours }} {{ he(T.prn_hours) }}</p>{% endif %}</div>{% if v.prn.limits_missing %}<p class="detail-fact caution">{{ ico("i-warn") }}<span>{{ he(T.prn_limits_missing) }}</span></p>{% endif %}{% endif %}
+          {% if v.custom_instr %}<p class="limit-box">{{ he(T.custom_head) }}<br>{{ v.custom_instr }}</p>{% endif %}
+          {% for c in v.cautions %}<p class="detail-fact caution">{{ ico("i-warn") }}<span>{{ he(c) }}</span></p>{% endfor %}
+          {% if v.note %}<p class="detail-fact">{{ ico("i-note") }}<span>{{ v.note }}</span></p>{% endif %}
+        </div>
+      </details>
+      {% endfor %}
+    </section>
+
+    <section class="share-section" id="share-section" aria-labelledby="share-title">
+      <h2 id="share-title">{{ he(T.share_title) }}</h2>
+      <div class="share-actions">
+        <a class="button button-primary" data-act="share" target="_blank" rel="noopener noreferrer" href="{{ wa_href }}">{{ ico("i-share") }}{{ he(T.send_whatsapp) }}</a>
+        <button class="button button-secondary" id="copy-button" type="button" data-act="copy" data-url="{{ copy_url }}">
+          <span class="copy-default">{{ he(T.copy_link) }}</span><span class="copy-done">{{ ico("i-check") }}{{ he(T.copied) }}</span>
+        </button>
+      </div>
+      <details class="share-preview"><summary>{{ he(T.will_send) }}</summary><div class="preview-body"><p>{{ he(T.guide) }}</p><p>{{ share_url_base }}?lang=<span lang="hi">hi</span><span lang="en">en</span>&amp;src=share</p></div></details>
+      <p class="screenshot-tip">{{ ico("i-camera") }}<span><strong>{{ he(T.screenshot) }}</strong><br>{{ he(T.screenshot_sub) }}</span></p>
+    </section>
+  </main>
+
+  <footer class="footer">
     <p>{{ he(T.dpdp) }}</p>
     <p><a href="/privacy">{{ he(T.privacy) }}</a></p>
-    <p>{{ he(T.ask_pharmacy) }} <b>{{ pharmacy.name }}</b></p>
+    <p>{{ he(T.ask_pharmacy) }} <strong>{{ pharmacy.name }}</strong></p>
   </footer>
-
-</main>
-
-{#- 미디어 실패 토스트 — 정지 표현: 애니메이션 0, 2초 후 제거 #}
-<div class="media-toast" id="media-toast" role="status" hidden>
-  {{ ico("i-clock") }}
-  <span>{{ he(T.try_later) }}</span>
 </div>
 
-{#- ═ SVG 심볼셋 — 인라인 <symbol>+<use>(항목 수와 무관하게 증분 0). s1-landing.html 그대로 #}
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <defs>
-    <symbol id="i-slot-m" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17h17"/><path d="M8 17a4 4 0 0 1 8 0"/><path d="M12 10.5V7.5M6.6 12.2 4.8 10.8M17.4 12.2l1.8-1.4"/></g></symbol>
-    <symbol id="i-slot-n" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 4.5V6M12 18v1.5M4.5 12H6M18 12h1.5M6.9 6.9l1.1 1.1M16 16l1.1 1.1M17.1 6.9 16 8M8 16l-1.1 1.1"/></g></symbol>
-    <symbol id="i-slot-e" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 15.5h17"/><path d="M8 15.5a4 4 0 0 1 8 0z" fill="currentColor"/><path d="M12 20.5V19"/></g></symbol>
-    <symbol id="i-slot-h" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.6 13.2A6.4 6.4 0 1 1 10.8 4.5a7.2 7.2 0 0 0 4.8 8.7z"/><path d="m17.8 5.2.4 1.2 1.2.4-1.2.4-.4 1.2-.4-1.2-1.2-.4 1.2-.4z" fill="currentColor" stroke="none"/></g></symbol>
-    <symbol id="i-tf-before" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.2" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M5.4 9.7v4.6"/><path d="M10.6 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><circle cx="18.4" cy="12" r="3.4"/><circle cx="18.4" cy="12" r="1.2"/></g></symbol>
-    <symbol id="i-tf-after" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.6" cy="12" r="3.4"/><circle cx="5.6" cy="12" r="1.2"/><path d="M10.8 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><rect x="15.4" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M18.6 9.7v4.6"/></g></symbol>
-    <symbol id="i-tf-with" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="4.6"/><circle cx="12" cy="14" r="1.6"/><rect x="9" y="3.4" width="6" height="4" rx="2"/><path d="M12 3.4v4"/></g></symbol>
-    <symbol id="i-tf-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14.5" r="4.6"/><rect x="14.8" y="4.2" width="6" height="4" rx="2"/><path d="M17.8 4.2v4"/></g></symbol>
-    <symbol id="i-speaker" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9.8v4.4h3l4.2 3.2V6.6L7.5 9.8h-3z"/><path d="M14.8 9.6a3.6 3.6 0 0 1 0 4.8M17.2 7.4a6.8 6.8 0 0 1 0 9.2"/></g></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M10 8.6v6.8l5.8-3.4z" fill="currentColor" stroke="none"/></g></symbol>
-    <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.8" r="2.6"/><circle cx="17.5" cy="18.2" r="2.6"/><path d="m8.3 10.7 6.9-3.7M8.3 13.3l6.9 3.7"/></g></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M4.5 15.5v-9a2 2 0 0 1 2-2h9"/></g></symbol>
-    <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4.5h4L15.5 7"/></g></symbol>
-    <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 21.2 19.6H2.8z"/><path d="M12 9.5v4.5M12 16.8v.3"/></g></symbol>
-    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></g></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
-    <symbol id="i-pill" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.6" y="6" width="10" height="5" rx="2.5"/><path d="M7.6 6v5"/><circle cx="16.4" cy="15.4" r="4.2"/><path d="m13.4 12.4 6 6"/></g></symbol>
-    <symbol id="i-drop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4.5c3.2 3.9 5.4 6.7 5.4 9.5a5.4 5.4 0 1 1-10.8 0C6.6 11.2 8.8 8.4 12 4.5z"/></g></symbol>
-    <symbol id="i-note" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10.5H10.5L6 19.5v-3.5H4z"/></g></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.7 4.6 4.6L19 8"/></g></symbol>
-    <symbol id="i-envelope" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
-    <symbol id="i-repeat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0 1 12-4.9M19 12a7 7 0 0 1-12 4.9"/><path d="M17 4v3.2h-3.2M7 20v-3.2h3.2"/></g></symbol>
-    <symbol id="p-tab" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6v16.8" stroke-width="1.4"/></g></symbol>
-    <symbol id="p-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.6" fill="currentColor"/></symbol>
-    <symbol id="p-tab-half" viewBox="0 0 24 24"><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
-    <symbol id="p-cap" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.6" y="8" width="18.8" height="8" rx="4"/><path d="M12 8v8" stroke-width="1.4"/><path d="M6.4 10.4v3.2" stroke-width="1.4" stroke-linecap="round"/></g></symbol>
-    <symbol id="p-spoon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="8.2" cy="15.6" rx="5.4" ry="3.6"/><path d="M4 15.2h8.4" stroke-width="1.4"/><path d="m12.9 12.4 7.3-7.3"/></g></symbol>
-    <symbol id="p-generic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.6" y="4.6" width="14.8" height="14.8" rx="4.4"/><path d="M9.2 12h5.6" stroke-width="1.4" stroke-linecap="round"/></g></symbol>
-  </defs>
+<defs>
+  <symbol id="i-clinic" viewBox="0 0 32 32"><path fill="currentColor" d="M5 10h22v17H5z"/><path fill="#f4c85a" d="M13 4h6v7h7v6h-7v7h-6v-7H6v-6h7z"/></symbol>
+  <symbol id="i-slot-m" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 24h26M10 24a6 6 0 0 1 12 0M16 14V9M8 17l-4-3M24 17l4-3"/></g></symbol>
+  <symbol id="i-slot-n" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="16" cy="16" r="6"/><path d="M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5 25 25M25 7l-3.5 3.5M10.5 21.5 7 25"/></g></symbol>
+  <symbol id="i-slot-e" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 21h26M10 21a6 6 0 0 1 12 0M16 26v3M8 18l-4 3M24 18l4 3"/></g></symbol>
+  <symbol id="i-slot-h" viewBox="0 0 32 32"><path d="M22 21A10 10 0 0 1 12 5a11 11 0 1 0 10 16Z" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="m24 6 1 2.5L28 9l-3 .8-1 2.5-1-2.5L20 9l3-.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-tf-before" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="12" width="10" height="7" rx="3.5"/><path d="M6 12v7M13 15.5h8m-3-3 3 3-3 3"/><circle cx="31" cy="16" r="7"/><circle cx="31" cy="16" r="2"/></g></symbol>
+  <symbol id="i-tf-after" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="16" r="7"/><circle cx="9" cy="16" r="2"/><path d="M18 15.5h8m-3-3 3 3-3 3"/><rect x="29" y="12" width="10" height="7" rx="3.5"/><path d="M34 12v7"/></g></symbol>
+  <symbol id="i-tf-with" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="18" r="9"/><circle cx="20" cy="18" r="3"/><rect x="15" y="3" width="10" height="7" rx="3.5"/><path d="M20 3v7"/></g></symbol>
+  <symbol id="i-tf-empty" viewBox="0 0 40 32"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="13" cy="18" r="8"/><path d="M7 12l12 12"/><rect x="25" y="5" width="11" height="7" rx="3.5"/><path d="M30.5 5v7"/></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="21" rx="3"/><path d="M4 13h24M10 4v6M22 4v6"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8l5 3"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 32 32"><path d="m6 17 6 6L26 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4 29 27H3Z"/><path d="M16 12v7M16 23v.5"/></g></symbol>
+  <symbol id="i-envelope" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="7" width="26" height="19" rx="3"/><path d="m4 9 12 9L28 9"/></g></symbol>
+  <symbol id="i-repeat" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16a10 10 0 0 1 17-7M25 16a10 10 0 0 1-17 7"/><path d="M24 4v6h-6M8 28v-6h6"/></g></symbol>
+  <symbol id="i-pill" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="15" height="9" rx="4.5"/><path d="M10.5 7v9"/><circle cx="22" cy="22" r="6"/><path d="m18 18 8 8"/></g></symbol>
+  <symbol id="i-package" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="m5 10 11-6 11 6v14l-11 5-11-5Z"/><path d="m5 10 11 6 11-6M16 16v13"/></g></symbol>
+  <symbol id="i-note" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6h22v16H14l-7 6v-6H5Z"/><path d="M10 12h12M10 17h8"/></g></symbol>
+  <symbol id="i-share" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="7" cy="16" r="4"/><circle cx="24" cy="7" r="4"/><circle cx="24" cy="25" r="4"/><path d="m10.5 14 10-5M10.5 18l10 5"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2"><rect x="11" y="11" width="16" height="16" rx="3"/><path d="M6 21V8a3 3 0 0 1 3-3h13"/></g></symbol>
+  <symbol id="i-camera" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="10" width="26" height="18" rx="3"/><circle cx="16" cy="19" r="5"/><path d="m10 10 2-4h8l2 4"/></g></symbol>
+  <symbol id="p-tab" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="16" cy="16" r="11"/><path d="M16 5v22"/></g></symbol>
+  <symbol id="p-tab-half" viewBox="0 0 32 32"><path d="M16 5a11 11 0 0 0 0 22Z" fill="currentColor"/><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="p-cap" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="10" width="26" height="12" rx="6"/><path d="M16 10v12"/></g></symbol>
+  <symbol id="p-spoon" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h18l-2 22H9Z"/><path d="M9 11h5M9 16h7M9 21h5"/></g></symbol>
+  <symbol id="p-drop" viewBox="0 0 32 32"><path d="M16 4c6 7 9 11 9 16a9 9 0 1 1-18 0c0-5 3-9 9-16Z" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="p-puff" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M11 6h10v8H11zM14 14v12h8V15M8 9H4M7 4 4 2M7 14l-3 2"/></g></symbol>
+  <symbol id="p-sachet" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4h18l-2 24H9Z"/><path d="M9 10h14M12 17h8"/></g></symbol>
+  <symbol id="p-application" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 25c5-9 7-14 10-14 2 0 2 3 0 7l5-9c1-2 4 0 3 2l-3 8 4-6c1-2 4 0 3 2l-4 8c-2 4-6 6-11 6Z"/><path d="M5 7h7M8.5 3.5v7"/></g></symbol>
+  <symbol id="p-generic" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="5" width="22" height="22" rx="6"/><path d="M11 16h10"/></g></symbol>
+</defs>
 </svg>
 
 <script>
-/* 제품 S1 클라 JS(≤5KB 바닐라) — 전부 progressive enhancement.
-   없어도 열람·언어(?lang= 재렌더)·공유(wa.me 정적 링크)가 성립한다.
-   담당: beacon(sendBeacon→/api/events, 유실 허용 §6.1) + 음성/영상 placeholder 토글 + 링크 복사. */
 (function () {
   "use strict";
-  var TOKEN = {{ token | tojson }};
-  var LANG = document.documentElement.getAttribute("data-lang") || "hi";
-  function uuid() {
-    try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
-    return "ev-" + Date.now() + "-" + Math.random().toString(16).slice(2, 10);
+  var token = {{ token | tojson }};
+  function eventId() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return "ev-" + Date.now();
   }
-  function beacon(type, props) {
+  function beacon(method) {
     try {
-      var body = JSON.stringify({ token: TOKEN, events: [{ client_event_id: uuid(), type: type, client_ts: Date.now(), props: props || {} }] });
-      if (navigator.sendBeacon) { navigator.sendBeacon("/api/events", body); return; }
-      var x = new XMLHttpRequest();
-      x.open("POST", "/api/events", true);
-      x.setRequestHeader("Content-Type", "application/json");
-      x.send(body);
+      var data = JSON.stringify({token: token, events: [{client_event_id: eventId(), type: "share.clicked", client_ts: Date.now(), props: {method: method}}]});
+      if (navigator.sendBeacon) navigator.sendBeacon("/api/events", new Blob([data], {type: "application/json"}));
     } catch (e) {}
   }
-  /* 오프라인 재시도 안내 — 정지 표현: 애니메이션 0, 2초 후 제거(outbox 완전판은 80% 범위 밖) */
-  var toastTimer = null;
-  function toast() {
-    var t = document.getElementById("media-toast");
-    if (!t) return;
-    t.hidden = false;
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.hidden = true; toastTimer = null; }, 2000);
+  function fallbackCopy(text) {
+    var field = document.createElement("textarea");
+    field.value = text; field.setAttribute("readonly", ""); field.style.position = "fixed"; field.style.opacity = "0";
+    document.body.appendChild(field); field.select();
+    var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(field); return ok;
   }
   document.addEventListener("click", function (e) {
-    var el = e.target.closest ? e.target.closest("[data-act]") : null;
-    if (!el) return;
-    var act = el.getAttribute("data-act");
-    if (act === "audio") { /* 실재생 없음(placeholder) — 자산 확정 시 <audio> 승격 */
-      if (navigator.onLine === false) { toast(); return; }
-      var on = el.getAttribute("aria-pressed") === "true";
-      el.setAttribute("aria-pressed", on ? "false" : "true");
-      if (!on) beacon("media.audio_play", { pattern: el.getAttribute("data-pattern"), lang: LANG });
-      return;
-    }
-    if (act === "video") { /* 실재생 없음(placeholder) — 자산 확정 시 data-src → <video> 승격 */
-      e.preventDefault();
-      if (navigator.onLine === false) { toast(); return; }
-      el.classList.toggle("is-playing");
-      if (el.classList.contains("is-playing")) beacon("media.video_play", { pattern: el.getAttribute("data-pattern"), lang: LANG });
-      return;
-    }
-    if (act === "share") { /* wa.me 링크 기본 동작 유지 — beacon만 부가 */
-      beacon("share.clicked", { method: "whatsapp" });
-      return;
-    }
-    if (act === "copy") {
-      var url = el.getAttribute("data-url") || "";
-      var done = function () {
-        el.classList.add("is-done");
-        setTimeout(function () { el.classList.remove("is-done"); }, 2000);
-      };
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
-        else done();
-      } catch (err) { done(); }
-      beacon("share.clicked", { method: "copy" });
-      return;
-    }
+    var target = e.target.closest ? e.target.closest("[data-act]") : null;
+    if (!target) return;
+    var act = target.getAttribute("data-act");
+    if (act === "share") { beacon("whatsapp"); return; }
+    if (act !== "copy") return;
+    var url = target.getAttribute("data-url") || "";
+    var success = function () { target.classList.add("is-done"); setTimeout(function () { target.classList.remove("is-done"); }, 2000); beacon("copy"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(success, function () { if (fallbackCopy(url)) success(); });
+    else if (fallbackCopy(url)) success();
   });
 })();
 </script>

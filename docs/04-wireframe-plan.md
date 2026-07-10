@@ -1,5 +1,13 @@
 # indoro 와이어프레임 제작 계획 v1.0
 
+> **역사 문서 · 현행 스펙 아님 (2026-07-10)**
+> 이 문서는 정적 와이어프레임 제작 당시의 계획을 보존한다. 현재 환자 화면은
+> 표/매트릭스·음성·영상 중심 구조를 사용하지 않으며, 하루 행동 흐름 포스터와
+> 민감정보가 없는 공유 링크가 정본이다. 현행 정보구조·근거·검증 결과는
+> [`03-wireframe-patient.md`](03-wireframe-patient.md),
+> [`05-india-medication-poster-research.md`](05-india-medication-poster-research.md),
+> [`06-mobile-poster-visual-qa.md`](06-mobile-poster-visual-qa.md)을 따른다.
+
 ## 0. 목적 · 도구 전제 · 운영 원칙
 
 **와이어프레임이 답해야 하는 질문은 3개뿐이다.** 이 3개에 답이 나오는 순간 해당 화면은 확정하고 폴리싱을 멈춘다.

@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Scrollable UX storyboard for the English indoro mobile medication poster.">
+  <title>indoro · English patient journey storyboard</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light only;
+      --paper: #fffaf0;
+      --paper-strong: #fff1d2;
+      --paper-deep: #f0e4c8;
+      --white: #fffef9;
+      --ink: #17211d;
+      --muted: #5b665f;
+      --green: #14533f;
+      --green-dark: #0b3b2c;
+      --green-pale: #e4f1e8;
+      --saffron: #ad4f08;
+      --yellow: #f4c85a;
+      --line: #d8d3c4;
+      --danger: #8a1f25;
+      --blue: #165d94;
+      --purple: #704087;
+      --shadow: 0 18px 50px rgba(19, 46, 36, .12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: #e8e1d2; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-width: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, "Noto Sans", "Segoe UI", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.55;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: var(--paper);
+    }
+    h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
+    a, button { font: inherit; }
+    a { color: inherit; }
+    svg { display: block; }
+    :focus-visible { outline: 3px solid var(--saffron); outline-offset: 3px; }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 30;
+      padding: 12px 16px;
+      color: #fff;
+      background: var(--green-dark);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .site-head {
+      color: #fff;
+      background: var(--green-dark);
+      border-bottom: 9px solid var(--saffron);
+    }
+    .head-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--green-dark);
+      background: var(--yellow);
+      border: 2px solid rgba(255,255,255,.72);
+      border-radius: 50%;
+    }
+    .brand-mark svg { width: 27px; height: 27px; }
+    .brand-copy strong { display: block; font-size: 1.06rem; letter-spacing: .01em; }
+    .brand-copy span { display: block; margin-top: 2px; font-size: .78rem; opacity: .82; }
+    .head-tag {
+      padding: 8px 11px;
+      border: 1px solid rgba(255,255,255,.48);
+      font-size: .77rem;
+      font-weight: 850;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: clamp(44px, 8vw, 92px) 0 clamp(42px, 7vw, 76px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+      gap: clamp(30px, 6vw, 80px);
+      align-items: center;
+    }
+    .overline {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--saffron);
+      font-size: .78rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .overline::before { content: ""; width: 34px; height: 4px; background: currentColor; }
+    .intro h1 {
+      max-width: 800px;
+      margin-top: 18px;
+      color: var(--green-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.8rem, 6vw, 5.6rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    .intro-lede {
+      max-width: 700px;
+      margin-top: 24px;
+      color: #354139;
+      font-size: clamp(1.05rem, 1.8vw, 1.28rem);
+      line-height: 1.62;
+    }
+    .intro-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .action-link {
+      min-height: 50px;
+      padding: 11px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 2px solid var(--green-dark);
+      text-decoration: none;
+      font-weight: 900;
+    }
+    .action-link.primary { color: #fff; background: var(--green-dark); }
+    .action-link.secondary { color: var(--green-dark); background: var(--white); }
+    .action-link svg { width: 20px; height: 20px; }
+
+    .journey-ticket {
+      position: relative;
+      color: var(--ink);
+      background: var(--white);
+      border: 3px solid var(--green-dark);
+      box-shadow: 12px 12px 0 var(--yellow);
+    }
+    .ticket-head { padding: 16px 18px; color: #fff; background: var(--green); }
+    .ticket-head span { display: block; font-size: .72rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; opacity: .86; }
+    .ticket-head strong { display: block; margin-top: 4px; font-size: 1.35rem; }
+    .ticket-body { padding: 18px; }
+    .ticket-path { display: grid; gap: 0; }
+    .ticket-stop {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 36px minmax(0,1fr);
+      gap: 12px;
+      align-items: start;
+      position: relative;
+    }
+    .ticket-stop:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 34px;
+      bottom: 0;
+      width: 2px;
+      background: var(--line);
+    }
+    .ticket-number {
+      width: 36px;
+      height: 36px;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--green-dark);
+      border-radius: 50%;
+      font-size: .82rem;
+      font-weight: 950;
+    }
+    .ticket-stop strong { display: block; padding-top: 4px; font-size: .92rem; }
+    .ticket-stop span { display: block; margin-top: 1px; color: var(--muted); font-size: .75rem; }
+    .demo-flag {
+      margin-top: 15px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: #5b3500;
+      background: var(--paper-strong);
+      border-left: 5px solid var(--saffron);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .story-shell {
+      width: min(1320px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-bottom: 100px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: clamp(24px, 4vw, 58px);
+      align-items: start;
+    }
+    .story-rail {
+      position: sticky;
+      top: 18px;
+      z-index: 10;
+      padding: 16px;
+      background: rgba(255,250,240,.96);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(19,46,36,.08);
+    }
+    .rail-kicker { color: var(--saffron); font-size: .7rem; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+    .rail-now { margin-top: 4px; color: var(--green-dark); font-size: 1rem; font-weight: 900; }
+    .progress-track { height: 7px; margin-top: 12px; overflow: hidden; background: var(--paper-deep); }
+    .progress-fill { width: 11.11%; height: 100%; background: var(--saffron); transition: width .2s ease-out; }
+    .rail-list { margin: 16px 0 0; padding: 0; list-style: none; }
+    .rail-list a {
+      min-height: 48px;
+      padding: 8px 4px;
+      display: grid;
+      grid-template-columns: 30px minmax(0,1fr);
+      gap: 9px;
+      align-items: center;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      text-decoration: none;
+      font-size: .78rem;
+      font-weight: 800;
+    }
+    .rail-list a::before {
+      content: attr(data-step);
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: var(--green-dark);
+      background: var(--green-pale);
+      border-radius: 50%;
+      font-size: .72rem;
+    }
+    .rail-list a[aria-current="step"] { color: var(--green-dark); }
+    .rail-list a[aria-current="step"]::before { color: #fff; background: var(--saffron); }
+
+    .story { min-width: 0; }
+    .scene {
+      min-height: 88vh;
+      padding: clamp(38px, 6vw, 72px) 0;
+      display: grid;
+      grid-template-columns: minmax(270px, .75fr) minmax(390px, 1.25fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      scroll-margin-top: 32px;
+      border-top: 1px solid var(--line);
+    }
+    .scene:first-child { border-top: 0; }
+    .scene-copy { align-self: center; }
+    .scene-number {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--saffron);
+      font-size: .75rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .scene-number::after { content: ""; width: 50px; height: 3px; background: currentColor; }
+    .scene h2 {
+      margin-top: 13px;
+      color: var(--green-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.15rem, 4vw, 4.1rem);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+    }
+    .scene-summary { margin-top: 20px; color: #3c4941; font-size: 1.05rem; line-height: 1.66; }
+    .scene-facts { margin: 24px 0 0; padding: 0; list-style: none; }
+    .scene-facts li {
+      padding: 11px 0;
+      display: grid;
+      grid-template-columns: 105px minmax(0,1fr);
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .scene-facts strong { color: var(--green-dark); font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+    .scene-facts span { color: var(--muted); }
+    .scene-canvas {
+      min-width: 0;
+      padding: clamp(20px, 4vw, 46px);
+      position: relative;
+      overflow: hidden;
+      background: var(--paper-strong);
+      border: 1px solid #d8c9a8;
+      box-shadow: var(--shadow);
+    }
+    .scene-canvas.dark { background: var(--green-dark); border-color: var(--green-dark); }
+    .scene-canvas::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 13px;
+      right: 15px;
+      color: rgba(23,33,29,.45);
+      font-size: .63rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .scene-canvas.dark::before { color: rgba(255,255,255,.48); }
+
+    .pharmacy-counter {
+      min-height: 440px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 22px;
+      align-items: end;
+    }
+    .counter-copy { align-self: center; }
+    .counter-copy .sign {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      color: #fff;
+      background: var(--green);
+      font-size: .75rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .counter-copy h3 { margin-top: 16px; color: var(--green-dark); font-family: Georgia, serif; font-size: clamp(1.8rem, 4vw, 3.3rem); line-height: 1.03; }
+    .counter-copy p { margin-top: 13px; color: var(--muted); font-size: .88rem; }
+    .packet-row { margin-top: 25px; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+    .medicine-packet {
+      width: 84px;
+      height: 118px;
+      padding: 12px 8px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      background: #fffdf5;
+      border: 2px solid var(--ink);
+      box-shadow: 4px 5px 0 rgba(23,33,29,.13);
+    }
+    .medicine-packet::before { content: ""; position: absolute; top: 12px; left: 9px; right: 9px; height: 2px; background: var(--line); box-shadow: 0 8px 0 var(--line); }
+    .packet-num {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--packet, var(--blue));
+      border-radius: 50%;
+      font-size: 1.35rem;
+      font-weight: 950;
+    }
+    .medicine-packet span:last-child { margin-top: 7px; font-size: .65rem; font-weight: 900; text-transform: uppercase; }
+    .handoff-card { background: #fff; border: 3px solid var(--green-dark); box-shadow: 9px 9px 0 var(--yellow); }
+    .handoff-card-head { padding: 12px 14px; color: #fff; background: var(--green-dark); font-size: .78rem; font-weight: 900; }
+    .handoff-card-body { padding: 16px; }
+    .qr {
+      width: min(100%, 190px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 2px;
+      padding: 8px;
+      background: #fff;
+      border: 2px solid var(--ink);
+    }
+    .qr i { background: transparent; }
+    .qr i.on { background: var(--ink); }
+    .handoff-code { margin-top: 13px; text-align: center; color: var(--green-dark); font-size: .78rem; font-weight: 900; }
+    .qr-note { margin-top: 4px; text-align: center; color: var(--danger); font-size: .6rem; font-weight: 950; letter-spacing: .08em; }
+    .handoff-rule { margin-top: 12px; padding-top: 12px; border-top: 2px dashed var(--line); font-size: .75rem; font-weight: 800; }
+
+    .scan-stage {
+      min-height: 480px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .scan-stage .phone-back { position: absolute; width: 235px; height: 440px; background: #1f2824; border: 8px solid #111; border-radius: 34px; transform: rotate(-6deg) translateX(-72px); opacity: .28; }
+    .scan-card {
+      width: min(100%, 390px);
+      position: relative;
+      z-index: 1;
+      color: var(--ink);
+      background: #fff;
+      border: 3px solid var(--ink);
+      box-shadow: 12px 14px 0 var(--yellow);
+    }
+    .scan-top { padding: 12px 15px; display: flex; align-items: center; gap: 9px; color: #fff; background: var(--green); }
+    .scan-top svg { width: 28px; height: 28px; }
+    .scan-top strong { font-size: .95rem; }
+    .scan-body { padding: 20px; }
+    .browser-bar { padding: 9px 12px; display: flex; align-items: center; gap: 8px; color: var(--muted); background: #edf0ed; border: 1px solid #ccd1cd; font-size: .72rem; }
+    .local-chip { padding: 3px 5px; color: #fff; background: var(--green); font-size: .52rem; font-weight: 950; letter-spacing: .04em; }
+    .scan-message { margin-top: 22px; color: var(--green-dark); font-family: Georgia, serif; font-size: 2rem; line-height: 1.05; }
+    .scan-points { margin: 19px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+    .scan-points li { min-height: 48px; display: flex; align-items: center; gap: 10px; font-size: .86rem; font-weight: 850; }
+    .scan-points svg { width: 26px; height: 26px; color: var(--saffron); flex: none; }
+
+    .phone {
+      width: min(100%, 390px);
+      margin: 0 auto;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--paper);
+      border: 9px solid #1c2420;
+      border-radius: 34px;
+      box-shadow: 0 22px 45px rgba(0,0,0,.24);
+    }
+    .phone-notch { width: 112px; height: 20px; margin: -1px auto 0; background: #1c2420; border-radius: 0 0 14px 14px; }
+    .patient-head { padding: 10px 13px 12px; color: #fff; background: var(--green-dark); border-bottom: 6px solid var(--saffron); }
+    .pharmacy-line { display: flex; align-items: center; gap: 9px; }
+    .small-mark { width: 34px; height: 34px; display: grid; place-items: center; color: var(--green-dark); background: var(--yellow); border-radius: 50%; }
+    .small-mark svg { width: 20px; height: 20px; }
+    .pharmacy-line small { display: block; font-size: .72rem; opacity: .82; }
+    .pharmacy-line strong { display: block; font-size: .95rem; }
+    .lang-row { margin-top: 9px; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid rgba(255,255,255,.55); }
+    .lang-row span { min-height: 42px; display: grid; place-items: center; font-size: .78rem; font-weight: 900; }
+    .lang-row .active { color: var(--green-dark); background: var(--yellow); }
+    .trust-mini { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: .66rem; opacity: .9; }
+    .phone-demo { padding: 8px 12px; color: #4f3100; background: var(--yellow); font-size: .72rem; font-weight: 900; }
+    .phone-hero { padding: 14px 12px 12px; background: var(--paper-strong); border-bottom: 2px solid var(--green-dark); }
+    .phone-kicker { color: var(--saffron); font-size: .72rem; font-weight: 950; letter-spacing: .08em; }
+    .phone-hero h3 { margin-top: 3px; color: var(--green-dark); font-size: 1.58rem; line-height: 1.12; }
+    .phone-hero p { margin-top: 5px; color: var(--muted); font-size: .82rem; }
+    .glance-card { margin-top: 9px; padding: 9px; background: #fff; border: 2px solid var(--green-dark); border-left: 6px solid var(--saffron); }
+    .glance-title { display: flex; align-items: center; gap: 6px; color: var(--green-dark); font-size: .76rem; font-weight: 950; }
+    .glance-title svg { width: 20px; height: 20px; }
+    .glance-meds { margin-top: 7px; display: grid; gap: 5px; }
+    .glance-med { display: grid; grid-template-columns: 25px minmax(0,1fr) auto; gap: 6px; align-items: center; }
+    .mini-num { width: 25px; height: 25px; display: grid; place-items: center; color: #fff; background: var(--packet, var(--blue)); border-radius: 50%; font-size: .7rem; font-weight: 950; }
+    .glance-med strong { min-width: 0; font-size: .8rem; line-height: 1.32; }
+    .glance-med b { color: var(--green-dark); font-size: .76rem; }
+    .match-rule { margin-top: 8px; padding-top: 7px; display: flex; align-items: center; gap: 6px; border-top: 1px dashed #ad8c4b; font-size: .72rem; font-weight: 850; }
+    .match-rule svg { width: 20px; height: 20px; color: var(--saffron); }
+    .day-strip { display: grid; grid-template-columns: repeat(4,1fr); background: #fff; border-bottom: 1px solid var(--line); }
+    .day-cell { min-height: 65px; padding: 7px 2px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; border-right: 1px solid var(--line); }
+    .day-cell:last-child { border-right: 0; }
+    .day-cell svg { width: 22px; height: 22px; color: var(--green); }
+    .day-cell span { font-size: .66rem; font-weight: 850; }
+    .mini-dots { display: flex; gap: 2px; }
+    .mini-dots i { width: 17px; height: 17px; display: grid; place-items: center; color: #fff; background: var(--packet, var(--blue)); border-radius: 50%; font-size: .52rem; font-style: normal; font-weight: 950; }
+    .mini-empty { min-height: 17px; color: var(--muted); font-size: .62rem; }
+    .screen-caption { padding: 10px 13px; color: #fff; background: #1c2420; font-size: .65rem; text-align: center; }
+
+    .flow-board { background: var(--white); border: 3px solid var(--green-dark); }
+    .flow-title { padding: 13px 16px; color: #fff; background: var(--green); font-size: .92rem; font-weight: 950; }
+    .time-row { display: grid; grid-template-columns: 102px minmax(0,1fr); border-bottom: 2px solid var(--green-dark); }
+    .time-row:last-child { border-bottom: 0; }
+    .time-label { padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--green-dark); background: var(--green-pale); border-right: 2px solid var(--green-dark); text-align: center; }
+    .time-label svg { width: 40px; height: 40px; }
+    .time-label strong { font-size: .75rem; }
+    .time-meds { min-width: 0; }
+    .flow-med { padding: 13px 14px; display: grid; grid-template-columns: 46px minmax(0,1fr); gap: 11px; align-items: start; }
+    .flow-med + .flow-med { border-top: 1px dashed #b7b0a0; }
+    .flow-num { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; background: var(--packet, var(--blue)); border: 3px solid #fff; outline: 2px solid var(--packet, var(--blue)); border-radius: 50%; font-size: 1.15rem; font-weight: 950; }
+    .flow-copy strong { display: block; font-size: .86rem; line-height: 1.35; }
+    .flow-dose { margin-top: 5px; display: flex; align-items: center; gap: 6px; color: var(--green-dark); font-size: .78rem; font-weight: 900; }
+    .flow-dose svg { width: 23px; height: 23px; }
+    .flow-meta { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px 12px; color: var(--muted); font-size: .65rem; font-weight: 750; }
+    .flow-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .flow-meta svg { width: 17px; height: 17px; }
+    .empty-row { padding: 22px 15px; color: var(--muted); font-size: .72rem; }
+
+    .grammar-board { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
+    .grammar-card { min-height: 205px; padding: 17px; background: #fff; border: 2px solid var(--green-dark); }
+    .grammar-card:nth-child(4) { background: var(--green-dark); color: #fff; }
+    .grammar-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .grammar-top small { color: var(--saffron); font-size: .63rem; font-weight: 950; letter-spacing: .09em; text-transform: uppercase; }
+    .grammar-card:nth-child(4) .grammar-top small { color: var(--yellow); }
+    .grammar-card h3 { margin-top: 14px; font-family: Georgia, serif; font-size: 1.35rem; line-height: 1.08; }
+    .grammar-card p { margin-top: 9px; color: var(--muted); font-size: .72rem; }
+    .grammar-card:nth-child(4) p { color: rgba(255,255,255,.74); }
+    .big-packet { width: 64px; height: 64px; display: grid; place-items: center; color: #fff; background: var(--blue); border: 4px solid #fff; outline: 3px solid var(--blue); border-radius: 50%; font-size: 1.85rem; font-weight: 950; }
+    .dose-demo { margin-top: 17px; display: flex; align-items: center; gap: 8px; color: var(--green-dark); }
+    .dose-demo svg { width: 36px; height: 36px; }
+    .dose-demo strong { font-size: 1.8rem; }
+    .meal-demo { margin-top: 17px; display: grid; grid-template-columns: auto 28px auto; align-items: center; gap: 7px; color: #7a3a00; font-size: .68rem; font-weight: 900; }
+    .meal-demo svg { width: 42px; height: 42px; }
+    .meal-demo.is-single { grid-template-columns: 74px minmax(0,1fr); color: #7a3a00; }
+    .meal-demo.is-single svg { width: 74px; height: 58px; }
+    .duration-demo { margin-top: 13px; display: flex; align-items: center; gap: 8px; color: var(--yellow); }
+    .duration-demo svg { width: 28px; height: 28px; }
+    .duration-demo strong { color: #fff; font-size: .95rem; }
+    .measure-demo { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+    .measure-demo svg { width: 52px; height: 52px; color: var(--yellow); }
+    .measure-demo strong { font-size: 1.6rem; }
+
+    .special-board { display: grid; gap: 14px; }
+    .special-card { padding: 17px; background: #fff; border: 2px solid var(--green-dark); border-left: 8px solid var(--saffron); }
+    .special-card.danger { border-left-color: var(--danger); }
+    .special-head { display: grid; grid-template-columns: 48px minmax(0,1fr); gap: 12px; align-items: center; }
+    .special-head .flow-num { width: 46px; height: 46px; font-size: 1.2rem; }
+    .special-head small { display: block; color: var(--danger); font-size: .62rem; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
+    .special-head strong { display: block; margin-top: 2px; font-size: .95rem; }
+    .weekly-line { margin: 14px 0 0 60px; display: flex; align-items: center; gap: 9px; color: var(--green-dark); font-weight: 900; }
+    .weekly-line svg { width: 30px; height: 30px; }
+    .limit-grid { margin: 14px 0 0 60px; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .limit { padding: 10px 8px; background: #fff4f0; border-top: 4px solid var(--danger); }
+    .limit span { display: block; color: var(--muted); font-size: .58rem; font-weight: 800; }
+    .limit strong { display: block; margin-top: 2px; color: var(--danger); font-size: 1.05rem; line-height: 1.2; }
+    .ask-line { margin: 12px 0 0 60px; padding: 9px 11px; display: flex; gap: 8px; align-items: flex-start; color: var(--danger); background: #fff0ed; font-size: .68rem; font-weight: 850; }
+    .ask-line svg { width: 19px; height: 19px; flex: none; }
+
+    .detail-share-grid { display: grid; grid-template-columns: 1fr .84fr; gap: 16px; align-items: stretch; }
+    .details-panel, .share-panel { background: #fff; border: 2px solid var(--green-dark); }
+    .panel-title { padding: 12px 14px; color: #fff; background: var(--green); font-size: .78rem; font-weight: 950; }
+    .detail-item { border-bottom: 1px solid var(--line); }
+    .detail-item:last-child { border-bottom: 0; }
+    .detail-summary { min-height: 58px; padding: 9px 11px; display: grid; grid-template-columns: 36px minmax(0,1fr) 28px; gap: 9px; align-items: center; }
+    .detail-summary .mini-num { width: 34px; height: 34px; font-size: .82rem; }
+    .detail-summary strong { font-size: .72rem; line-height: 1.32; }
+    .detail-summary b { color: var(--green); font-size: 1.4rem; }
+    .detail-open { padding: 0 12px 12px 56px; color: var(--muted); font-size: .65rem; }
+    .share-panel { background: var(--paper-strong); }
+    .share-panel .panel-title { background: var(--saffron); }
+    .share-body { padding: 14px; }
+    .share-body p { color: var(--muted); font-size: .7rem; }
+    .share-button { min-height: 50px; margin-top: 9px; padding: 9px 11px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; background: var(--green-dark); border: 2px solid var(--green-dark); font-size: .72rem; font-weight: 900; }
+    .share-button.secondary { color: var(--green-dark); background: #fff; }
+    .share-button svg { width: 20px; height: 20px; }
+    .privacy-note { margin-top: 12px; padding-top: 11px; display: flex; align-items: flex-start; gap: 8px; border-top: 1px dashed #ad8c4b; color: var(--muted); font-size: .62rem; }
+    .privacy-note svg { width: 18px; height: 18px; color: var(--green); flex: none; }
+
+    .state-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+    .state-card { min-height: 280px; padding: 16px; display: flex; flex-direction: column; background: #fff; border: 2px solid var(--green-dark); }
+    .state-icon { width: 50px; height: 50px; display: grid; place-items: center; color: var(--green-dark); background: var(--green-pale); border-radius: 50%; }
+    .state-icon svg { width: 28px; height: 28px; }
+    .state-card.expired .state-icon, .state-card.revoked .state-icon { color: var(--danger); background: #fff0ed; }
+    .state-card small { margin-top: 18px; color: var(--saffron); font-size: .6rem; font-weight: 950; letter-spacing: .1em; text-transform: uppercase; }
+    .state-card h3 { margin-top: 6px; color: var(--green-dark); font-family: Georgia, serif; font-size: 1.2rem; line-height: 1.12; }
+    .state-card p { margin-top: 10px; color: var(--muted); font-size: .68rem; }
+    .state-hi { color: var(--green-dark); font-size: .72rem; font-weight: 800; line-height: 1.6; }
+    .state-note { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); color: var(--muted); font-size: .62rem; }
+    .state-action { min-height: 48px; margin-top: auto; padding: 9px; display: grid; place-items: center; color: #fff; background: var(--green-dark); font-size: .68rem; font-weight: 900; text-align: center; }
+    .state-action, .share-button { pointer-events: none; user-select: none; }
+
+    .outcome-board { color: #fff; background: var(--green-dark); }
+    .outcome-head { padding: 22px; border-bottom: 1px solid rgba(255,255,255,.22); }
+    .outcome-head small { color: var(--yellow); font-size: .65rem; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+    .outcome-head h3 { margin-top: 7px; font-family: Georgia, serif; font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.05; }
+    .answer-grid { display: grid; grid-template-columns: repeat(2,1fr); }
+    .answer { min-height: 150px; padding: 19px; border-right: 1px solid rgba(255,255,255,.2); border-bottom: 1px solid rgba(255,255,255,.2); }
+    .answer:nth-child(2n) { border-right: 0; }
+    .answer:nth-last-child(-n+2) { border-bottom: 0; }
+    .answer span { width: 34px; height: 34px; display: grid; place-items: center; color: var(--green-dark); background: var(--yellow); border-radius: 50%; font-weight: 950; }
+    .answer strong { display: block; margin-top: 13px; font-size: .9rem; }
+    .answer p { margin-top: 5px; color: rgba(255,255,255,.74); font-size: .7rem; }
+    .outcome-action { padding: 20px 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: #082c21; }
+    .outcome-action p { max-width: 340px; color: rgba(255,255,255,.78); font-size: .72rem; }
+    .outcome-action .action-link { color: var(--green-dark); background: var(--yellow); border-color: var(--yellow); }
+
+    .page-foot { padding: 34px 16px; color: #fff; background: #101713; border-top: 8px solid var(--saffron); }
+    .foot-inner { width: min(1180px,100%); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .foot-inner strong { display: block; }
+    .foot-inner p { margin-top: 4px; color: rgba(255,255,255,.65); font-size: .76rem; }
+    .foot-inner a { min-height: 48px; display: inline-flex; align-items: center; color: var(--yellow); font-weight: 900; }
+
+    @media (max-width: 980px) {
+      .intro { grid-template-columns: 1fr; }
+      .journey-ticket { width: min(560px,100%); }
+      .story-shell { grid-template-columns: 1fr; gap: 0; }
+      .story-rail { top: 0; margin: 0 -16px; padding: 10px 16px 11px; border-left: 0; border-right: 0; }
+      .rail-list { display: none; }
+      .rail-kicker, .rail-now { display: inline; }
+      .rail-now::before { content: " · "; color: var(--muted); }
+      .progress-track { margin-top: 7px; }
+      .scene { min-height: auto; grid-template-columns: 1fr; gap: 28px; scroll-margin-top: 82px; }
+      .scene-copy { max-width: 720px; }
+    }
+
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      .head-inner { width: min(100% - 24px,1180px); }
+      .brand-copy span, .head-tag { display: none; }
+      .intro { width: min(100% - 24px,1180px); padding-top: 38px; }
+      .intro h1 { font-size: clamp(2.55rem, 14vw, 4rem); }
+      .intro-actions { display: grid; }
+      .action-link { width: 100%; }
+      .journey-ticket { box-shadow: 7px 7px 0 var(--yellow); }
+      .story-shell { width: min(100% - 24px,1320px); }
+      .story-rail { margin-left: -12px; margin-right: -12px; }
+      .scene { padding: 44px 0; }
+      .scene h2 { font-size: clamp(2.1rem, 12vw, 3rem); }
+      .scene-facts li { grid-template-columns: 84px minmax(0,1fr); gap: 9px; }
+      .scene-canvas { margin: 0 -4px; padding: 26px 12px 16px; box-shadow: 0 12px 30px rgba(19,46,36,.12); }
+      .pharmacy-counter { min-height: 0; grid-template-columns: 1fr; }
+      .counter-copy h3 { max-width: 280px; }
+      .packet-row { margin-bottom: 12px; }
+      .medicine-packet { width: 58px; height: 92px; padding-left: 5px; padding-right: 5px; }
+      .packet-num { width: 38px; height: 38px; font-size: 1.1rem; }
+      .handoff-card { width: min(100%,320px); }
+      .scan-stage .phone-back { display: none; }
+      .scan-stage { min-height: 420px; }
+      .phone { border-width: 7px; border-radius: 27px; }
+      .flow-board { border-width: 2px; }
+      .time-row { grid-template-columns: 76px minmax(0,1fr); }
+      .time-label { padding: 13px 4px; }
+      .time-label svg { width: 34px; height: 34px; }
+      .flow-med { padding: 12px 9px; grid-template-columns: 40px minmax(0,1fr); gap: 9px; }
+      .flow-num { width: 38px; height: 38px; font-size: 1rem; }
+      .grammar-board { grid-template-columns: 1fr; }
+      .grammar-card { min-height: 185px; }
+      .limit-grid { margin-left: 0; }
+      .weekly-line, .ask-line { margin-left: 0; }
+      .detail-share-grid { grid-template-columns: 1fr; }
+      .state-grid { grid-template-columns: 1fr; }
+      .state-card { min-height: 230px; }
+      .answer-grid { grid-template-columns: 1fr; }
+      .answer, .answer:nth-child(2n), .answer:nth-last-child(-n+2) { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.2); }
+      .answer:last-child { border-bottom: 0; }
+      .foot-inner { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#story">Skip to storyboard</a>
+
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <symbol id="i-cross" viewBox="0 0 24 24"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="currentColor"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><path d="M3 3h7v7H3zm2 2v3h3V5zm9-2h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zm9-2h3v3h-3zm4 0h3v7h-3zm-4 5h3v2h-3z" fill="currentColor"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 9h8v6H8z" fill="currentColor"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5h4M11 19h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-noon" viewBox="0 0 24 24"><path d="M3 17h18M5 17a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v4M4 9l3 2m13-2-3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-evening" viewBox="0 0 24 24"><path d="M3 17h18M5 17a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4v4m-8 5h3m10 0h3M6 7l2 2m10-2-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 15.5A8 8 0 0 1 8.5 5 8 8 0 1 0 19 15.5z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><path d="M5.2 18.8a5 5 0 0 1 0-7.1l6.5-6.5a5 5 0 0 1 7.1 7.1l-6.5 6.5a5 5 0 0 1-7.1 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5l7 7" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-halfpill" viewBox="0 0 24 24"><path d="M5.2 18.8a5 5 0 0 1 0-7.1l6.5-6.5a5 5 0 0 1 7.1 7.1l-6.5 6.5a5 5 0 0 1-7.1 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5l7 7M8.5 8.5l-3.3 3.2a5 5 0 0 0 7.1 7.1l3.2-3.3z" fill="currentColor"/></symbol>
+    <symbol id="i-plate" viewBox="0 0 24 24"><path d="M4 15h16M6 15a6 6 0 0 1 12 0M3 19h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 6v2" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-meal-after" viewBox="0 0 80 48"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="24" r="12"/><circle cx="17" cy="24" r="4"/><path d="M32 24h18m-6-6 6 6-6 6"/><rect x="57" y="17" width="18" height="14" rx="7"/><path d="M66 17v14"/></g></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 3v4m10-4v4M3 10h18" stroke="currentColor" stroke-width="2"/><path d="M7 14h3v3H7z" fill="currentColor"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M6 4h11l-1 17H8L6 4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 9h4m-4 4h3m-3 4h4" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20 11.8a8 8 0 0 1-11.8 7L4 20l1.2-4.1A8 8 0 1 1 20 11.8z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 8c.2 3 2 4.8 5 5l1-1.2 2 1c-.5 1.7-1.7 2.3-3.2 2.1-3.8-.5-6.2-2.9-6.7-6.7C6.9 6.7 7.5 5.5 9.2 5l1 2z" fill="currentColor"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8 7 1.5-3h5L16 7" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v5m0 3h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 10A7 7 0 0 0 6 7.5L4 11m2 3a7 7 0 0 0 12 2.5l2-3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.6 5.6 18.4 18.4" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <header class="site-head">
+    <div class="head-inner">
+      <div class="brand">
+        <span class="brand-mark"><svg aria-hidden="true"><use href="#i-cross"/></svg></span>
+        <span class="brand-copy"><strong>indoro</strong><span>English patient experience</span></span>
+      </div>
+      <span class="head-tag">Scrollable UX storyboard · v1</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <span class="overline">English experience preview</span>
+        <h1 id="page-title">A medicine guide that reads like a day, not a table.</h1>
+        <p class="intro-lede">This storyboard follows an English-reading patient from the pharmacy counter to the last safe action on the page. The central promise stays simple: match the packet number, then follow morning to night.</p>
+        <div class="intro-actions">
+          <a class="action-link primary" href="#scene-1"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Start the journey</a>
+          <a class="action-link secondary" href="/rx/new"><svg aria-hidden="true"><use href="#i-phone"/></svg>Start a live demo</a>
+        </div>
+      </div>
+      <aside class="journey-ticket" aria-label="Storyboard overview">
+        <div class="ticket-head"><span>One continuous task</span><strong>Understand today’s medicines</strong></div>
+        <div class="ticket-body">
+          <div class="ticket-path">
+            <div class="ticket-stop"><span class="ticket-number">1</span><div><strong>Receive</strong><span>QR slip + numbered packets</span></div></div>
+            <div class="ticket-stop"><span class="ticket-number">2</span><div><strong>Recognise</strong><span>Pharmacy, language, and next dose</span></div></div>
+            <div class="ticket-stop"><span class="ticket-number">3</span><div><strong>Act</strong><span>Follow time, amount, meal, duration</span></div></div>
+            <div class="ticket-stop"><span class="ticket-number">4</span><div><strong>Recover</strong><span>Share safely or ask the pharmacy</span></div></div>
+          </div>
+          <div class="demo-flag"><svg width="20" height="20" aria-hidden="true"><use href="#i-alert"/></svg><span>Storyboard data is illustrative only. It is not a prescription or medical advice.</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="story-shell" id="story">
+      <nav class="story-rail" aria-label="Storyboard scenes">
+        <span class="rail-kicker">Current scene</span>
+        <p class="rail-now" id="rail-now">01 · Pharmacy handoff</p>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+        <ol class="rail-list">
+          <li><a href="#scene-1" data-step="01" aria-current="step">Pharmacy handoff</a></li>
+          <li><a href="#scene-2" data-step="02">Scan, no app</a></li>
+          <li><a href="#scene-3" data-step="03">Three-second answer</a></li>
+          <li><a href="#scene-4" data-step="04">Morning to night</a></li>
+          <li><a href="#scene-5" data-step="05">Action grammar</a></li>
+          <li><a href="#scene-6" data-step="06">Special directions</a></li>
+          <li><a href="#scene-7" data-step="07">Details and sharing</a></li>
+          <li><a href="#scene-8" data-step="08">Recovery states</a></li>
+          <li><a href="#scene-9" data-step="09">Patient outcome</a></li>
+        </ol>
+      </nav>
+
+      <div class="story">
+        <section class="scene" id="scene-1" data-title="Pharmacy handoff" data-index="1">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 01 · Before the phone</span>
+            <h2>The screen starts at the pharmacy counter.</h2>
+            <p class="scene-summary">The pharmacist writes a packet number on each medicine packet. The screen repeats that number inside a coloured circle, but the written number—not colour—is the safety anchor.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Receives a printed QR slip and packets marked 1 through 5.</span></li>
+              <li><strong>Interface move</strong><span>Repeats each written number inside a coloured circle and beside the word “Packet”.</span></li>
+              <li><strong>Error prevented</strong><span>Picking a medicine by name or colour alone.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Physical-to-digital handoff">
+            <div class="pharmacy-counter">
+              <div class="counter-copy">
+                <span class="sign"><svg width="18" height="18" aria-hidden="true"><use href="#i-cross"/></svg>Community pharmacy</span>
+                <h3>Write the number. Point to the number.</h3>
+                <p>The handoff works even when medicine names are difficult to read or remember.</p>
+                <div class="packet-row" role="group" aria-label="Five numbered demo medicine packets">
+                  <div class="medicine-packet" style="--packet:#165d94"><span class="packet-num">1</span><span>Packet</span></div>
+                  <div class="medicine-packet" style="--packet:#98490c"><span class="packet-num">2</span><span>Packet</span></div>
+                  <div class="medicine-packet" style="--packet:#2a6a33"><span class="packet-num">3</span><span>Packet</span></div>
+                  <div class="medicine-packet" style="--packet:#704087"><span class="packet-num">4</span><span>Packet</span></div>
+                  <div class="medicine-packet" style="--packet:#9a2932"><span class="packet-num">5</span><span>Packet</span></div>
+                </div>
+              </div>
+              <div class="handoff-card">
+                <div class="handoff-card-head">Scan to open today’s medicine guide</div>
+                <div class="handoff-card-body">
+                  <div class="qr" role="img" aria-label="Decorative, non-scannable QR illustration">
+                    <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i>
+                    <i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i>
+                    <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+                    <i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i>
+                    <i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i>
+                    <i></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i>
+                    <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i>
+                    <i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i>
+                    <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i>
+                  </div>
+                  <p class="handoff-code">DEMO CODE · 74 21 08</p>
+                  <p class="qr-note">ILLUSTRATION · NOT SCANNABLE</p>
+                  <p class="handoff-rule">Packet number on paper = packet number on screen</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-2" data-title="Scan, no app" data-index="2">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 02 · Entry</span>
+            <h2>Scan once. Read in the browser.</h2>
+            <p class="scene-summary">The page opens without an app install or account. Before showing instructions, it establishes the pharmacy source, makes English explicit, and avoids putting medicine names in the URL.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Scans the QR with a low-cost Android phone.</span></li>
+              <li><strong>Interface move</strong><span>Shows pharmacy identity, language choice, and a plain browser page.</span></li>
+              <li><strong>Error prevented</strong><span>Abandoning the task because of sign-up, installation, or an unfamiliar link.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas dark" data-label="No-install entry">
+            <div class="scan-stage">
+              <div class="phone-back" aria-hidden="true"></div>
+              <div class="scan-card">
+                <div class="scan-top"><svg aria-hidden="true"><use href="#i-scan"/></svg><strong>QR recognised</strong></div>
+                <div class="scan-body">
+                  <div class="browser-bar"><span class="local-chip">LOCAL</span><span>127.0.0.1:8600/p/••••••••?lang=en</span></div>
+                  <h3 class="scan-message">Your medicine guide is ready.</h3>
+                  <ul class="scan-points">
+                    <li><svg aria-hidden="true"><use href="#i-phone"/></svg>No app to install</li>
+                    <li><svg aria-hidden="true"><use href="#i-lock"/></svg>No name or medicine in the QR URL</li>
+                    <li><svg aria-hidden="true"><use href="#i-cross"/></svg>Issued by the pharmacy on your slip</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-3" data-title="Three-second answer" data-index="3">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 03 · First viewport</span>
+            <h2>The next action is visible before the first scroll.</h2>
+            <p class="scene-summary">The English version keeps the same poster hierarchy as Hindi: pharmacy trust first, then “today’s medicines,” then a compact at-a-glance answer. Language is a switch, not a separate product.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Looks for what to take next, not a complete clinical record.</span></li>
+              <li><strong>Interface move</strong><span>Puts time, packet number, medicine, and amount in one glance card.</span></li>
+              <li><strong>Error prevented</strong><span>Searching through medicine-by-medicine detail before finding the next dose.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="English first viewport">
+            <div class="phone" role="group" aria-label="English patient poster first viewport mockup">
+              <div class="phone-notch"></div>
+              <div class="patient-head">
+                <div class="pharmacy-line"><span class="small-mark"><svg aria-hidden="true"><use href="#i-cross"/></svg></span><span><small>From your pharmacy</small><strong>Jan Seva Medical Store</strong></span></div>
+                <div class="lang-row"><span>हिन्दी</span><span class="active">English</span></div>
+                <div class="trust-mini"><span>Issued 10 Jul 2026 (IST)</span><span>Valid till 9 Aug 2026</span></div>
+              </div>
+              <div class="phone-demo">DEMO MEDICINES · NOT A PRESCRIPTION</div>
+              <div class="phone-hero">
+                <span class="phone-kicker">TODAY’S MEDICINES</span>
+                <h3>Take today’s medicines in this order</h3>
+                <p>Follow from morning to night, top to bottom</p>
+                <div class="glance-card">
+                  <div class="glance-title"><svg aria-hidden="true"><use href="#i-sun"/></svg>AT A GLANCE · MORNING</div>
+                  <div class="glance-meds">
+                    <div class="glance-med"><span class="mini-num" style="--packet:#165d94">1</span><strong>Amoxicillin 500 mg</strong><b>1 capsule</b></div>
+                    <div class="glance-med"><span class="mini-num" style="--packet:#98490c">2</span><strong>Metformin 500 mg</strong><b>½ tablet</b></div>
+                  </div>
+                  <div class="match-rule"><svg aria-hidden="true"><use href="#i-eye"/></svg>Match the number on your packet with the same card below</div>
+                </div>
+              </div>
+              <div class="day-strip">
+                <div class="day-cell"><svg aria-hidden="true"><use href="#i-sun"/></svg><span>Morning</span><span class="mini-dots"><i style="--packet:#165d94">1</i><i style="--packet:#98490c">2</i></span></div>
+                <div class="day-cell"><svg aria-hidden="true"><use href="#i-noon"/></svg><span>Noon</span><span class="mini-empty">None</span></div>
+                <div class="day-cell"><svg aria-hidden="true"><use href="#i-evening"/></svg><span>Evening</span><span class="mini-dots"><i style="--packet:#165d94">1</i><i style="--packet:#98490c">2</i><i style="--packet:#2a6a33">3</i></span></div>
+                <div class="day-cell"><svg aria-hidden="true"><use href="#i-moon"/></svg><span>Night</span><span class="mini-empty">None</span></div>
+              </div>
+              <div class="screen-caption">First screen answers “when, what, how much?”</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-4" data-title="Morning to night" data-index="4">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 04 · Core reading path</span>
+            <h2>A day becomes the information architecture.</h2>
+            <p class="scene-summary">Instead of a matrix, instructions are grouped into a fixed four-part rhythm: Morning → Noon → Evening → Night. Empty times stay visible so the sequence never changes between prescriptions.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Scrolls in the same direction that the day progresses.</span></li>
+              <li><strong>Interface move</strong><span>Repeats time icon + label, then packet + medicine + amount.</span></li>
+              <li><strong>Error prevented</strong><span>Reading across the wrong row or mistaking “none” for missing data.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Daily action flow">
+            <div class="flow-board">
+              <div class="flow-title">When and how much to take today</div>
+              <div class="time-row">
+                <div class="time-label"><svg aria-hidden="true"><use href="#i-sun"/></svg><strong>MORNING</strong></div>
+                <div class="time-meds">
+                  <div class="flow-med"><span class="flow-num" style="--packet:#165d94">1</span><div class="flow-copy"><strong>Amoxicillin 500 mg</strong><div class="flow-dose"><svg aria-hidden="true"><use href="#i-pill"/></svg>1 capsule</div><div class="flow-meta"><span><svg aria-hidden="true"><use href="#i-plate"/></svg>After food</span><span><svg aria-hidden="true"><use href="#i-calendar"/></svg>5 days</span></div></div></div>
+                  <div class="flow-med"><span class="flow-num" style="--packet:#98490c">2</span><div class="flow-copy"><strong>Metformin 500 mg</strong><div class="flow-dose"><svg aria-hidden="true"><use href="#i-halfpill"/></svg>½ tablet</div><div class="flow-meta"><span><svg aria-hidden="true"><use href="#i-plate"/></svg>With food</span><span><svg aria-hidden="true"><use href="#i-calendar"/></svg>30 days</span></div></div></div>
+                </div>
+              </div>
+              <div class="time-row">
+                <div class="time-label"><svg aria-hidden="true"><use href="#i-noon"/></svg><strong>NOON</strong></div>
+                <div class="time-meds"><div class="empty-row">No medicine listed at this time</div></div>
+              </div>
+              <div class="time-row">
+                <div class="time-label"><svg aria-hidden="true"><use href="#i-evening"/></svg><strong>EVENING</strong></div>
+                <div class="time-meds">
+                  <div class="flow-med"><span class="flow-num" style="--packet:#165d94">1</span><div class="flow-copy"><strong>Amoxicillin 500 mg</strong><div class="flow-dose"><svg aria-hidden="true"><use href="#i-pill"/></svg>1 capsule</div><div class="flow-meta"><span><svg aria-hidden="true"><use href="#i-plate"/></svg>After food</span><span><svg aria-hidden="true"><use href="#i-calendar"/></svg>5 days</span></div></div></div>
+                  <div class="flow-med"><span class="flow-num" style="--packet:#98490c">2</span><div class="flow-copy"><strong>Metformin 500 mg</strong><div class="flow-dose"><svg aria-hidden="true"><use href="#i-halfpill"/></svg>½ tablet</div><div class="flow-meta"><span><svg aria-hidden="true"><use href="#i-plate"/></svg>With food</span><span><svg aria-hidden="true"><use href="#i-calendar"/></svg>30 days</span></div></div></div>
+                  <div class="flow-med"><span class="flow-num" style="--packet:#2a6a33">3</span><div class="flow-copy"><strong>Demo cough syrup</strong><div class="flow-dose"><svg aria-hidden="true"><use href="#i-cup"/></svg>5 ml</div><div class="flow-meta"><span><svg aria-hidden="true"><use href="#i-plate"/></svg>After food</span><span><svg aria-hidden="true"><use href="#i-calendar"/></svg>3 days</span></div></div></div>
+                </div>
+              </div>
+              <div class="time-row">
+                <div class="time-label"><svg aria-hidden="true"><use href="#i-moon"/></svg><strong>NIGHT</strong></div>
+                <div class="time-meds"><div class="empty-row">No medicine listed at this time</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-5" data-title="Action grammar" data-index="5">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 05 · Every instruction</span>
+            <h2>Four visual sentences describe the action.</h2>
+            <p class="scene-summary">Each medicine card combines redundant cues. Colour supports recognition, but number and label carry meaning. Dose, food order, duration, and measurement are all explicit.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Checks one packet immediately before taking it.</span></li>
+              <li><strong>Interface move</strong><span>Uses icon + number or icon + short label, never icon alone.</span></li>
+              <li><strong>Error prevented</strong><span>Wrong packet, wrong amount, wrong meal timing, or wrong duration.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Redundant action cues">
+            <div class="grammar-board">
+              <article class="grammar-card">
+                <div class="grammar-top"><small>01 · Identity</small><span class="big-packet">2</span></div>
+                <h3>Packet 2</h3>
+                <p>The same written number appears on the physical packet and every on-screen instruction.</p>
+              </article>
+              <article class="grammar-card">
+                <div class="grammar-top"><small>02 · Amount</small></div>
+                <div class="dose-demo"><svg aria-hidden="true"><use href="#i-halfpill"/></svg><strong>½</strong><span>tablet</span></div>
+                <h3>Shape + number + unit</h3>
+                <p>Supports half tablets, capsules, drops, puffs, sachets, applications, and ml.</p>
+              </article>
+              <article class="grammar-card">
+                <div class="grammar-top"><small>03 · Meal order</small></div>
+                <div class="meal-demo is-single"><svg aria-hidden="true"><use href="#i-meal-after"/></svg><strong>After food</strong></div>
+                <h3>After food</h3>
+                <p>The sequence is drawn and written so colour or terminology is never the only cue.</p>
+              </article>
+              <article class="grammar-card">
+                <div class="grammar-top"><small>04 · Duration + measure</small></div>
+                <div class="measure-demo"><svg aria-hidden="true"><use href="#i-cup"/></svg><strong>5 ml</strong></div>
+                <div class="duration-demo"><svg aria-hidden="true"><use href="#i-calendar"/></svg><strong>Duration · 5 days</strong></div>
+                <p>Measure liquids with a marked cup or oral syringe. Duration is stated as a clear labelled fact.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-6" data-title="Special directions" data-index="6">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 06 · Outside the daily rhythm</span>
+            <h2>Exceptions are separated, not squeezed into the timetable.</h2>
+            <p class="scene-summary">Weekly, custom, and only-when-needed medicines live in a distinct zone below the daily flow. PRN instructions show each-time amount, daily maximum, and minimum gap together.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Needs a medicine only on Sunday, or only when fever occurs.</span></li>
+              <li><strong>Interface move</strong><span>Moves exceptions into a clearly titled special section.</span></li>
+              <li><strong>Error prevented</strong><span>Treating a weekly or PRN medicine as a daily scheduled dose.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Weekly and PRN safety">
+            <div class="special-board">
+              <article class="special-card">
+                <div class="special-head"><span class="flow-num" style="--packet:#704087">4</span><div><small>Once a week</small><strong>Vitamin D3 60,000 IU · 1 sachet</strong></div></div>
+                <div class="weekly-line"><svg aria-hidden="true"><use href="#i-calendar"/></svg>Every week · Sunday · after food</div>
+              </article>
+              <article class="special-card danger">
+                <div class="special-head"><span class="flow-num" style="--packet:#9a2932">5</span><div><small>Only when needed · fever</small><strong>Paracetamol 500 mg</strong></div></div>
+                <div class="limit-grid">
+                  <div class="limit"><span>Each time</span><strong>1 tablet</strong></div>
+                  <div class="limit"><span>At most</span><strong>3 / day</strong></div>
+                  <div class="limit"><span>Gap of at least</span><strong>6 hours</strong></div>
+                </div>
+                <div class="ask-line"><svg aria-hidden="true"><use href="#i-alert"/></svg>If a limit is missing, ask the pharmacy before taking it.</div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-7" data-title="Details and sharing" data-index="7">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 07 · Secondary actions</span>
+            <h2>Details and sharing wait until the core task is complete.</h2>
+            <p class="scene-summary">Medicine details expand only when requested. WhatsApp, link copy, and screenshot guidance sit below the instructions, with a privacy reminder that the token link can be opened by anyone who receives it.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Checks a detail or asks a family member to help later.</span></li>
+              <li><strong>Interface move</strong><span>Keeps optional actions collapsed and visually quieter.</span></li>
+              <li><strong>Error prevented</strong><span>Letting sharing tools or media placeholders compete with the next dose.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Progressive disclosure">
+            <div class="detail-share-grid">
+              <div class="details-panel">
+                <div class="panel-title">Full medicine details</div>
+                <div class="detail-item"><div class="detail-summary"><span class="mini-num" style="--packet:#165d94">1</span><strong>Amoxicillin 500 mg</strong><b>+</b></div></div>
+                <div class="detail-item"><div class="detail-summary"><span class="mini-num" style="--packet:#98490c">2</span><strong>Metformin 500 mg</strong><b>−</b></div><div class="detail-open">½ tablet · morning and evening · with food · 30 days</div></div>
+                <div class="detail-item"><div class="detail-summary"><span class="mini-num" style="--packet:#2a6a33">3</span><strong>Demo cough syrup</strong><b>+</b></div></div>
+                <div class="detail-item"><div class="detail-summary"><span class="mini-num" style="--packet:#704087">4</span><strong>Vitamin D3 60,000 IU</strong><b>+</b></div></div>
+                <div class="detail-item"><div class="detail-summary"><span class="mini-num" style="--packet:#9a2932">5</span><strong>Paracetamol 500 mg</strong><b>+</b></div></div>
+              </div>
+              <div class="share-panel">
+                <div class="panel-title">Share with family</div>
+                <div class="share-body">
+                  <p>Core instructions are already above. These actions support later recall and family help.</p>
+                  <span class="share-button"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Send on WhatsApp</span>
+                  <span class="share-button secondary"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy link</span>
+                  <span class="share-button secondary"><svg aria-hidden="true"><use href="#i-camera"/></svg>Take a screenshot and keep it</span>
+                  <div class="privacy-note"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Share only with someone you trust. Anyone with the link can open this guide.</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-8" data-title="Recovery states" data-index="8">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 08 · When the guide cannot open</span>
+            <h2>Failure states tell the truth—and nothing more.</h2>
+            <p class="scene-summary">Preparing and expired pages provide a safe next step. A revoked link deliberately reveals only that it is unavailable: no pharmacy, reason, or medicine details are exposed.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Opens a guide before sync, after expiry, or after the pharmacy disables it.</span></li>
+              <li><strong>Interface move</strong><span>Auto-retries while preparing, sends expired guides back to the pharmacy, and keeps revoked links information-minimal.</span></li>
+              <li><strong>Error prevented</strong><span>Following old instructions or learning sensitive context from a disabled token.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas" data-label="Safe recovery">
+            <div class="state-grid">
+              <article class="state-card pending"><span class="state-icon"><svg aria-hidden="true"><use href="#i-refresh"/></svg></span><small>Preparing</small><p class="state-hi" lang="hi">जानकारी तैयार हो रही है</p><h3>Your guide is being prepared</h3><p>This page will try again in a moment.</p><span class="state-action">Try again now · अभी फिर खोलें</span></article>
+              <article class="state-card expired"><span class="state-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><small>Expired</small><p class="state-hi" lang="hi">यह जानकारी पुरानी हो गई है</p><h3>This guide has expired</h3><p>Please ask your pharmacy for a new one.</p><p class="state-note">Pharmacy name and general medicine safety appear below on the deployed page.</p></article>
+              <article class="state-card revoked"><span class="state-icon"><svg aria-hidden="true"><use href="#i-ban"/></svg></span><small>Revoked</small><p class="state-hi" lang="hi">यह लिंक अब उपलब्ध नहीं है</p><h3>This link is no longer available</h3><p class="state-note">No pharmacy, reason, safety advice, or action is disclosed.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene" id="scene-9" data-title="Patient outcome" data-index="9">
+          <div class="scene-copy">
+            <span class="scene-number">Scene 09 · End state</span>
+            <h2>The patient leaves with four answers, not a dashboard.</h2>
+            <p class="scene-summary">The English experience is successful when the patient can find the next time and packet in seconds, then confirm amount, meal relation, and duration without decoding a table.</p>
+            <ul class="scene-facts">
+              <li><strong>Patient moment</strong><span>Returns to the same guide at the next dose or shows it to family.</span></li>
+              <li><strong>Interface move</strong><span>Preserves one reading path across simple and complex prescriptions.</span></li>
+              <li><strong>Local validation</strong><span>English wording, icons, and operational handoff still require field testing in Indian pharmacies.</span></li>
+            </ul>
+          </div>
+          <div class="scene-canvas dark" data-label="What the patient knows">
+            <div class="outcome-board">
+              <div class="outcome-head"><small>End of journey</small><h3>“I know what to do next.”</h3></div>
+              <div class="answer-grid">
+                <div class="answer"><span>1</span><strong>Which packet?</strong><p>Match the written packet number.</p></div>
+                <div class="answer"><span>2</span><strong>When?</strong><p>Follow Morning → Noon → Evening → Night.</p></div>
+                <div class="answer"><span>3</span><strong>How much?</strong><p>Read the number, unit, and dose picture together.</p></div>
+                <div class="answer"><span>4</span><strong>How safely?</strong><p>Check meal order, duration, and special limits.</p></div>
+              </div>
+              <div class="outcome-action"><p>Issue a demo prescription, open its QR link, then choose English to see the server-rendered poster and sharing controls.</p><a class="action-link" href="/rx/new"><svg aria-hidden="true"><use href="#i-phone"/></svg>Start a live demo</a></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="page-foot">
+    <div class="foot-inner"><div><strong>indoro English UX storyboard</strong><p>Prototype narrative · illustrative medicine data only · 10 July 2026</p></div><a href="#page-title">Back to top ↑</a></div>
+  </footer>
+
+  <script>
+    (function () {
+      var scenes = Array.prototype.slice.call(document.querySelectorAll('.scene'));
+      var links = Array.prototype.slice.call(document.querySelectorAll('.rail-list a'));
+      var now = document.getElementById('rail-now');
+      var fill = document.getElementById('progress-fill');
+      if (!('IntersectionObserver' in window) || !scenes.length) return;
+
+      function selectScene(scene) {
+        var index = Number(scene.getAttribute('data-index')) || 1;
+        var title = scene.getAttribute('data-title') || '';
+        now.textContent = String(index).padStart(2, '0') + ' · ' + title;
+        fill.style.width = ((index / scenes.length) * 100) + '%';
+        links.forEach(function (link, linkIndex) {
+          if (linkIndex === index - 1) link.setAttribute('aria-current', 'step');
+          else link.removeAttribute('aria-current');
+        });
+      }
+
+      var observer = new IntersectionObserver(function (entries) {
+        var visible = entries.filter(function (entry) { return entry.isIntersecting; });
+        if (!visible.length) return;
+        visible.sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+        selectScene(visible[0].target);
+      }, { rootMargin: '-20% 0px -50% 0px', threshold: [0, .15, .4, .7] });
+
+      scenes.forEach(function (scene) { observer.observe(scene); });
+    }());
+  </script>
+</body>
+</html>

@@ -236,16 +236,26 @@
           (dwErr ? '<span class="field-error">' + svgErr() + esc(dwErr.msg) + "</span>" : "") + "</div>";
       }
       if (p.schedule_type === "prn") {
+        var perUse = it.extra_params && it.extra_params.dose_per_use;
+        var doseErr = errFor(i, "extra_params.dose_per_use");
+        var maxErr = errFor(i, "prn_max_per_day");
+        var gapErr = errFor(i, "prn_min_gap_hours");
         h += '<div class="zone"><span class="field-label">PRN (only when needed)</span>' +
+          '<div class="qty-row" style="margin-bottom:10px;"><span class="t-supporting t-secondary">Dose each time <b>(required)</b></span>' +
+          '<div class="stepper"><button class="stepper-btn" type="button" data-act="prndose" data-d="-1" aria-label="decrease dose each time">−</button><output class="stepper-value">' + fmtN(perUse || 0) + '</output><button class="stepper-btn" type="button" data-act="prndose" data-d="1" aria-label="increase dose each time">+</button></div>' +
+          '<span class="t-supporting t-secondary">' + unitEn(it.dose_unit) + '</span></div>' +
+          (doseErr ? '<span class="field-error">' + svgErr() + esc(doseErr.msg) + "</span>" : "") +
           '<label class="field"><span class="field-help" style="margin:0 0 4px;">Reason</span>' +
           '<select class="input" data-in="prnreason"><option value=""' + (it.prn_reason_key ? "" : " selected") + ">Select reason…</option>" +
           Object.keys(I18N.prn_reasons).map(function (k) {
             return '<option value="' + k + '"' + (it.prn_reason_key === k ? " selected" : "") + ">" + I18N.prn_reasons[k].en + "</option>";
           }).join("") + "</select></label>" +
-          '<div class="qty-row" style="margin-top:10px;"><span class="t-supporting t-secondary">Max per day</span>' +
+          '<div class="qty-row" style="margin-top:10px;"><span class="t-supporting t-secondary">Max per day <b>(required)</b></span>' +
           '<div class="stepper"><button class="stepper-btn" type="button" data-act="prnmax" data-d="-1" aria-label="decrease max per day">−</button><output class="stepper-value">' + fmtN(it.prn_max_per_day || 0) + '</output><button class="stepper-btn" type="button" data-act="prnmax" data-d="1" aria-label="increase max per day">+</button></div>' +
-          '<span class="t-supporting t-secondary">Min gap</span>' +
-          '<div class="stepper"><button class="stepper-btn" type="button" data-act="prngap" data-d="-1" aria-label="decrease gap hours">−</button><output class="stepper-value">' + fmtN(it.prn_min_gap_hours || 0) + ' h</output><button class="stepper-btn" type="button" data-act="prngap" data-d="1" aria-label="increase gap hours">+</button></div></div></div>';
+          '<span class="t-supporting t-secondary">Min gap <b>(required)</b></span>' +
+          '<div class="stepper"><button class="stepper-btn" type="button" data-act="prngap" data-d="-1" aria-label="decrease gap hours">−</button><output class="stepper-value">' + fmtN(it.prn_min_gap_hours || 0) + ' h</output><button class="stepper-btn" type="button" data-act="prngap" data-d="1" aria-label="increase gap hours">+</button></div></div>' +
+          (maxErr ? '<span class="field-error">' + svgErr() + esc(maxErr.msg) + "</span>" : "") +
+          (gapErr ? '<span class="field-error">' + svgErr() + esc(gapErr.msg) + "</span>" : "") + "</div>";
       }
       if (it.pattern_key === "CUSTOM") {
         var xp = it.extra_params || {};
@@ -269,7 +279,7 @@
       var qtyUnit = unitEn(it.dose_unit);
 
       /* 필드 인라인로 못 붙인 잔여 에러(서버 422의 임의 path 포함) — 카드 상단에 나열 */
-      var known = ["drug_name_raw", "extra_params.day_of_week", "extra_params.instructions", "extra_params.verbal_counseling_given"];
+      var known = ["drug_name_raw", "extra_params.day_of_week", "extra_params.dose_per_use", "extra_params.instructions", "extra_params.verbal_counseling_given"];
       var rest = errsFor(i).filter(function (e) {
         return known.indexOf(e.path.slice(("items." + i + ".").length)) < 0;
       });
@@ -422,6 +432,8 @@
       if (p.schedule_type === "once") it.duration_days = 1;
       if (p.schedule_type === "weekly") {
         if (!(it.extra_params && "day_of_week" in it.extra_params)) it.extra_params = { day_of_week: null };
+      } else if (k === "PRN") {
+        it.extra_params = { dose_per_use: null };
       } else if (k === "CUSTOM") {
         if (!(it.extra_params && "instructions" in it.extra_params)) it.extra_params = { instructions: "", verbal_counseling_given: false };
       } else {
@@ -461,6 +473,12 @@
           if (!(it.extra_params && it.extra_params.day_of_week)) errs.push({ path: pre + "extra_params.day_of_week", msg: "Pick a day of week" });
           if (it.duration_days == null) errs.push({ path: pre + "duration_days", msg: "Set duration" });
         }
+        if (p.schedule_type === "prn") {
+          var dosePerUse = it.extra_params && it.extra_params.dose_per_use;
+          if (!(typeof dosePerUse === "number" && dosePerUse > 0)) errs.push({ path: pre + "extra_params.dose_per_use", msg: "Set the dose for each use" });
+          if (!(typeof it.prn_max_per_day === "number" && it.prn_max_per_day > 0)) errs.push({ path: pre + "prn_max_per_day", msg: "Set the maximum uses per day" });
+          if (!(typeof it.prn_min_gap_hours === "number" && it.prn_min_gap_hours > 0)) errs.push({ path: pre + "prn_min_gap_hours", msg: "Set the minimum gap in hours" });
+        }
         if (it.pattern_key === "CUSTOM") {
           var xp = it.extra_params || {};
           if (!(xp.instructions || "").trim()) errs.push({ path: pre + "extra_params.instructions", msg: "Instructions are required" });
@@ -499,7 +517,9 @@
       }
       if (p.schedule_type === "once") parts[0] += " · single dose";
       if (p.schedule_type === "prn") {
-        parts[0] = "SOS" + (it.prn_reason_key ? " (" + I18N.prn_reasons[it.prn_reason_key].en + ")" : "") +
+        var perUse = it.extra_params && it.extra_params.dose_per_use;
+        parts[0] = "SOS" + (perUse ? " · " + fmtN(perUse) + " " + u + "/use" : " · dose missing") +
+          (it.prn_reason_key ? " (" + I18N.prn_reasons[it.prn_reason_key].en + ")" : "") +
           (it.prn_max_per_day ? " · max " + fmtN(it.prn_max_per_day) + "/day" : "") +
           (it.prn_min_gap_hours ? " · gap " + fmtN(it.prn_min_gap_hours) + " h" : "");
       }
@@ -593,7 +613,7 @@
         return r.json().then(function (j) { return { status: r.status, body: j }; });
       }).then(function (res) {
         if (res.status === 201 || res.status === 200) {              /* 200 = 멱등 replay(동일 token) */
-          location.href = "/rx/" + encodeURIComponent(res.body.id) + "/qr";
+          location.href = "/rx/" + encodeURIComponent(res.body.id) + "/qr?from=issue";
           return;
         }
         setIssuing(false);
@@ -691,6 +711,13 @@
           break;
         case "prnmax": if (it) { it.prn_max_per_day = Math.max(0, Math.min(12, (it.prn_max_per_day || 0) + parseInt(btn.getAttribute("data-d"), 10))); renderItems(); } break;
         case "prngap": if (it) { it.prn_min_gap_hours = Math.max(0, Math.min(24, (it.prn_min_gap_hours || 0) + parseInt(btn.getAttribute("data-d"), 10))); renderItems(); } break;
+        case "prndose":
+          if (it) {
+            it.extra_params = it.extra_params || {};
+            it.extra_params.dose_per_use = Math.max(0, Math.min(10, (it.extra_params.dose_per_use || 0) + 0.5 * parseInt(btn.getAttribute("data-d"), 10)));
+            renderItems();
+          }
+          break;
         case "note-open": if (it) { it._noteOpen = true; renderItems(); } break;
         case "add":                                                  /* 직전 카드 접힘 + duration 승계 */
           if (M.items.length < 10) {
@@ -775,6 +802,12 @@
      ========================================================== */
   function initQr() {
     var pid = BOOT.prescription_id;
+    var query = new URLSearchParams(location.search);
+    var initialIssue = query.get("from") === "issue";
+    if (initialIssue) {
+      query.delete("from");
+      history.replaceState(null, "", location.pathname + (query.toString() ? "?" + query.toString() : "") + location.hash);
+    }
 
     function qrSvg(url) {
       /* ECC Q(인쇄 스펙 §2.1 — 봉투 부착 후 접힘·오염 내성) 단일 렌더 · quiet zone 4모듈 · 타입 자동 */
@@ -849,6 +882,16 @@
         .then(function (r) {
           if (!r.ok) throw new Error(r.status === 404 ? "Prescription not found (or another pharmacy's)." : "Server error (" + r.status + ").");
           return r.json();
+        })
+        .then(function (bundle) {
+          /* QR 재표시는 분모(rx.created)를 건드리지 않고 별도 이벤트로 기록한다.
+             이 보조 호출 실패는 이미 받은 QR 화면을 막지 않는다. */
+          if (!initialIssue) {
+            fetch("/api/prescriptions/" + encodeURIComponent(pid) + "/qr", {
+              headers: { "X-Pharmacy-Id": pharmacyId() }
+            }).catch(function () {});
+          }
+          return bundle;
         })
         .then(render)
         .catch(function (e) { fail(e.message || "Could not load."); });

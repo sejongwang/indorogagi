@@ -217,6 +217,15 @@ def init_db(db_path: str | Path | None = None) -> None:
     conn = get_conn(db_path)
     try:
         conn.executescript(SCHEMA_SQL)
+        # 2026-07: OD_NIGHT의 설정 계약을 저녁(E)에서 밤(H)으로 바로잡았다.
+        # 구 데이터 중 H가 비어 있고 E만 있는 명백한 레거시 행만 이동한다. E/H가
+        # 모두 채워진 모호한 수기 데이터는 임상 의미를 추측하지 않고 그대로 둔다.
+        conn.execute(
+            "UPDATE prescription_items "
+            "SET dose_night=dose_evening, dose_evening=0 "
+            "WHERE pattern_key='OD_NIGHT' "
+            "AND dose_night=0 AND dose_evening>0"
+        )
         conn.commit()
     finally:
         conn.close()

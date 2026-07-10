@@ -58,6 +58,21 @@ ui:
     application: { hi: "लगाएं", en: "apply" }
   s1:
     from_pharmacy: { hi: "दवा दुकान से मिली जानकारी", en: "From your pharmacy" }
+    poster_kicker: { hi: "आज की दवा", en: "TODAY'S MEDICINES" }
+    poster_title: { hi: "आज दवा ऐसे लें", en: "Take today's medicines in this order" }
+    poster_sub: { hi: "सुबह से रात तक ऊपर से नीचे देखें", en: "Follow from morning to night, top to bottom" }
+    at_a_glance: { hi: "एक नज़र में", en: "At a glance" }
+    language_label: { hi: "भाषा चुनें", en: "Choose language" }
+    daily_order_label: { hi: "सुबह से रात तक दवा का क्रम", en: "Medicine order from morning to night" }
+    today_schedule: { hi: "आज कब और कितनी दवा", en: "When and how much to take today" }
+    packet: { hi: "पुड़िया", en: "Packet" }
+    no_medicine: { hi: "इस समय कोई दवा नहीं लिखी है", en: "No medicine listed at this time" }
+    special_title: { hi: "अलग समय या ज़रूरत पर", en: "Special or only when needed" }
+    details_title: { hi: "हर दवा की पूरी जानकारी", en: "Full medicine details" }
+    details_sub: { hi: "ज़रूरत हो तो दवा का नंबर दबाकर खोलें", en: "Open a packet number if you need more detail" }
+    open_details: { hi: "पूरी जानकारी", en: "Details" }
+    duration: { hi: "कितने दिन", en: "Duration" }
+    measure_ml: { hi: "निशान वाले कप या सिरिंज से नापें", en: "Measure with a marked cup or oral syringe" }
     issued: { hi: "{date} को बनी (IST)", en: "Issued {date} (IST)" }
     valid_till: { hi: "{date} तक चलेगी", en: "Valid till {date}" }
     days: { hi: "दिन", en: "days" }
@@ -80,6 +95,8 @@ ui:
     prn_times: { hi: "बार", en: "times a day" }
     prn_gap: { hi: "दो बार के बीच कम से कम", en: "Gap of at least" }
     prn_hours: { hi: "घंटे", en: "hours" }
+    prn_dose_missing: { hi: "एक बार में कितनी दवा लेनी है, दवा दुकान से पूछें", en: "Ask the pharmacy how much to take each time" }
+    prn_limits_missing: { hi: "दिन की अधिकतम सीमा या दो खुराकों का अंतर नहीं लिखा है — दवा दुकान से पूछें", en: "The daily maximum or minimum gap is missing — ask the pharmacy before taking it" }
     custom_head: { hi: "ख़ास तरीक़ा — दुकानदार की बताई विधि से ही लें", en: "Special directions — take exactly as the pharmacist explained" }
     each_time: { hi: "हर बार", en: "Each time" }
     total: { hi: "कुल", en: "Total" }
@@ -96,7 +113,7 @@ ui:
       custom: { hi: "विशेष", en: "special" }
     screenshot: { hi: "स्क्रीनशॉट लेकर रखें", en: "Take a screenshot and keep it" }
     screenshot_sub: { hi: "बिना इंटरनेट भी दिखेगा", en: "Works without internet too" }
-    dpdp: { hi: "यह जानकारी सिर्फ़ दवा समझाने के लिए है — नाम-पता नहीं लिया जाता", en: "This page only explains your medicines — no name or address is collected" }
+    dpdp: { hi: "QR लिंक में नाम या पता नहीं लिखा है — इसे केवल भरोसेमंद व्यक्ति को भेजें", en: "The QR link does not contain a name or address — share it only with someone you trust" }
     privacy: { hi: "गोपनीयता — और जानें", en: "Privacy — learn more" }
     ask_pharmacy: { hi: "सवाल हो तो दुकान से पूछें:", en: "Questions? Ask your pharmacy:" }
     try_later: { hi: "फिर बाद में", en: "Try again later" }
@@ -104,12 +121,15 @@ ui:
     title: { hi: "जानकारी तैयार हो रही है", en: "Your guide is being prepared" }
     body: { hi: "थोड़ी देर में यह पेज अपने आप फिर खुलेगा", en: "This page will try again in a moment" }
     ask: { hi: "अगर फिर भी न खुले तो दवा दुकान से पूछें", en: "If it still does not open, ask your pharmacy" }
+    retry: { hi: "अभी फिर खोलें", en: "Try again now" }
   gone: # 410(만료·회수) + /c 코드 불일치 — hi/en 병기 문법
     expired_title: { hi: "यह जानकारी पुरानी हो गई है", en: "This guide has expired" }
     expired_body: { hi: "नई जानकारी के लिए दवा दुकान से पूछें", en: "Please ask your pharmacy for a new one" }
     revoked_title: { hi: "यह लिंक अब उपलब्ध नहीं है", en: "This link is no longer available" }
     code_miss_title: { hi: "कोड नहीं मिला", en: "Code not found" }
     code_miss_body: { hi: "कोड फिर से जांचकर दोबारा डालें", en: "Check the code and try again" }
+    code_label: { hi: "कोड", en: "Code" }
+    code_submit: { hi: "फिर खोलें", en: "Open again" }
     safety_title: { hi: "दवा की सामान्य हिदायतें", en: "General medicine safety" }
     safety:
       - { hi: "पुरानी दवा अपने मन से दोबारा शुरू न करें", en: "Do not restart old medicines on your own" }
@@ -121,3 +141,13 @@ ui:
     body: { hi: "पर्ची या पुड़िया पर लिखा कोड यहाँ डालें", en: "Enter the code printed on your slip or packet" }
     label: { hi: "कोड", en: "Code" }
     submit: { hi: "खोलें", en: "Open" }
+  privacy:
+    title: { hi: "आपकी जानकारी और गोपनीयता", en: "Your information and privacy" }
+    intro: { hi: "यह पेज केवल आपकी दवा समझाने के लिए है।", en: "This page is only for explaining your medicines." }
+    stores_title: { hi: "क्या रखा जाता है", en: "What is stored" }
+    stores_body: { hi: "दवा की जानकारी, वैकल्पिक पहचान, दवा दुकान, जारी करने और खोलने का समय रखा जाता है। QR लिंक में आपका नाम, पता या दवा का नाम नहीं लिखा होता।", en: "Medicine instructions, an optional patient label, pharmacy, issue time, and page-open events are stored. Your name, address, and medicine names are not placed in the QR URL." }
+    sharing_title: { hi: "परिवार को भेजना", en: "Sharing with family" }
+    sharing_body: { hi: "WhatsApp या कॉपी किया गया लिंक जिसे मिलेगा, वह यह दवा पेज खोल सकता है। केवल भरोसेमंद व्यक्ति को भेजें।", en: "Anyone who receives the WhatsApp or copied link can open this medicine page. Share it only with someone you trust." }
+    help_title: { hi: "मदद या हटाने के लिए", en: "Help or removal" }
+    help_body: { hi: "लिंक बंद कराने या सवाल पूछने के लिए पर्ची वाली दवा दुकान से संपर्क करें।", en: "Contact the pharmacy on your slip to disable the link or ask a question." }
+    back: { hi: "वापस", en: "Back" }

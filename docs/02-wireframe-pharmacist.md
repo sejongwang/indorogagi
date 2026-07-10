@@ -108,7 +108,7 @@ flowchart TD
 | 식전후 칩 | `timing_food` | `before_food/after_food/with_food/empty_stomach` + "미지정"(NULL). 패턴과 독립 축(D14), 자동완성 시 프리필 |
 | 기간 | `duration_days` | 빈도 칩 3/5/7/10/15/30 + 스테퍼. 첫 항목은 기본값 없음(오입력 방지 > 탭 1회 절약), **2번째 항목부터 직전 값 승계** |
 | 총량 뱃지 | `total_quantity` | Σ슬롯×일수 자동 산출, 탭 시 수정(서버는 경고만 — §3.3) |
-| 패턴 가변 영역 | `extra_params_json` / `prn_*` | WEEKLY_ONCE → 요일 칩 7(`day_of_week` 필수) · PRN → `prn_reason_key` 셀렉트 + `prn_max_per_day`·`prn_min_gap_hours` 스테퍼 · STAT_SINGLE → 1회분만, 기간 비활성 · CUSTOM → `instructions` textarea + **"구두로 설명했습니다" 체크 필수**(`verbal_counseling_given`) + "환자 화면엔 영상 대신 주의 카드" 고지(§3.4) |
+| 패턴 가변 영역 | `extra_params_json` / `prn_*` | WEEKLY_ONCE → 요일 칩 7(`day_of_week` 필수) · PRN → **1회량 `dose_per_use` 필수 스테퍼** + `prn_reason_key` 셀렉트 + `prn_max_per_day`·`prn_min_gap_hours` 스테퍼 · STAT_SINGLE → 1회분만, 기간 비활성 · CUSTOM → `instructions` textarea + **"구두로 설명했습니다" 체크 필수**(`verbal_counseling_given`) + "환자 화면엔 영상 대신 주의 카드" 고지(§3.4) |
 | 메모(선택) | `prescription_items.note` | 기본 접힘 |
 
 *(c) "약 추가" 버튼 · (d) 하단 고정 바*: 추가 시 새 카드(`position`+1), 직전 카드는 **1행 요약으로 접힘**(약명 · 1-0-1 · 식후 · 5일) — 탭으로 재확장. 하단 바 = 항목 수 + "확인하고 발급" + G2 연결 상태 점.
@@ -156,7 +156,7 @@ flowchart TD
 
 ## 5. P3 발급 완료·QR 표시
 
-**목적**: 발급된 링크를 환자 손에 물리적으로 옮기는 화면 — 최초 발급과 재표시(P5 경유) 겸용.
+**목적**: 발급된 링크를 환자 손에 물리적으로 옮기는 화면 — 최초 발급과 재표시(P5 경유) 겸용. 최초 발급 이동의 일회성 `?from=issue`는 주소에서 즉시 제거하고 `qr.redisplayed`를 남기지 않으며, 이후 직접 재방문·새로고침만 재표시로 센다.
 
 **핵심 요소와 바인딩**
 

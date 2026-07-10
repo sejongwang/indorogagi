@@ -156,6 +156,14 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
         if schedule_type == "weekly":
             if not extra or extra.get("day_of_week") not in days:
                 return _verr(f"{p}.extra_params.day_of_week", "required for weekly pattern")
+        if schedule_type == "prn":
+            dose_per_use = (extra or {}).get("dose_per_use")
+            if not _is_num(dose_per_use) or dose_per_use <= 0:
+                return _verr(f"{p}.extra_params.dose_per_use", "required number > 0 for PRN")
+            for prn_field in ("prn_max_per_day", "prn_min_gap_hours"):
+                pv = item.get(prn_field)
+                if not _is_num(pv) or pv <= 0:
+                    return _verr(f"{p}.{prn_field}", "required number > 0 for PRN")
         # §4.3: CUSTOM은 instructions + verbal_counseling_given=true 필수
         if schedule_type == "custom":
             instructions = (extra or {}).get("instructions")
@@ -163,7 +171,8 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
                 return _verr(f"{p}.extra_params.instructions", "required for CUSTOM")
             if (extra or {}).get("verbal_counseling_given") is not True:
                 return _verr(f"{p}.extra_params.verbal_counseling_given", "must be true for CUSTOM")
-        # §4.3: prn은 상한 '권장' — 검증 실패 사유로 삼지 않는다(형식만 확인)
+        # PRN 외 일정에 잔존 값이 있어도 잘못된 숫자는 받지 않는다.
+        # PRN의 상한·최소 간격은 위에서 필수로 검증된다.
         for prn_field in ("prn_max_per_day", "prn_min_gap_hours"):
             pv = item.get(prn_field)
             if pv is not None and (not _is_num(pv) or pv <= 0):

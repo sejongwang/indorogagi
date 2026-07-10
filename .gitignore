@@ -14,3 +14,6 @@ server/var/
 # 에디터/OS 잡파일
 *.swp
 Thumbs.db
+
+# 로컬 브라우저 세션 기록(최종 검토 캡처는 output/playwright/에 보존)
+.playwright-cli/

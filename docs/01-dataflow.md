@@ -199,6 +199,8 @@ sequenceDiagram
     Pt->>API: 구 링크 → 410 안내 페이지(사유 미표기)
 ```
 
+최초 발급 성공 이동은 `/rx/{id}/qr?from=issue`를 사용한다. QR 화면은 이 일회성 표지를 즉시 `history.replaceState`로 지우고 재표시 API를 부르지 않는다. 이후 직접 재방문·새로고침에서만 `GET /api/prescriptions/{id}/qr`를 호출해 `qr.redisplayed`를 기록하므로 최초 표시가 "다시 보기" 지표에 섞이지 않는다.
+
 ### 2.5 QR 스캔 실패 사다리 (재규정)
 
 전제 보정: "Android 9+ 기본 카메라 스캔" 가정은 타깃층에서 과대평가다 — JioPhone(KaiOS, 카메라 QR 미지원) 수천만 대, QR 인식 없는 구형/저가 Android(Lens 미설치 포함)가 상당 비율 존재한다. **스캔 불가 단말 비율 자체가 M1 실측 대상**이다.
@@ -273,7 +275,7 @@ erDiagram
 **prescription_items** — M/N/E/H 4슬롯 분해 저장(3슬롯 관행 "1-0-1" + QID·HS를 스키마 변경 없이 커버). `drug_name_raw`가 **진실의 원천**, `drug_id`는 장식(enrichment). `timing_food` 독립 축(D14): `before_food|after_food|with_food|empty_stomach|NULL`. `total_quantity`는 Σ슬롯×일수 자동 산출 후 약사 수정 허용(서버는 경고만).
 
 - **`dose_unit` enum(설정 데이터로 확정)**: `tablet, capsule, ml, drop, puff, sachet, application` 7종 + i18n `unit.*` 키 + 아이콘 asset_key를 시드에 포함. 시럽은 REAL 슬롯 값을 활용해 `doses: {M:5, E:5}, dose_unit:"ml"`처럼 표현하고(계량컵/스푼 아이콘 병행), 검증 규칙에 "`dose_unit=ml`이면 `total_quantity` 단위도 ml(병 아님)"을 명시. **tablet 하드코딩 금지** — 시럽이 '1 गोली'로 렌더되는 것은 안전 사고다.
-- `extra_params_json`이 패턴 고유 파라미터 슬롯(`{"day_of_week":"sun"}`, CUSTOM의 `{"instructions":"...","verbal_counseling_given":true}`) — 새 패턴이 새 컬럼을 요구하지 않게 하는 확장 지점.
+- `extra_params_json`이 패턴 고유 파라미터 슬롯(`{"day_of_week":"sun"}`, PRN의 `{"dose_per_use":1}`, CUSTOM의 `{"instructions":"...","verbal_counseling_given":true}`) — 새 패턴이 새 컬럼을 요구하지 않게 하는 확장 지점.
 - **웹뷰 카드 대조 수단**: 각 item 카드는 `position` 번호를 **색+숫자 이중 부호화**(1=파랑, 2=주황…)로 크게 표시한다. 인도 조제 관행상 라벨 없는 종이봉투·절단 스트립이 흔하고 저문해 환자는 문자열 대조가 불가하므로, 약사가 조제 시 각 봉투에 같은 번호를 유성펜으로 기입하는 절차(§2.1)와 짝을 이룬다. 이 절차는 파일럿 서면 합의·교육 자료에 명시(§10-10).
 
 **drugs** — 유일한 "설정성 DB 테이블"(런타임 쓰기 = 승격 루프가 있으므로 DB 잔류). 시드 픽스처 5~10종(**코어 8패턴 + CUSTOM 예시** 커버). `source: seed|pharmacy|curated`, `default_pattern_key` 등 프리필이 자동완성의 가치. 승격 루프: `SELECT lower(trim(drug_name_raw)), count(*) FROM prescription_items WHERE drug_id IS NULL GROUP BY 1 ORDER BY 2 DESC` — 인도 체류 중 매일 밤 상위부터 등록. 소급 매칭해도 표시 문자열은 raw라 환자 화면 불변.
@@ -299,7 +301,7 @@ erDiagram
 | key | schedule_type | slots | 파생 표기 | 시드 약 예 |
 |---|---|---|---|---|
 | OD_MORNING | daily | M | 1-0-0 | Amlodipine 5 |
-| OD_NIGHT | daily | E | 0-0-1 | Atorvastatin 10 |
+| OD_NIGHT | daily | H | 0-0-0-1 | Atorvastatin 10 |
 | BD | daily | M,E | 1-0-1 | Amoxicillin 500 |
 | TDS | daily | M,N,E | 1-1-1 | Dolo 650 |
 | QID | daily | M,N,E,H | 1-1-1-1 | 시럽 항생제(ml) |
@@ -309,6 +311,8 @@ erDiagram
 | CUSTOM | custom | — | 자유 지시문 | (테이퍼링 등) |
 
 CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영상 대신 주의 카드(경고 아이콘 + "약사의 설명을 따르세요" hi/en + 원문) — 잘못된 패턴 영상 노출이 무영상보다 위험하다. **CUSTOM 비율은 M1 핵심 지표**(임계 15% 초과 = 8패턴 가설 수정 신호), 원문은 차기 패턴 후보 발굴 데이터.
+
+`OD_NIGHT`의 초기 E(저녁) 시드와 H(밤) 라벨 불일치는 2026-07-10에 H로 통일했다. 서버 기동 시 H=0이고 E>0인 명백한 구 `OD_NIGHT` 행만 E→H로 옮기는 멱등 마이그레이션을 실행하며, E와 H가 모두 채워진 모호한 행은 현지 확인 없이 변경하지 않는다.
 
 ### 3.5 언어 협상 우선순위
 
@@ -395,7 +399,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 | `GET /api/prescriptions/{id}` | 상세 + 열람 현황 + **미리보기 렌더**(staff 쿠키와 무관한 내부 경로 — §6.3-4) | 약사 |
 | `PUT /api/prescriptions/{id}` | 수정 = 버전 업 (토큰 불변, D4) | 약사 |
 | `POST /api/prescriptions/{id}/reissue` | 폐기 후 신규 처방·신규 토큰 (구 토큰 410, D5) | 약사 |
-| `GET /api/prescriptions/{id}/qr` | 재표시용 url 반환(qr_svg 없음 — 클라 렌더, D18) + `qr.redisplayed` 계측 | 약사 |
+| `GET /api/prescriptions/{id}/qr` | 재방문용 url 반환(qr_svg 없음 — 클라 렌더, D18) + `qr.redisplayed` 계측. `?from=issue` 최초 화면은 호출하지 않음 | 약사 |
 | `POST /api/prescriptions/{id}/scan-failure` | 스캔 실패 사유 원탭 기록 → `events[scan.failed]` | 약사 |
 | `GET /api/drugs?q=` | 약명 자동완성 — naive `lower()` LIKE, 인덱스·캐시 헤더 없음(시드 수십 행) | 약사 |
 | `GET /api/patterns` | 패턴 정의 단일 소스(patterns.yaml + i18n + 자산 키 병합, ETag=파일 해시). **폼 버튼도 이 응답으로 렌더 — 클라 하드코딩 금지** | 약사·서버 |
@@ -442,7 +446,7 @@ CUSTOM은 제출 전 "구두로 설명했습니다" 체크 필수, 웹뷰는 영
 }
 ```
 
-검증: `pattern_key`는 patterns.yaml 활성 항목에 존재해야 하며, `slots` 밖 슬롯 dose는 0, `daily`는 슬롯 합>0, `prn`은 상한 권장, `weekly/once`는 `extra_params` 필수 키, CUSTOM은 `instructions` + `verbal_counseling_given=true` 필수, `dose_unit`은 enum 7종. `drug_id`는 존재 검증만, 실패해도 무시(자유 텍스트가 항상 유효 경로). `total_quantity` 불일치는 경고만. **검증 로직 자체가 패턴 설정 파일을 읽는다** — 패턴 추가가 코드 수정이 되지 않게.
+검증: `pattern_key`는 patterns.yaml 활성 항목에 존재해야 하며, `slots` 밖 슬롯 dose는 0, `daily`는 슬롯 합>0, PRN은 `extra_params.dose_per_use>0`, `prn_max_per_day>0`, `prn_min_gap_hours>0` 전부 필수, weekly는 `day_of_week` 필수, CUSTOM은 `instructions` + `verbal_counseling_given=true` 필수, `dose_unit`은 enum 7종. `drug_id`는 존재 검증만, 실패해도 무시(자유 텍스트가 항상 유효 경로). `total_quantity` 불일치는 경고만. **검증 로직 자체가 패턴 설정 파일을 읽는다** — 패턴 추가가 코드 수정이 되지 않게.
 
 **201 응답** (멱등 replay는 200 + `"replayed": true`, 동일 token — 재시도가 새 토큰을 만들면 환자에게 링크가 두 개 생긴다):
 
@@ -654,7 +658,7 @@ service worker app-shell은 v0 미도입 — "오프라인 상태에서 폼을 *
 
 ### 7.3 오프라인 재열람
 
-HTTP 캐시만으론 오프라인 내비게이션 비보장, 환자측 service worker는 인앱 브라우저 파편화로 v0 범위 밖. 대응: ① "화면을 캡처해 보관하세요" 유도 카드(hi/en) — 스크린샷이 저사양 환경의 사실상 표준 오프라인 사본, ② 공유 메시지에 링크+핵심 요약 텍스트(약명, "아침1-점심0-저녁1", 기간) 동봉 — 메시지 자체가 오프라인 사본, ③ HTML no-cache+ETag(304는 2G에서도 싸다).
+HTTP 캐시만으론 오프라인 내비게이션 비보장, 환자측 service worker는 인앱 브라우저 파편화로 v0 범위 밖. 대응: ① "화면을 캡처해 보관하세요" 유도 카드(hi/en) — 스크린샷이 저사양 환경의 사실상 표준 오프라인 사본, ② WhatsApp 공유 URL에는 약명·용법을 넣지 않고 불투명 토큰 링크만 동봉(§8의 공유 문구 제외 원칙), ③ HTML no-cache+ETag(304는 2G에서도 싸다).
 
 ### 7.4 위험도 요약
 
