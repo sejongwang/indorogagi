@@ -12,6 +12,8 @@
     "source_url": "data/catalog/indoro-synthetic-demo-v1.json",
     "input_uri": "data/catalog/indoro-synthetic-demo-v1.json",
     "version": "1.0.0",
+    "snapshot_mode": "delta",
+    "package_schema_version": "2",
     "published_at": "2026-07-10",
     "source_updated_at": "2026-07-10",
     "legal_review_required": false,

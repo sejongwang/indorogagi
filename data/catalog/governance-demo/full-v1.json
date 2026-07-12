@@ -1,0 +1,91 @@
+{
+  "source": {
+    "slug": "indoro-governance-synthetic-demo",
+    "name": "indoro governance synthetic demo",
+    "operator": "indoro test suite",
+    "tier": 3,
+    "usage_scope": "demo",
+    "reuse_status": "demo_only",
+    "version": "1.0.0",
+    "snapshot_mode": "full",
+    "package_schema_version": "2",
+    "source_url": "https://example.invalid/indoro-synthetic-governance-demo",
+    "input_uri": "data/catalog/governance-demo/full-v1.json"
+  },
+  "records": [
+    {
+      "source_record_id": "gov-complete-001",
+      "brand_name": "DEMO Clearleaf 10",
+      "generic_name": "Invented Clearleaf Ingredient",
+      "ingredients": [{"name": "Invented Clearleaf Ingredient", "strength": "10 mg"}],
+      "strength": "10 mg",
+      "form": "tablet",
+      "route": "oral",
+      "manufacturer": "Synthetic Demo Manufacturer",
+      "review_status": "verified"
+    },
+    {
+      "source_record_id": "gov-missing-ingredient-002",
+      "brand_name": "DEMO Blankroot 25",
+      "strength": "25 mg",
+      "form": "tablet",
+      "route": "oral"
+    },
+    {
+      "source_record_id": "gov-missing-strength-003",
+      "brand_name": "DEMO Measureless",
+      "generic_name": "Invented Measureless Ingredient",
+      "ingredients": [{"name": "Invented Measureless Ingredient"}],
+      "form": "capsule",
+      "route": "oral"
+    },
+    {
+      "source_record_id": "gov-drop-route-004",
+      "brand_name": "DEMO Routecheck Drops",
+      "generic_name": "Invented Routecheck Ingredient",
+      "ingredients": [{"name": "Invented Routecheck Ingredient", "strength": "0.5%"}],
+      "strength": "0.5%",
+      "form": "drops"
+    },
+    {
+      "source_record_id": "gov-similar-005",
+      "brand_name": "DEMO Cardiwell 5",
+      "generic_name": "Invented Alpha Ingredient",
+      "ingredients": [{"name": "Invented Alpha Ingredient", "strength": "5 mg"}],
+      "strength": "5 mg",
+      "form": "tablet",
+      "route": "oral"
+    },
+    {
+      "source_record_id": "gov-similar-006",
+      "brand_name": "DEMO Cardiwel 50",
+      "generic_name": "Invented Beta Ingredient",
+      "ingredients": [{"name": "Invented Beta Ingredient", "strength": "50 mg"}],
+      "strength": "50 mg",
+      "form": "tablet",
+      "route": "oral"
+    },
+    {
+      "source_record_id": "gov-inactive-007",
+      "brand_name": "DEMO Dormant Product",
+      "generic_name": "Invented Dormant Ingredient",
+      "ingredients": [{"name": "Invented Dormant Ingredient", "strength": "2 mg"}],
+      "strength": "2 mg",
+      "form": "tablet",
+      "route": "oral",
+      "status": "inactive"
+    },
+    {
+      "source_record_id": "gov-retire-me-008",
+      "brand_name": "DEMO Earlier Snapshot Only Product With A Deliberately Long Distinguishing Name",
+      "generic_name": "Invented Retirement Candidate Ingredient Combination Alpha Plus Beta",
+      "ingredients": [
+        {"name": "Invented Retirement Candidate Ingredient Alpha", "strength": "1 mg"},
+        {"name": "Invented Retirement Candidate Ingredient Beta", "strength": "2 mg"}
+      ],
+      "strength": "1 mg + 2 mg",
+      "form": "tablet",
+      "route": "oral"
+    }
+  ]
+}

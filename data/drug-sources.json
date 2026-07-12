@@ -13,7 +13,7 @@
       "approved_at": "2026-07-10",
       "approved_by_role": "indoro data governance review",
         "records_sha256": "e06801716c56985d4a3d57d4c9c188b85aee95dbbde518861521dc23668a5ad7",
-        "source_metadata_sha256": "4e1071bd22371769e085a49f60559b11b2cf8483e2a9323df25674c8e45b330c",
+        "source_metadata_sha256": "2fb45152122f310af85980adb60d81d3172a0d65b7974a9473bc73b265d44d69",
       "scope_note": "Approval covers only the 11 NPPA-authored formulation records in the pinned package. It does not approve inferred brands, manufacturers, regimens, substitutions, or third-party fields."
     }
   },

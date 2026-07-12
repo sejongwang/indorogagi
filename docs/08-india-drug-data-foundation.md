@@ -18,6 +18,9 @@ indoro는 **성분 온톨로지 전체**나 **온라인 약국 상품 DB 복제�
 5. 처방에는 약사가 본 원문과 선택 당시 카탈로그 스냅샷을 보존한다. 환자 화면은 이후 바뀔 수 있는 실시간 카탈로그가 아니라 발급 당시 약사가 확인한 표시명을 사용한다.
 6. 인도 정부가 공개한 자료라는 사실만으로 상업적 재사용이 허용된다고 간주하지 않는다. 파일별 라이선스가 명확하지 않으면 Tier 2로 두고 현지 법무 검토 전에는 운영 임포트를 막는다.
 7. production 패키지는 스스로 `approved`라고 선언할 수 없다. 별도 로컬 승인 레지스트리의 exact slug, records SHA-256, source metadata SHA-256, 승인일·승인 역할이 모두 일치해야 한다.
+8. source가 계산한 `review_status`/`lifecycle_status`와 사람이 결정한 `workflow_review_status`/`operational_lifecycle_status`를 분리한다. source 품질이 `verified`여도 약사 승인 이력이 없으면 자동으로 `approved`가 되지 않는다.
+9. 사람의 승인·반려·비활성화·복구·retirement 결정은 presentation 현재 상태와 append-only 감사 행을 같은 transaction에서 기록하고, `record_version`으로 동시 검토 덮어쓰기를 막는다.
+10. `snapshot_mode=full`에서 빠진 원본 ID는 즉시 삭제·비활성화하지 않는다. 이전 성공 full snapshot과 비교해 retirement batch/candidate만 제안하고, 사람의 후보 결정 → batch 승인 → 별도 apply 뒤에만 `retired`로 바꾼다.
 
 ## 1. 정보 요구사항
 
@@ -157,7 +160,7 @@ Tier는 기관 전체가 아니라 **개별 자료**에 부여한다. 같은 기
 
 임포트 실행은 당시 source, license, approval registry entry와 각 해시를 snapshot으로 보존한다. 따라서 나중에 source row가 수정되더라도 처방 발급 시 사용한 import run의 근거를 복원할 수 있다. Tier 2를 production으로 쓰려면 레지스트리에 현지 법무 승인 범위와 고정 해시를 새로 기록해야 하며, Tier 숫자만 바꾸는 것은 승인 절차가 아니다.
 
-현재 승인 entry는 `nppa-antidiabetes-formulations-2026-03`의 records SHA-256 `e06801716c56985d4a3d57d4c9c188b85aee95dbbde518861521dc23668a5ad7`, source metadata SHA-256 `4e1071bd22371769e085a49f60559b11b2cf8483e2a9323df25674c8e45b330c`를 고정한다. source metadata 해시에는 `accessed_at`, 원본 artifact manifest·SHA-256·byte 수, 변환 방식이 포함된다. 원본 NPPA PDF 자체는 SHA-256 `fd23814ae3a0009a0d8d6e14d079ff3e72605edfae6041e3529ccd988f311e62`(401,697 bytes)로 고정한다. 이 값은 데이터의 의학적 승인이 아니라 현재 파일·출처 메타데이터에 대한 import 허가 식별자다.
+현재 승인 entry는 `nppa-antidiabetes-formulations-2026-03`의 records SHA-256 `e06801716c56985d4a3d57d4c9c188b85aee95dbbde518861521dc23668a5ad7`, source metadata SHA-256 `2fb45152122f310af85980adb60d81d3172a0d65b7974a9473bc73b265d44d69`를 고정한다. source metadata 해시에는 `accessed_at`, 원본 artifact manifest·SHA-256·byte 수, 변환 방식, `snapshot_mode`, `package_schema_version`이 포함된다. 원본 NPPA PDF 자체는 SHA-256 `fd23814ae3a0009a0d8d6e14d079ff3e72605edfae6041e3529ccd988f311e62`(401,697 bytes)로 고정한다. 이 값은 데이터의 의학적 승인이 아니라 현재 파일·출처 메타데이터에 대한 import 허가 식별자다.
 
 PDF 표는 자동 OCR 결과를 바로 약 식별자로 승격하지 않는다. 공식 호스트·TLS·크기·PDF signature·원본 해시를 `fetch_catalog_source.py`가 검증하고, 사람이 원문 11행을 대조한 CSV를 `nppa_package.py`가 결정적으로 JSON package로 변환한다. PDF hash나 reviewed CSV가 바뀌면 package check와 production approval gate가 실패하며 새 버전·약사/데이터 거버넌스 검토가 필요하다.
 
@@ -192,6 +195,11 @@ erDiagram
     drug_ingredients ||--o{ drug_presentation_ingredients : joins
     drug_presentations ||--o{ drug_aliases : searched_by
     drug_presentations ||--o{ drug_packages : packaged_as
+    drug_presentations ||--o{ drug_review_decisions : audited_by
+    drug_import_runs ||--o{ drug_retirement_batches : proposes
+    drug_retirement_batches ||--o{ drug_retirement_candidates : contains
+    drug_retirement_batches ||--o{ drug_retirement_batch_events : audited_by
+    drug_presentations ||--o{ drug_retirement_candidates : may_retire
     drug_presentations ||--o{ prescription_items : optionally_selected
 ```
 
@@ -201,19 +209,25 @@ erDiagram
 | --- | --- | --- |
 | `catalog_database_meta` | SQLite 파일 자체의 카탈로그 역할을 production 또는 demo로 고정 | singleton `id=1`, `catalog_mode` check. 최초 apply가 역할을 기록하고 반대 scope의 후속 apply를 거부 |
 | `drug_sources` | 운영기관·Tier·라이선스·재사용 상태 | `slug` unique, `reuse_status`, `usage_scope` |
-| `drug_import_runs` | apply 버전·입력/records 해시·source/license/approval snapshot·수량·보고서 | `(source_id, version, input_sha256, mode)` 멱등 키. 현재 dry-run은 메모리 DB에서만 실행되어 운영 DB에 run row를 남기지 않음 |
-| `drug_import_run_records` | 동일 불변 원본이 어느 실행에 참여했는지와 실행별 imported/needs_review/quarantined 상태 | `(import_run_id, record_ordinal)` unique |
+| `drug_import_runs` | apply 버전·source/license/approval snapshot·수량·보고서와 importer/normalization/package schema/snapshot mode/code revision | `(source_id, version, input_sha256, mode)` unique. `input_sha256`는 package content와 처리 버전을 합친 replay key이고 순수 입력은 `package_content_sha256`에 별도 보존. dry-run은 운영 DB에 run row를 남기지 않음 |
+| `drug_import_run_records` | 동일 불변 원본이 어느 실행에 참여했는지와 실행별 imported/needs_review/quarantined 상태 | `(import_run_id, record_ordinal)` unique. 현재/이전 normalized projection SHA-256, changed-field JSON, review 필요 여부 보존 |
 | `drug_source_records` | 원본 레코드의 불변 JSON·해시 버전 | `(source_id, source_record_id, raw_sha256)` unique |
-| `drug_presentations` | 약사가 한 검색 결과로 선택하는 상품/성분·함량·제형 단위 | 원문/정규화명, route, release, review/lifecycle status |
+| `drug_presentations` | 약사가 한 검색 결과로 선택하는 상품/성분·함량·제형 단위 | source 계산 상태와 사람 운영 상태 분리, `record_version` optimistic lock, 현재 normalized projection JSON/SHA-256, 실제 적용된 `current_import_run_record_id` |
 | `drug_ingredients` | 중복 가능한 성분명 사전 | 정규화명 unique, 원문 표시명 보존 |
 | `drug_presentation_ingredients` | 복합제 성분 순서와 성분별 함량 | `(presentation_id, ordinal)` unique |
 | `drug_aliases` | 상품·성분·언어별 확인된 검색 별칭 | presentation, alias type, language, review status |
 | `drug_packages` | 포장 형태·수량 | 복용량 기본값과 분리 |
+| `drug_review_decisions` | 승인·반려·재검토·inactive/active·retirement 적용의 append-only 감사 | reviewer, 역할, 이유, note, 이전/다음 review·lifecycle, expected/result version과 결정 당시 normalized snapshot/SHA-256. UPDATE/DELETE trigger 차단 |
+| `drug_retirement_batches` | 후속 full snapshot의 누락 후보 묶음 | source, incoming/baseline run, `proposed -> under_review -> approved -> applied` 또는 cancelled, batch version |
+| `drug_retirement_candidates` | 누락된 presentation별 사람 결정 | `pending`, `keep_active`, `retire`, `needs_investigation`; 후보 생성만으로 lifecycle 불변 |
+| `drug_retirement_batch_events` | batch 생성·후보 결정·승인·적용·취소 append-only ledger | `candidate_decided`를 포함해 actor, 역할, 이유, note, 이전/다음 상태와 expected/result batch version을 연속 기록; UPDATE/DELETE trigger 차단 |
 | `prescription_items` | 약사가 전사한 처방 | `drug_name_raw` 정본, nullable catalog ID, 선택 상태, 발급 스냅샷 |
 
 기존 `drugs` 테이블과 ID는 호환 레이어로 보존한다. 마이그레이션은 additive하게 수행하며 기존 처방의 `drug_id`를 재번호화하지 않는다.
 
-canonical presentation의 안정 키는 `(source_id, source_record_id)`이고, 같은 원본 ID의 내용 변경은 `(source_id, source_record_id, raw_sha256)`가 다른 불변 `drug_source_records` 버전으로 추가된다. `dedupe_fingerprint`와 품질 queue는 후보 탐지에만 쓰며 source·함량·제형·route가 다른 presentation을 자동 합치지 않는다. 같은 raw 버전이 후속 릴리스에 다시 등장하면 새 원본 행을 만들지 않고 `drug_import_run_records`로 각 실행 참여를 연결한다.
+canonical presentation의 안정 키는 `(source_id, source_record_id)`이고, 같은 원본 ID의 내용 변경은 `(source_id, source_record_id, raw_sha256)`가 다른 불변 `drug_source_records` 버전으로 추가된다. `dedupe_fingerprint`와 품질 queue는 후보 탐지에만 쓰며 source·함량·제형·route가 다른 presentation을 자동 합치지 않는다. 같은 raw 버전이 후속 릴리스에 다시 등장하면 새 원본 행을 만들지 않고 `drug_import_run_records`로 각 실행 참여를 연결한다. presentation의 `current_import_run_record_id`는 현재 projection을 실제로 적용한 성공 run-record를 가리킨다. 가장 최근 실행이 같은 raw를 재사용하다 실패·격리돼도 이 포인터는 바뀌지 않으며, 최신 실패 evidence는 별도 run-record로 남는다.
+
+재처리는 raw hash와 별도로 normalized projection을 비교한다. importer/normalization version만 달라지고 projection SHA-256이 같으면 별도 import run과 source evidence audit를 남기되 기존 사람 승인·반려는 유지한다. projection이 바뀌면 top-level changed-field diff를 기록하고 승인(`approved`)만 `needs_review`로 되돌린다. 사람의 반려(`rejected`)는 유지한다 — `needs_review`는 검색 가능한 상태이므로 자동 리셋은 사람이 건 검색 차단을 상류 변경만으로 해제하게 된다(09 §7의 excluded 재등장 처리와 동일 원칙). 반려 레코드의 재검토는 사람의 `review_requested` 전이로만 연다. 어느 경우든 presentation `record_version`은 증가하므로 이전 source evidence에 기반한 retirement 후보는 stale이 된다. 사람 결정 원장에는 당시 normalized snapshot 자체가 남아 이후 projection이 바뀌어도 검토자가 본 내용을 복원할 수 있다.
 
 예를 들어 NPPA `anti-diabetes-009`는 원본 formulation `Metformin 500 mg tablet`, 성분 `Metformin`, 함량 `500 mg`, 제형 `tablet`, 제조사·route 미제공으로 저장된다. `500`과 `mg`는 단순 강도 규칙으로 구조화할 수 있지만 제조사·route·복용법은 추정하지 않는다. 처방 선택 시 이 presentation과 정확한 raw/import provenance를 스냅샷으로 보존하고, 환자에게는 약사가 확인한 표시명과 별도 입력한 복약 정보만 전달한다.
 
@@ -225,7 +239,7 @@ canonical presentation의 안정 키는 `(source_id, source_record_id)`이고, �
 - `selected`: DB 결과를 선택하고 약사가 그 표시명을 확인함
 - `selected_then_modified`: 선택 후 약명이 수정됨. 최초 검색 원문과 수정 사실을 보존하되 잘못된 catalog ID 연결은 제거
 
-서버는 클라이언트가 보낸 성분·함량·제형을 신뢰하지 않고 선택된 ID를 다시 조회해 스냅샷을 만든다. 스냅샷에는 exact source record raw hash, import run/version/input hash, 당시 source/license/approval snapshot을 포함한다. 환자 화면은 이 내부 provenance를 노출하지 않고 약사가 확인한 표시명만 사용한다. 이후 카탈로그가 갱신돼도 이미 발급한 안내가 조용히 변하지 않는다.
+서버는 클라이언트가 보낸 성분·함량·제형을 신뢰하지 않고 선택된 ID를 다시 조회해 스냅샷을 만든다. 스냅샷에는 `current_import_run_record_id`가 지정한 exact source record raw hash, import run/version/input hash, 당시 source/license/approval snapshot을 포함한다. 단순히 가장 최근 실행을 고르지 않으므로 실패한 재처리의 provenance가 처방에 섞이지 않는다. 환자 화면은 이 내부 provenance를 노출하지 않고 약사가 확인한 표시명만 사용한다. 이후 카탈로그가 갱신돼도 이미 발급한 안내가 조용히 변하지 않는다.
 
 ## 5. 정규화와 중복 방지
 
@@ -300,7 +314,7 @@ canonical presentation의 안정 키는 `(source_id, source_record_id)`이고, �
 6. 정규화 토큰 일치
 7. 3자 이상 substring
 
-같은 문자열 순위에서는 production을 demo보다 먼저, 그 안에서 `verified -> unverified -> needs_review` 순으로 두되 불완전 레코드임을 숨기지 않는다. `inactive`는 기본 검색에서 제외하고, demo source는 명시적 `include_demo` 컨텍스트에서만 포함한다. 초기 버전은 edit distance 기반 fuzzy matching을 사용하지 않는다. 유사 이름을 잘못 올리는 위험이 누락보다 크기 때문이다.
+같은 문자열 순위에서는 production을 demo보다 먼저, 그 안에서 사람 운영 상태 `approved -> unverified -> needs_review` 순으로 두되 불완전 레코드임을 숨기지 않는다. `rejected`, `operational_lifecycle_status != active`는 기본 검색에서 제외하고 demo source는 명시적 `include_demo` 컨텍스트에서만 포함한다. 초기 버전은 edit distance 기반 fuzzy matching을 사용하지 않는다. 유사 이름을 잘못 올리는 위험이 누락보다 크기 때문이다.
 
 ### FTS5 결정
 
@@ -356,5 +370,6 @@ V1은 FTS5를 사용하지 않는다. 현재 승인된 production 레코드는 1
 
 - **가능:** 11개 NPPA formulation으로 성분/함량/제형 기반 검색 경로와 출처 승인·갱신·스냅샷을 운영 검증하고, 별도 합성 DB로 동명·상이 함량/제형, SR/ER, route, 긴 이름, 별칭, 자유 입력 UX를 시연한다.
 - **불가능:** 전국 상품명·제조사·포장 전체 검색, 최신 판매/허가/리콜 상태 단정, 진단·적응증·상호작용·대체약·복용량 추천.
-- **운영 정책 미확정:** 현재 importer는 delta/upsert 의미다. 새 full snapshot에서 사라진 기존 source ID를 자동 비활성화하지 않는다. 원본이 full snapshot인지, 누락이 철회인지 일시 오류인지에 대한 현지 약사·데이터 운영 정책을 정한 뒤 `snapshot_mode`와 승인된 retirement 절차를 추가해야 한다.
-- **변경 이력 한계:** 원본 버전과 import-run 참여 이력은 보존하지만 `drug_presentations`의 수동 상태 변경 사유·검토자·결정일을 기록하는 전용 audit 테이블은 아직 없다. 현 단계의 롤백 정본은 import 전 SQLite 백업이며, 운영 비활성화 UI와 승인된 상태 변경 이력은 후속 구현·현지 운영 정책이 필요하다.
+- **구현된 운영 경계:** package는 `snapshot_mode=delta|full`을 선언한다. delta는 누락 비교를 하지 않고, 첫 full은 baseline 부재를 보고하며, 후속 full은 이전 성공 full에 포함된 적이 있는 비-retired presentation의 누락을 retirement 후보로만 생성한다. 열린 batch는 중복 제안하지 않지만 취소/keep 뒤의 계속된 누락은 다음 full에서 다시 제안할 수 있다. 승인·적용 전까지 검색 상태는 바뀌지 않는다.
+- **구현된 변경 이력:** 사람의 review/lifecycle 결정과 retirement batch 변경은 append-only ledger에 reviewer·역할·이유·note·상태·version과 함께 남는다. 기존 이력 수정·삭제 API는 없고 DB trigger도 이를 거부한다.
+- **남은 운영 정책:** 어떤 source 누락을 `keep_active`, `retire`, `needs_investigation`으로 판단할지는 현지 약사·데이터 운영 책임자가 정해야 한다. 현재 내부 UI는 인증·권한·CSRF가 없는 loopback 전용 prototype이므로 production 노출은 금지한다.

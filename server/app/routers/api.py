@@ -305,6 +305,10 @@ async def create_prescription(request: Request):
             # §2.3: 조용한 재생성 금지 — 클라가 약사 확인 목록에 올린다
             return _err(409, "TOKEN_COLLISION",
                         "pre-generated token already exists; do not regenerate silently")
+        except db.IdempotencyConflictError:
+            # §4.1: 동일 멱등키 + 다른 본문 — 조용한 replay는 수정 내용을 유실시킨다
+            return _err(409, "IDEMPOTENCY_CONFLICT",
+                        "same client_input_id was already issued with a different body")
         result = _attach_url(result, _base_url(request))
         return JSONResponse(result, status_code=200 if result["replayed"] else 201)
     finally:
@@ -366,6 +370,10 @@ async def reissue_prescription(prescription_id: str, request: Request):
             result = db.reissue(conn, prescription_id, pharmacy_id, payload)
         except LookupError:
             return _err(404, "NOT_FOUND", "not found")  # 미존재·타 약국 — 존재 은닉
+        except ValueError:
+            # 이미 폐기된 구건 — 폐기 시각·감사를 덮어쓰지 않는다. 활성 대체본을 재발급.
+            return _err(410, "LINK_REVOKED",
+                        "prescription already revoked; reissue its active replacement")
         except db.TokenCollisionError:
             return _err(409, "TOKEN_COLLISION",
                         "pre-generated token already exists; do not regenerate silently")
@@ -501,6 +509,9 @@ async def edit_prescription(prescription_id: str, request: Request):
         except ValueError:
             # revoked 처방은 수정 불가(§5.2) — 구건은 부활하지 않는다
             return _err(410, "LINK_REVOKED", "cannot edit a revoked prescription")
+        except db.PrescriptionExpiredError:
+            # 만료 후 수정 허용은 expires_at 재산정으로 죽은 토큰을 되살린다(§5.2)
+            return _err(410, "LINK_EXPIRED", "cannot edit an expired prescription; reissue instead")
         return JSONResponse(_bundle_to_detail(bundle, _base_url(request)), status_code=200)
     finally:
         conn.close()

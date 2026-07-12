@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 from pathlib import Path
 from typing import Any, Sequence
@@ -71,6 +72,7 @@ def run_catalog_import(
     dry_run: bool,
     db_path: str | Path | None = None,
     database_mode: str | None = None,
+    retirement_preview_db: str | Path | None = None,
 ) -> dict[str, Any]:
     """Run the catalog API and attach whole-database quality review queues.
 
@@ -88,6 +90,17 @@ def run_catalog_import(
             raise ValueError("demo import requires an explicit isolated --db-path")
         if Path(db_path).expanduser().resolve() == Path(db.DB_PATH_DEFAULT).expanduser().resolve():
             raise ValueError("demo import cannot target the production database")
+
+    # retirement 프리뷰 플래그 검증은 어떤 쓰기보다 먼저 한다. apply 커밋 뒤에 검증하면
+    # --dry-run 없이 실수로 부른 '실패' 명령이 완전한 apply를 커밋해버린다(INV-9).
+    if retirement_preview_db is not None:
+        if not dry_run:
+            raise ValueError("--retirement-preview-db requires --dry-run")
+        if str(source.get("snapshot_mode") or "delta") != "full":
+            raise ValueError("retirement preview requires a full snapshot package")
+        preview_path = Path(retirement_preview_db).expanduser().resolve()
+        if not preview_path.exists():
+            raise ValueError("retirement preview database does not exist")
 
     if dry_run:
         connection = db.get_conn(":memory:")
@@ -115,6 +128,26 @@ def run_catalog_import(
         for field in REVIEW_QUEUE_FIELDS:
             report[field] = report["database_quality"].get(field) or []
         report["source_breakdown"] = report["database_quality"].get("source_breakdown") or []
+        if retirement_preview_db is not None:
+            # 플래그 조합은 위에서 이미 검증됨(쓰기 전). 여기서는 read-only 프리뷰만 실행.
+            preview_conn = sqlite3.connect(
+                f"file:{preview_path.as_posix()}?mode=ro", uri=True
+            )
+            preview_conn.row_factory = sqlite3.Row
+            try:
+                from app.catalog_governance import preview_full_snapshot_retirement
+
+                incoming_ids = [
+                    str(record.get("source_record_id") or record.get("id"))
+                    for record in records
+                    if isinstance(record, dict)
+                    and (record.get("source_record_id") or record.get("id"))
+                ]
+                report["retirement_preview"] = preview_full_snapshot_retirement(
+                    preview_conn, str(source["slug"]), incoming_ids
+                )
+            finally:
+                preview_conn.close()
         return report
     finally:
         connection.close()
@@ -201,6 +234,36 @@ def _markdown_source(report: dict[str, Any], *, heading_level: int) -> list[str]
             record_id = str(failed.get("source_record_id", "unknown")).replace("`", "\\`")
             errors = ", ".join(str(value) for value in failed.get("errors") or []) or "unspecified"
             lines.append(f"- `{record_id}`: {errors}")
+    lines.extend(["", f"{heading}# Normalized projection comparison", ""])
+    if report.get("normalization_comparison_available"):
+        lines.extend(
+            [
+                f"- Created: {int(report.get('normalization_created_count') or 0)}",
+                f"- Changed: {int(report.get('normalization_changed_count') or 0)}",
+                f"- Unchanged: {int(report.get('normalization_unchanged_count') or 0)}",
+                f"- Source ingest issues: {int(report.get('source_ingest_issue_count') or 0)}",
+                f"- Human review required: {int(report.get('review_required_count') or 0)}",
+                f"- Prior decisions reopened: {int(report.get('review_reopened_count') or 0)}",
+            ]
+        )
+        changes = report.get("normalization_changes") or []
+        if changes:
+            lines.extend(["", "Changed-field details:", ""])
+            for change in changes:
+                record_id = str(change.get("source_record_id") or "unknown").replace(
+                    "`", "\\`"
+                )
+                fields = ", ".join(change.get("changed_fields") or []) or "initial projection"
+                review = "review required" if change.get("review_required") else "review preserved"
+                lines.append(
+                    f"- `{record_id}` ({change.get('change_type') or 'changed'}): "
+                    f"{fields}; {review}"
+                )
+    else:
+        lines.append(
+            "- Not available in the isolated dry-run database. Use apply or a separately "
+            "approved read-only baseline comparison to evaluate reprocessing changes."
+        )
     return lines
 
 
@@ -251,6 +314,22 @@ def render_markdown_report(report: dict[str, Any]) -> str:
             lines.append(
                 f"| {source['slug']} | {source['tier']} | {source['usage_scope']} | {source['presentations']} |"
             )
+    retirement_preview = report.get("retirement_preview")
+    if retirement_preview:
+        lines.extend([
+            "",
+            "## Read-only retirement preview",
+            "",
+            "This comparison does not change presentation lifecycle state.",
+            "",
+            f"- Baseline import run: `{retirement_preview.get('baseline_import_run_id') or 'missing'}`",
+            f"- Baseline missing: `{'yes' if retirement_preview.get('baseline_missing') else 'no'}`",
+            f"- Candidate count: {int(retirement_preview.get('candidate_count') or 0)}",
+        ])
+        for candidate in retirement_preview.get("candidates") or []:
+            lines.append(
+                f"- `{candidate['source_record_id']}`: {candidate.get('brand_name_raw') or 'Unnamed presentation'}"
+            )
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -290,6 +369,21 @@ def print_report_summary(
         f"excluded={report.get('excluded', 0)} "
         f"needs_review={report.get('needs_review', 0)}"
     )
+    if report.get("normalization_comparison_available"):
+        print(
+            "normalization: "
+            f"created={report.get('normalization_created_count', 0)} "
+            f"changed={report.get('normalization_changed_count', 0)} "
+            f"unchanged={report.get('normalization_unchanged_count', 0)} "
+            f"review_required={report.get('review_required_count', 0)} "
+            f"review_reopened={report.get('review_reopened_count', 0)}"
+        )
+    if report.get("retirement_preview"):
+        print(
+            "retirement preview: "
+            f"candidates={report['retirement_preview'].get('candidate_count', 0)} "
+            f"baseline_missing={report['retirement_preview'].get('baseline_missing', False)}"
+        )
     print(f"JSON report: {json_path}")
     print(f"Markdown report: {markdown_path}")
 
@@ -326,6 +420,14 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("production", "demo"),
         help="persist/verify the target DB role; defaults to the package usage scope",
     )
+    parser.add_argument(
+        "--retirement-preview-db",
+        type=Path,
+        help=(
+            "read-only baseline database for a full-snapshot --dry-run; never creates "
+            "or applies retirement candidates"
+        ),
+    )
     return parser
 
 
@@ -340,6 +442,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             dry_run=args.dry_run,
             db_path=args.db_path,
             database_mode=args.database_mode,
+            retirement_preview_db=args.retirement_preview_db,
         )
         json_path, markdown_path = write_quality_reports(report, args.report_dir)
     except (OSError, json.JSONDecodeError, ValueError) as exc:

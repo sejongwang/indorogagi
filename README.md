@@ -14,7 +14,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [의약품 데이터 기반](docs/08-india-drug-data-foundation.md), [카탈로그 운영](docs/09-drug-catalog-operations.md), [최신 인포그래픽 시각 QA](docs/07-infographic-poster-visual-qa.md) |
+| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [의약품 데이터 기반](docs/08-india-drug-data-foundation.md), [검토·감사·retirement 운영](docs/09-drug-catalog-operations.md), [최신 인포그래픽 시각 QA](docs/07-infographic-poster-visual-qa.md) |
 | [`wireframes/`](wireframes/) | 초기 클릭형 와이어프레임. 환자 화면의 현재 정본은 `server/templates/patient.html` |
 | [`server/`](server/) | FastAPI + SQLite 관통 프로토타입. 출처 추적 카탈로그 검색 → 발급 → 실제 QR → 모바일 복약 포스터가 동작 |
 | [`data/`](data/) | NPPA 공식 formulation 11건과 프로젝트가 작성한 합성 demo fixture 16건. 라이선스가 불명확한 레거시 627건 파일은 제거. 출처·한계는 [`data/drugs-README.md`](data/drugs-README.md) |
@@ -52,6 +52,21 @@ uv run python scripts/seed_import.py --catalog-scope demo --apply \
 INDORO_DB_PATH=var/indoro-demo.db uv run uvicorn app.main:app --port 8600
 ```
 
+검토 queue와 full-snapshot retirement를 시연할 때는 별도의 synthetic 운영 DB를 만든다. 이 내부 UI는 인증·CSRF가 없는 loopback 전용 prototype이며 기본 비활성이다.
+
+```bash
+cd server
+uv run python scripts/catalog_governance_demo.py \
+  --db-path var/catalog-governance-demo.db
+INDORO_DB_PATH=var/catalog-governance-demo.db \
+INDORO_CATALOG_OPS_ENABLED=1 \
+  uv run uvicorn app.main:app --host 127.0.0.1 --port 8610
+# http://127.0.0.1:8610/catalog/review
+# http://127.0.0.1:8610/catalog/retirements
+```
+
+운영 prototype은 `127.0.0.1`에 직접 bind할 때만 사용한다. 외부 요청을 loopback으로 재작성할 수 있는 reverse proxy, tunnel, port-forward에는 연결하지 않는다. 실제 배포에는 별도 인증·RBAC·CSRF가 필요하다.
+
 > 폰으로 QR을 실제 스캔하려면 `--host 0.0.0.0`으로 띄우고 폰에서 `http://<이 PC의 LAN IP>:8600/rx/new`로 접속한다. QR은 요청 호스트 기준으로 URL을 인코딩하므로 `127.0.0.1`로 띄우면 폰에서 열리지 않는다.
 
 ### 와이어프레임 (정적 화면)
@@ -66,8 +81,8 @@ python3 -m http.server 8493 --directory wireframes
 인도 방문 전 원격으로 가능한 트랙을 완료한 상태다.
 
 - **환자 화면**: 아침→점심→저녁→밤의 하루 흐름 포스터. 각 행동에 봉투 색+번호, 약명, 용량, 식전/식후, 기간을 함께 표시하고 약별 상세·공유는 아래에 둔다.
-- **의약품 카탈로그**: 출처·버전·원본·검토 상태를 추적한다. NPPA 공식 formulation 11건만 production DB에 두고, 검색 UX 검증용 합성 fixture 16건은 별도 demo DB에 둔다. 상업 사이트 참고분이 섞인 기존 627건은 저장소와 importer에서 제거했다.
+- **의약품 카탈로그**: 출처·버전·원본·처리 버전을 추적하고, 사람 review와 검색 lifecycle을 분리한다. optimistic locking, append-only audit, delta/full snapshot 구분, 사람 승인 뒤에만 적용되는 retirement batch를 제공한다. NPPA 공식 formulation 11건만 production DB에 두고 검색·운영 UX 합성 fixture는 별도 demo DB에 둔다.
 - **서버 프로토타입**: 자동완성 → 확인 → 발급 → QR → 포스터 → 언어 전환·공유와 상태 화면까지 실동작하고 전체 pytest로 회귀 검증한다.
-- **의도적 미구현(현지/후속 트랙)**: 전국 상품명 데이터 라이선스, 현지 약사·법무·언어 검증, 실제 음성/영상, 완전한 오프라인 큐, 일부 운영 화면(온보딩·목록·수정 UI), 배포. 서버의 [`README.md`](server/README.md)에 범위표가 있다.
+- **의도적 미구현(현지/후속 트랙)**: 전국 상품명 데이터 라이선스, 현지 약사·법무·언어 검증, 운영 UI의 실제 인증·RBAC·CSRF, 실제 음성/영상, 완전한 오프라인 큐, 일부 약국 운영 화면(온보딩·목록·수정 UI), 배포. 서버의 [`README.md`](server/README.md)에 범위표가 있다.
 
 다음: 팀 리뷰 → 파일럿 지역(1차 언어) 확정 → 현지 사용자 테스트.
