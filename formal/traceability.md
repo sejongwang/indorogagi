@@ -1,0 +1,28 @@
+# 불변식 → 코드 → 모델 → 테스트 추적성 매트릭스
+
+명세: [spec.md](spec.md) · 반례: [counterexamples.md](counterexamples.md) · 실행: `python3 formal/model/m1_prescription.py`, `python3 formal/model/m2_governance.py [--buggy]`
+
+라인 번호는 2026-07-11 수정 반영 후 기준. "검증" 열: 판독=핵심 경로 직접 판독, 모델=탐색기 불변식, 테스트=pytest, (CX-n)=이번에 발견·수정된 반례.
+
+| 불변식 | 집행 지점 (file:line) | 모델 | 테스트 | 상태 |
+|---|---|---|---|---|
+| **INV-1** QR 불변 (a)토큰 재바인딩 없음 (b)조용한 내용 변경 없음 (c)충돌 시 409 | (a) `access_tokens.prescription_id` 쓰기는 INSERT뿐 — db.py `_issue_token_tx`, UPDATE 없음 (b) edit는 version+1 + revisions + `rx.edited` 단일 tx — db.py `edit_prescription`; **발급 항목 live 재조회 제거(CX-5)** — db.py `_build_bundle`:1380 (c) 클라 토큰 충돌 `TokenCollisionError`→409, 재생성 금지 — db.py·api.py:304-307; **replay 본문 대조(CX-3)** — db.py `_replay_or_conflict`:1248 | m1 `INV-1:token-binding`, `T1c:...` | test_lifecycle_invariants, test_api 멱등, test_snapshot_immutability | ✅ (CX-3·CX-5 수정) |
+| **INV-2** 재활성 금지 | 파생 판정 db.py `_token_status`:1355(문자열 ISO Z 비교), revoked_at 널링 경로 없음; **edit 만료 가드 + 조건부 expires_at UPDATE(CX-1)** — db.py `edit_prescription`:1541-1548·1600-1615, api.py:512-514 | m1 `INV-2:no-resurrection`(ever_dead 이력) | `test_edit_expired_prescription_does_not_resurrect_token` | ✅ (CX-1 수정) |
+| **INV-3** 발급 스냅샷 불변 | 카탈로그 모듈은 `prescription_items`에 쓰지 않음(catalog_governance.py·drug_catalog.py에 해당 UPDATE/DELETE 부재 — 헌터 전수 확인); **환자 렌더는 snapshot_json/자유 원문만 — live 재조회 fallback 제거(CX-5)** — db.py `_build_bundle`:1380 | (전이 구조상 카탈로그 액션에 items 효과 없음) | test_catalog_governance `test_retirement_preserves_issued_snapshot...`, `test_retirement_keeps_existing_qr...`, **test_snapshot_immutability 3건** | ✅ (CX-5 수정) |
+| **INV-4** 자동 retire 금지 | `retired` 쓰기는 `apply_retirement_batch`:1140 한 곳(승인 batch + 전 후보 버전 재확인 + 단일 tx); 후보 생성은 lifecycle 불변; 일반 UI 전이에 retired 부재 — `transition_presentation`:270-283 | m2 `INV-4:retire-only-via-approved-apply` + `evidence-version-chain` + `LIFE:retired-terminal` | `test_delta_first_full_and_followup_full_retirement_workflow` 외 retirement 계열 6건 | ✅ |
+| **INV-5** 중복 발급 수렴 | `UNIQUE(pharmacy_id, client_input_id)` db.py 스키마:121 + IntegrityError→replay — `create_prescription`:1259; 토큰 UNIQUE + 서버 생성 재시도 루프 `_issue_token_tx`; reissue 멱등 replay api.py:359-379 | m1 `INV-5:no-duplicate-issue` (150만 상태 위반 0) | test_api 멱등, `test_reissue_retry_with_same_cid_still_replays` | ✅ |
+| **INV-6** projection+audit 원자성 | 발급: rx+items+token+`rx.created` 단일 커밋 `_insert_prescription_tx`:1198→`create_prescription` commit; 뷰: claim+view.first+view.opened+scan 단일 커밋 patient.py:459-475; 거버넌스: BEGIN IMMEDIATE + 같은 tx append — `transition_presentation`:228·317, `decide_retirement_candidate`:871·959, `apply_retirement_batch`:1148·1240 | (전이=원자 액션으로 모델링 — 코드 판독으로 뒷받침) | `test_review_transitions_are_atomic_append_only_and_optimistically_locked`, `test_retirement_apply_rolls_back_every_projection_when_audit_insert_fails` | ✅ |
+| **INV-7** stale 검토자 | `record_version` 조건부 UPDATE + rowcount — `transition_presentation`:286-297; 후보 3중 버전 검사 `decide_retirement_candidate`:889-899; approve/apply stale 재확인 `_change_batch_state`:1039-1054, `apply_retirement_batch`:1172-1179 | m2 (버전 가드를 전이 가드로 인코딩 — 위반 0) | 동상 + `test_retirement_approval_rejects_newer_presentation_evidence`, `test_retirement_apply_rejects_stale_presentation_as_one_transaction` | ✅ |
+| **INV-8** 검색 격리 | 검색 필터 `operational_lifecycle_status='active' AND workflow_review_status<>'rejected'` — drug_catalog.py:1561-1562; demo scope는 약국 컨텍스트만 — api.py `search_drugs`:584-587; 발급 시 drug_id 서버 재검증(미존재/demo/inactive/retired/rejected/명칭 불일치 → 링크 해제) — db.py `_insert_items_tx`:1090-1133; **rejected sticky(CX-2)** — catalog_governance.py `record_source_refresh`:324; **meta-less DB demo 브랜딩 대칭 가드(CX-7)** — drug_catalog.py `_ensure_database_mode`:1127-1143 | m2 `INV-8:human-block-not-searchable` (BUGGY 2스텝 검출 / FIXED 위반 0) | `test_projection_change_preserves_human_rejection_and_search_block`, `test_excluded_later_payload_preserves_human_rejection_and_search_block`, **`test_issuing_against_human_rejected_catalog_id_clears_link...`**, **`test_metaless_db_with_production_sources_refuses_demo_first_apply`** | ✅ (CX-2·CX-7 수정) |
+| **INV-9** 부분 상태 금지 | 모든 쓰기 헬퍼 try/commit/except/rollback — db.py 규약(모듈 docstring), create·reissue·edit; 거버넌스 전 함수 rollback; dry-run은 메모리 DB(docs/09 §4); **preview 플래그 검증을 apply 앞으로(CX-6)** — catalog_import.py `run_catalog_import`:88-102 | (전이=원자 — 크래시는 "커밋 전 전무/커밋 후 전부"로 환원) | `test_retirement_apply_rolls_back_every_projection_when_audit_insert_fails`, `test_failed_same_raw_reprocess...`, **`test_retirement_preview_flag_without_dry_run_leaves_no_committed_state`** | ✅ (CX-6 수정) |
+| **INV-10** 불변 provenance | append-only 원장 + UPDATE/DELETE 차단 트리거(스키마 — drug_review_decisions·drug_retirement_batch_events); `current_import_run_record_id`는 성공 적용 run만(C5) — drug_catalog.py:928-991; **reissue 폐기 시각 보존(CX-4)** — db.py `reissue`:1470-1489; purge 널링은 명세 허용 예외(§8.3) | m1 `INV-10:immutable-provenance`(revoked_at 덮어쓰기·감사 중복) | `test_second_reissue_of_revoked_prescription_is_rejected`, audit append-only 계열 | ✅ (CX-4 수정) |
+
+## 모델 실행 결과 요약
+
+| 모델 | 모드 | 탐색 상태 | 결과 |
+|---|---|---|---|
+| m1_prescription (M1·M2 발급/수정/재발급/열람/시간) | 구현 의미론(수정 전) | 1,500,000 (경계 도달) | T1c 2스텝 · INV-10 3스텝 · INV-2 5스텝 위반 검출 / INV-1·INV-5 위반 0 |
+| m2_governance (M3–M5 검토/임포트/retirement) | `--buggy`(수정 전) | 1,200,000 (경계 도달) | INV-8 2스텝 위반 검출 |
+| m2_governance | FIXED(현재 코드) | 1,200,000 (경계 도달) | 위반 0 |
+
+한계 정직 고지: 탐색은 상태 경계(150만/120만)와 도메인 축약(처방≤3, presentation 2, 버전≤7, 정수 클록) 안에서 전수이며, 그 밖은 증명하지 않는다. 트랜잭션 원자성은 SQLite 직렬화 전제를 코드 판독(BEGIN IMMEDIATE·단일 commit·rollback)으로 뒷받침했고, fsync 수준 내구성은 검증 범위 밖(spec.md §8).
