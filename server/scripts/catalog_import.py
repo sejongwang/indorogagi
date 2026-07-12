@@ -91,6 +91,17 @@ def run_catalog_import(
         if Path(db_path).expanduser().resolve() == Path(db.DB_PATH_DEFAULT).expanduser().resolve():
             raise ValueError("demo import cannot target the production database")
 
+    # retirement 프리뷰 플래그 검증은 어떤 쓰기보다 먼저 한다. apply 커밋 뒤에 검증하면
+    # --dry-run 없이 실수로 부른 '실패' 명령이 완전한 apply를 커밋해버린다(INV-9).
+    if retirement_preview_db is not None:
+        if not dry_run:
+            raise ValueError("--retirement-preview-db requires --dry-run")
+        if str(source.get("snapshot_mode") or "delta") != "full":
+            raise ValueError("retirement preview requires a full snapshot package")
+        preview_path = Path(retirement_preview_db).expanduser().resolve()
+        if not preview_path.exists():
+            raise ValueError("retirement preview database does not exist")
+
     if dry_run:
         connection = db.get_conn(":memory:")
         connection.executescript(db.SCHEMA_SQL)
@@ -118,13 +129,7 @@ def run_catalog_import(
             report[field] = report["database_quality"].get(field) or []
         report["source_breakdown"] = report["database_quality"].get("source_breakdown") or []
         if retirement_preview_db is not None:
-            if not dry_run:
-                raise ValueError("--retirement-preview-db requires --dry-run")
-            if str(source.get("snapshot_mode") or "delta") != "full":
-                raise ValueError("retirement preview requires a full snapshot package")
-            preview_path = Path(retirement_preview_db).expanduser().resolve()
-            if not preview_path.exists():
-                raise ValueError("retirement preview database does not exist")
+            # 플래그 조합은 위에서 이미 검증됨(쓰기 전). 여기서는 read-only 프리뷰만 실행.
             preview_conn = sqlite3.connect(
                 f"file:{preview_path.as_posix()}?mode=ro", uri=True
             )

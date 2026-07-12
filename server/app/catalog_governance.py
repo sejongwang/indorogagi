@@ -334,11 +334,16 @@ def record_source_refresh(
     The caller owns the importer transaction. Every processing run increments the
     optimistic version so older retirement evidence becomes stale. It never reactivates
     a retired/inactive item; an identical deterministic projection preserves the human
-    decision, while a changed projection reopens approval/rejection for review.
+    decision, while a changed projection reopens a prior approval for review.
+
+    A human rejection stays in force even when the projection changes: needs_review is
+    a searchable state, so resetting rejected here would let an upstream edit silently
+    undo a human search block (same rationale as record_source_ingest_issue). Reopening
+    a rejected record is a human decision via the review_requested transition.
     """
     previous_review = presentation["workflow_review_status"]
     next_review = previous_review
-    if normalized_projection_changed and previous_review in ("approved", "rejected"):
+    if normalized_projection_changed and previous_review == "approved":
         next_review = "needs_review"
     previous_lifecycle = presentation["operational_lifecycle_status"]
     expected = presentation["record_version"]
@@ -365,8 +370,11 @@ def record_source_refresh(
             else "source_evidence_reprocessed"
         ),
         note=(
-            "A later source or normalization run changed the normalized presentation; "
-            "prior approval or rejection was reopened when applicable."
+            (
+                "A later source or normalization run changed the normalized presentation; "
+                "a prior approval was reopened for review, while a prior rejection "
+                "remains in force until a human requests re-review."
+            )
             if normalized_projection_changed
             else "A later source or normalization run produced the same normalized presentation; "
             "the human review decision was preserved while evidence version advanced."

@@ -40,6 +40,14 @@ class TokenCollisionError(Exception):
     """클라 사전생성 토큰의 UNIQUE 충돌 — 조용한 재생성 금지(§2.3), 라우터가 409 TOKEN_COLLISION 처리."""
 
 
+class IdempotencyConflictError(Exception):
+    """동일 멱등키 + 다른 본문(§4.1) — 조용한 replay는 수정 내용을 유실시킨다. 라우터가 409 처리."""
+
+
+class PrescriptionExpiredError(Exception):
+    """만료된 처방의 수정 시도 — 만료 토큰은 부활하지 않는다(§5.2). 라우터가 410 LINK_EXPIRED 처리."""
+
+
 # ---------------------------------------------------------------- 기본 유틸
 
 def now_utc() -> str:
@@ -88,6 +96,24 @@ def compute_expires_at(created_at: str, max_duration_days: int) -> str:
     return (base + timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def client_request_sha256(payload: dict[str, Any]) -> str:
+    """멱등 충돌 판정용 본문 해시(§4.1). 처방 내용을 결정하는 필드만 포함한다.
+
+    client_metrics·issued_at_client은 제외 — 오프라인 outbox 재전송은 retry_count 등
+    계측만 달라지며(§4.3), 계측 차이가 발급 replay를 막으면 안 된다. token은 포함 —
+    같은 멱등키로 다른 토큰이 오면 클라 재생성(§2.3 금지 사항) 신호다."""
+    core = {
+        "patient_label": payload.get("patient_label"),
+        "lang": payload.get("lang"),
+        "note": payload.get("note"),
+        "token": payload.get("token"),
+        "items": payload.get("items"),
+    }
+    return hashlib.sha256(
+        json.dumps(core, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
 # ---------------------------------------------------------------- 스키마
 
 SCHEMA_SQL = """
@@ -118,6 +144,7 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     active_input_ms   INTEGER,
     issued_at_client  TEXT,
     reissue_of        TEXT,
+    client_request_sha256 TEXT,                    -- §4.1: 멱등 충돌 판정용 본문 해시
     created_at        TEXT NOT NULL,
     UNIQUE (pharmacy_id, client_input_id)          -- D10: 멱등키
 );
@@ -602,6 +629,7 @@ def init_db(db_path: str | Path | None = None) -> None:
         applied_run_migration_pending = conn.execute(
             "SELECT 1 FROM schema_migrations WHERE version=7"
         ).fetchone() is None
+        _ensure_column(conn, "prescriptions", "client_request_sha256", "TEXT")
         _ensure_column(conn, "prescription_items", "drug_input_raw", "TEXT")
         _ensure_column(
             conn,
@@ -1176,13 +1204,13 @@ def _insert_prescription_tx(
         """INSERT INTO prescriptions
            (id, pharmacy_id, client_input_id, patient_label, lang, note, status, version,
             entry_method, origin, input_duration_ms, active_input_ms, issued_at_client,
-            reissue_of, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, 'active', 1, 'manual', ?, ?, ?, ?, ?, ?)""",
+            reissue_of, client_request_sha256, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, 'active', 1, 'manual', ?, ?, ?, ?, ?, ?, ?)""",
         (
             presc_id, pharmacy_id, payload["client_input_id"], payload.get("patient_label"),
             payload.get("lang") or "hi", payload.get("note"), origin,
             metrics.get("input_duration_ms"), metrics.get("active_input_ms"),
-            payload.get("issued_at_client"), reissue_of, created,
+            payload.get("issued_at_client"), reissue_of, client_request_sha256(payload), created,
         ),
     )
 
@@ -1217,15 +1245,27 @@ def _insert_prescription_tx(
     return _issue_result(conn, presc, replayed=False)
 
 
+def _replay_or_conflict(
+    conn: sqlite3.Connection, existing: dict[str, Any], payload: dict[str, Any]
+) -> dict[str, Any]:
+    """멱등 replay 전 본문 대조(§4.1). 다르면 409 대상 — 조용한 replay는
+    타임아웃 후 수정-재제출을 유실시킨다. 해시 없는 구 행은 비교 없이 replay(호환)."""
+    stored = existing.get("client_request_sha256")
+    if stored is not None and stored != client_request_sha256(payload):
+        raise IdempotencyConflictError(existing["id"])
+    return _issue_result(conn, existing, replayed=True)
+
+
 def create_prescription(
     conn: sqlite3.Connection, pharmacy_id: str, payload: dict[str, Any]
 ) -> dict[str, Any]:
     """처방 생성(멱등 — D10). payload는 §4.3 POST 본문 형태(dict).
-    동일 (pharmacy_id, client_input_id) 기존재 시 기존 발급 결과를 replayed=True로 반환.
+    동일 (pharmacy_id, client_input_id) + 동일 본문이면 기존 발급 결과를 replayed=True로 반환,
+    동일 멱등키 + 다른 본문이면 IdempotencyConflictError(§4.1).
     클라 사전생성 token 충돌 시 TokenCollisionError."""
     existing = find_by_client_input_id(conn, pharmacy_id, payload["client_input_id"])
     if existing is not None:
-        return _issue_result(conn, existing, replayed=True)
+        return _replay_or_conflict(conn, existing, payload)
     try:
         result = _insert_prescription_tx(conn, pharmacy_id, payload)
         conn.commit()
@@ -1236,7 +1276,7 @@ def create_prescription(
             # 동시 요청 레이스 — 먼저 커밋된 쪽을 replay로 반환
             existing = find_by_client_input_id(conn, pharmacy_id, payload["client_input_id"])
             if existing is not None:
-                return _issue_result(conn, existing, replayed=True)
+                return _replay_or_conflict(conn, existing, payload)
         raise
     except Exception:
         conn.rollback()
@@ -1341,18 +1381,12 @@ def _build_bundle(conn: sqlite3.Connection, presc_row: sqlite3.Row,
         drug = None
         if row_data.get("drug_catalog_snapshot_json"):
             # 발급 당시 약사가 확인한 immutable snapshot을 렌더한다. 이후 카탈로그 갱신은
-            # 이미 발급된 처방의 표시명·제형·출처 경고를 소급 변경하지 않는다.
+            # 이미 발급된 처방의 표시명·제형·출처 경고를 소급 변경하지 않는다(§4.6).
             drug = json.loads(row_data["drug_catalog_snapshot_json"])
-        elif item_row["drug_id"]:
-            from app.drug_catalog import get_presentation_snapshot
-
-            drug = get_presentation_snapshot(conn, item_row["drug_id"])
-            if drug is None:
-                drug = _drug_dict(
-                    conn.execute(
-                        "SELECT * FROM drugs WHERE id = ?", (item_row["drug_id"],)
-                    ).fetchone()
-                )
+        # drug_id는 있으나 스냅샷이 없는 항목(스냅샷 컬럼 이전의 legacy 행)은 live
+        # 카탈로그를 재조회하지 않는다 — 재조회는 이미 발급된 QR의 표시 내용을
+        # 카탈로그 편집·retirement에 따라 조용히 바꾸므로 §4.6/INV-1·INV-3 위반이다.
+        # 동결된 drug_name_raw 등 행 자체 컬럼만으로 렌더하고 enrichment는 생략한다.
         items.append(_item_dict(item_row, drug))
 
     revised_at = conn.execute(
@@ -1435,16 +1469,25 @@ def reissue(
     old = get_prescription_bundle(conn, prescription_id)
     if old is None or old["prescription"]["pharmacy_id"] != pharmacy_id:
         raise LookupError(prescription_id)
+    if old["prescription"]["status"] == "revoked" or old["access"]["revoked_at"]:
+        # 이미 종결된 구건의 재발급은 폐기 시각·감사 이력을 덮어쓰고 대체본을
+        # 분기시킨다(INV-10). 활성 대체본을 재발급해야 한다. 만료는 §4.4대로 허용.
+        raise ValueError("cannot reissue a revoked prescription")
 
     now = now_utc()
     reason = payload.get("reason") or "other"
     try:
-        # 1) 구건 종결
-        conn.execute(
-            "UPDATE prescriptions SET status = 'revoked' WHERE id = ?", (prescription_id,)
+        # 1) 구건 종결 — 조건부 UPDATE: 동시 reissue 레이스에서도 종결은 정확히 1회
+        cur = conn.execute(
+            "UPDATE prescriptions SET status = 'revoked' "
+            "WHERE id = ? AND status != 'revoked'",
+            (prescription_id,),
         )
+        if cur.rowcount != 1:
+            raise ValueError("cannot reissue a revoked prescription")
         conn.execute(
-            "UPDATE access_tokens SET revoked_at = ? WHERE prescription_id = ?",
+            "UPDATE access_tokens SET revoked_at = ? "
+            "WHERE prescription_id = ? AND revoked_at IS NULL",
             (now, prescription_id),
         )
         # 2) 구건 스냅샷을 revision으로 보관 (감사 이력)
@@ -1497,9 +1540,13 @@ def edit_prescription(
     old = get_prescription_bundle(conn, prescription_id)
     if old is None or old["prescription"]["pharmacy_id"] != pharmacy_id:
         raise LookupError(prescription_id)
-    if old["prescription"]["status"] == "revoked":
+    if old["token_status"] == TOKEN_STATUS_REVOKED:
         # 폐기된 처방은 부활하지 않는다(§5.2) — 수정도 불가. 재발급 경로를 쓴다.
         raise ValueError("cannot edit a revoked prescription")
+    if old["token_status"] == TOKEN_STATUS_EXPIRED:
+        # 만료 후 수정을 허용하면 4)의 expires_at 재산정이 죽은 토큰을 되살린다(§5.2
+        # 금지 전이 expired→active). 만료 건은 재발급(신규 처방·신규 토큰) 경로만 유효.
+        raise PrescriptionExpiredError(prescription_id)
 
     now = now_utc()
     old_presc = old["prescription"]
@@ -1534,19 +1581,29 @@ def edit_prescription(
         max_duration = _insert_items_tx(conn, prescription_id, pharmacy_id, items)
 
         # 3) 헤더 버전 업 + 선택 헤더 필드 갱신 (토큰 불변 — D4)
+        #    status 조건: 위 가드 뒤 커밋 전에 reissue가 끼어든 레이스에서도
+        #    폐기된 구건의 내용이 바뀌지 않게 한다.
         new_lang = payload.get("lang") if "lang" in payload else old_presc["lang"]
         new_label = payload.get("patient_label") if "patient_label" in payload else old_presc["patient_label"]
         new_note = payload.get("note") if "note" in payload else old_presc["note"]
-        conn.execute(
-            "UPDATE prescriptions SET version = ?, lang = ?, patient_label = ?, note = ? WHERE id = ?",
+        cur = conn.execute(
+            "UPDATE prescriptions SET version = ?, lang = ?, patient_label = ?, note = ? "
+            "WHERE id = ? AND status = 'active'",
             (new_version, new_lang, new_label, new_note, prescription_id),
         )
+        if cur.rowcount != 1:
+            raise ValueError("cannot edit a revoked prescription")
         # 4) 만료창 재산정(D6 — duration이 바뀌면 반영). token/URL은 그대로.
+        #    expires_at 조건: 가드 통과 후 만료 경계를 넘은 경우에도 죽은 토큰을
+        #    되살리지 않는다(§5.2 expired→active 금지 — 재산정은 살아 있는 토큰 한정).
         expires_at = compute_expires_at(old["access"]["created_at"], max_duration)
-        conn.execute(
-            "UPDATE access_tokens SET expires_at = ? WHERE prescription_id = ?",
-            (expires_at, prescription_id),
+        cur = conn.execute(
+            "UPDATE access_tokens SET expires_at = ? "
+            "WHERE prescription_id = ? AND expires_at > ?",
+            (expires_at, prescription_id, now),
         )
+        if cur.rowcount != 1:
+            raise PrescriptionExpiredError(prescription_id)
 
         record_event(
             conn, "rx.edited",

@@ -45,9 +45,9 @@ pharmacist QR URL을 열면 P3 QR 화면. 새 처방 입력은 `http://127.0.0.1
 
 | 상태 | 항목 |
 |---|---|
-| **구현** | 발급 API(멱등·검증 422·오프라인 토큰 409)·reissue(D5)·source/version/raw/importer/normalization 추적 의약품 검색·자유 입력·review/lifecycle 분리·optimistic locking·append-only audit·delta/full snapshot retirement workflow·loopback 운영 UI·이벤트 비콘·S1 하루 시간 흐름 포스터(첫눈 실약명·봉투 색+번호·단위별 자체 SVG·PRN 1회량/일일최대/최소간격·식전후 순서·기간·hi/en D12)·대기/410/코드 재입력/개인정보 화면·view.first 원자 선점·ivid 쿠키·P1 자동완성/확인·P3 실제 SVG QR/인쇄/전체화면·3종 데모 |
+| **구현** | 발급 API(멱등·검증 422·오프라인 토큰 409·**동일 멱등키+다른 본문 409 IDEMPOTENCY_CONFLICT**)·reissue(D5, **revoked 재발급 410 — 폐기 provenance 불변**)·수정(D4, **만료 건 410 — expired→active 부활 금지**)·source/version/raw/importer/normalization 추적 의약품 검색·자유 입력·review/lifecycle 분리(**projection 변경 시에도 사람 rejected 유지**)·optimistic locking·append-only audit·delta/full snapshot retirement workflow·loopback 운영 UI·이벤트 비콘·S1 하루 시간 흐름 포스터(첫눈 실약명·봉투 색+번호·단위별 자체 SVG·PRN 1회량/일일최대/최소간격·식전후 순서·기간·hi/en D12)·대기/410/코드 재입력/개인정보 화면·view.first 원자 선점·ivid 쿠키·P1 자동완성/확인·P3 실제 SVG QR/인쇄/전체화면·3종 데모 |
 | **스텁** (코드 주석 명기) | 완전한 오프라인 제출(outbox)·If-None-Match 304(ETag 발급만)·현지 검증 전 음성/영상. 미구현 미디어 placeholder는 환자 화면에서 제거 |
-| **제외** | P0/P4/P6 화면·Postgres·배포·rate limit/tarpit·purge 스크립트·IDEMPOTENCY_CONFLICT 409(항상 replay)·media.video_complete 발행(실재생 없음) |
+| **제외** | P0/P4/P6 화면·Postgres·배포·rate limit/tarpit·purge 스크립트(D+50 백로그 — docs/01 §9.2)·pre_sync 소급 인정(§2.3)·media.video_complete 발행(실재생 없음) |
 
 ## 메모
 

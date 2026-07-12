@@ -96,6 +96,85 @@ def _demo_package() -> dict:
     }
 
 
+def test_retirement_preview_flag_without_dry_run_leaves_no_committed_state(tmp_path):
+    """반례 CX-6 (INV-9): --retirement-preview-db는 --dry-run 전용인데, 검증이 apply
+    커밋 뒤에 있어 실수로 --dry-run 없이 부른 '실패' 명령이 완전한 apply를 커밋한다.
+
+    운영자가 읽기 전용 프리뷰를 의도했으나 --dry-run을 빠뜨리면(apply가 기본), DB 파일
+    생성·모드 브랜딩·source·import run·presentation이 커밋된 뒤 ValueError가 나서
+    보고서도 없이 실패한다 — 실패한 명령이 상태를 남기면 안 된다는 계약(INV-9) 위반."""
+    package = _demo_package()
+    target = tmp_path / "target.db"
+    baseline = tmp_path / "baseline.db"
+    db.init_db(baseline)  # 존재하는 baseline이라 '파일 없음'이 아닌 플래그 검증에 도달
+
+    with pytest.raises(ValueError):
+        catalog_import.run_catalog_import(
+            package["source"],
+            package["records"],
+            dry_run=False,
+            db_path=str(target),
+            database_mode="demo",
+            retirement_preview_db=str(baseline),
+        )
+
+    # 실패한 프리뷰 오용은 대상 DB에 어떤 커밋도 남기지 않아야 한다
+    if target.exists():
+        conn = db.get_conn(target)
+        try:
+            runs = conn.execute("SELECT COUNT(*) AS n FROM drug_import_runs").fetchone()["n"]
+            presentations = conn.execute(
+                "SELECT COUNT(*) AS n FROM drug_presentations"
+            ).fetchone()["n"]
+        finally:
+            conn.close()
+        assert runs == 0, "실패한 프리뷰 명령이 import run을 커밋했다 (INV-9 위반)"
+        assert presentations == 0, "실패한 프리뷰 명령이 presentation을 커밋했다"
+
+
+def test_metaless_db_with_production_sources_refuses_demo_first_apply(tmp_path):
+    """반례 CX-7 (INV-8): catalog_database_meta 행이 없는데 production source가 이미
+    있는 DB(meta 테이블 도입 이전에 seed된 legacy DB의 상태)를 demo first-apply가
+    조용히 demo로 브랜딩한다 — demo 레코드가 production 레코드 옆에 앉고, 이후 모든
+    production refresh가 영구 거부된다.
+
+    missing-row 분기가 production 방향만 보호(demo source가 있으면 production 거부)하고
+    demo 방향(production source가 있으면 demo 거부)은 빠져 있던 비대칭이 원인."""
+    path = tmp_path / "legacy.db"
+    db.init_db(path)
+    conn = db.get_conn(path)
+    try:
+        # meta 도입 이전 legacy 상태 재현: production source 존재 + meta 행 없음
+        conn.execute(
+            """INSERT INTO drug_sources
+               (id, slug, name, operator, tier, usage_scope, reuse_status,
+                created_at, updated_at)
+               VALUES ('src-prod','official-legacy','Official legacy','Authority',
+                       1,'production','approved','2026-01-01T00:00:00Z',
+                       '2026-01-01T00:00:00Z')""",
+        )
+        conn.execute("DELETE FROM catalog_database_meta")
+        conn.commit()
+
+        package = _demo_package()
+        with pytest.raises(ValueError):
+            drug_catalog.import_catalog(
+                conn, package["source"], package["records"], database_mode="demo"
+            )
+
+        # 브랜딩·demo source 유입이 없어야 한다
+        meta = conn.execute(
+            "SELECT catalog_mode FROM catalog_database_meta WHERE id=1"
+        ).fetchone()
+        assert meta is None or meta["catalog_mode"] == "production"
+        demo_sources = conn.execute(
+            "SELECT COUNT(*) AS n FROM drug_sources WHERE usage_scope='demo'"
+        ).fetchone()["n"]
+        assert demo_sources == 0, "demo source가 production DB에 유입됐다 (INV-8 위반)"
+    finally:
+        conn.close()
+
+
 def test_generic_cli_dry_run_then_apply_preserves_raw_record(tmp_path):
     package = _production_package()
     package_path = tmp_path / "package.json"

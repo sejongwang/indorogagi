@@ -1124,11 +1124,19 @@ def _ensure_database_mode(conn: sqlite3.Connection, expected_mode: str) -> None:
         )
         return
 
+    # meta 행이 없는 DB(meta 도입 이전 legacy seed)를 first-apply가 브랜딩하기 전에
+    # 이미 든 데이터의 scope를 양방향으로 확인한다. 한쪽만 막으면 production 데이터가
+    # 든 DB가 demo로 브랜딩돼 demo 레코드가 섞이고 이후 production refresh가 막힌다(INV-8).
     existing_demo = conn.execute(
         "SELECT 1 FROM drug_sources WHERE usage_scope='demo' LIMIT 1"
     ).fetchone()
     if existing_demo and expected_mode != "demo":
         raise ValueError("database already contains demo sources; production mode refused")
+    existing_production = conn.execute(
+        "SELECT 1 FROM drug_sources WHERE usage_scope='production' LIMIT 1"
+    ).fetchone()
+    if existing_production and expected_mode != "production":
+        raise ValueError("database already contains production sources; demo mode refused")
     now = _now()
     conn.execute(
         """INSERT INTO catalog_database_meta

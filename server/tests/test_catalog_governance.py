@@ -438,6 +438,79 @@ def test_excluded_later_payload_preserves_human_rejection_and_search_block(
     assert "rejection remains in force" in audit["note"]
 
 
+def test_projection_change_preserves_human_rejection_and_search_block(
+    governance_conn,
+):
+    """반례 트레이스(formal/spec.md S1): reject → 상류 projection 변경 임포트 → 검색 재유입.
+
+    사람이 검색에서 차단한 레코드(rejected)를 자동 임포트가 needs_review로 되돌리면
+    needs_review는 검색 가능 상태이므로 사람 개입 없이 차단이 풀린다(INV-8).
+    excluded/quarantined 경로(위 테스트)와 동일하게 rejected는 유지돼야 하며,
+    재검토는 사람의 review_requested 전이로만 연다."""
+    conn = governance_conn
+    _import(conn, "1", [_record("blocked", "DEMO Blocked", complete=False)])
+    row = _presentation(conn, "blocked")
+    governance.transition_presentation(
+        conn,
+        row["id"],
+        action="review_rejected",
+        expected_record_version=row["record_version"],
+        **_review_fields(reason_code="dangerous_lookalike"),
+    )
+    rejected = _presentation(conn, "blocked")
+    assert drug_catalog.search_catalog(conn, "DEMO Blocked", include_demo=True) == []
+
+    # 상류가 표시 필드를 바꾼 후속 임포트 — projection 변경 경로(excluded 아님)
+    report = _import(conn, "2", [_record("blocked", "DEMO Blocked Revised", complete=False)])
+    current = _presentation(conn, "blocked")
+    assert current["workflow_review_status"] == "rejected", (
+        "projection 변경이 사람의 rejected를 자동으로 되돌리면 차단 레코드가 검색에 재유입된다"
+    )
+    assert drug_catalog.search_catalog(conn, "DEMO Blocked", include_demo=True) == []
+    assert drug_catalog.search_catalog(
+        conn, "DEMO Blocked Revised", include_demo=True
+    ) == []
+    assert report["review_reopened_count"] == 0
+
+    # 근거(evidence)는 전진해야 한다: 버전 증가 + 감사 행 + 변경 diff 보존
+    assert current["record_version"] == rejected["record_version"] + 1
+    audit = conn.execute(
+        """SELECT * FROM drug_review_decisions
+           WHERE presentation_id=? AND action='source_record_updated'
+           ORDER BY rowid DESC LIMIT 1""",
+        (current["id"],),
+    ).fetchone()
+    assert audit["previous_review_status"] == "rejected"
+    assert audit["next_review_status"] == "rejected"
+
+    # 재개는 사람의 몫: review_requested(rejected→needs_review)는 계속 가능해야 한다
+    governance.transition_presentation(
+        conn,
+        current["id"],
+        action="review_requested",
+        expected_record_version=current["record_version"],
+        **_review_fields(reason_code="source_changed_reconsider"),
+    )
+    reopened = _presentation(conn, "blocked")
+    assert reopened["workflow_review_status"] == "needs_review"
+
+
+def test_projection_change_still_reopens_human_approval(governance_conn):
+    """대칭 확인: approved의 리셋(신뢰 하향 방향)은 유지된다 — 기존 계약 회귀 방지."""
+    conn = governance_conn
+    _import(conn, "1", [_record("anchor2", "DEMO Anchor Two", complete=False)])
+    row = _presentation(conn, "anchor2")
+    governance.transition_presentation(
+        conn,
+        row["id"],
+        action="review_approved",
+        expected_record_version=row["record_version"],
+        **_review_fields(),
+    )
+    _import(conn, "2", [_record("anchor2", "DEMO Anchor Two Revised", complete=False)])
+    assert _presentation(conn, "anchor2")["workflow_review_status"] == "needs_review"
+
+
 def test_failed_same_raw_reprocess_does_not_replace_applied_run_identity(
     governance_conn, monkeypatch
 ):
