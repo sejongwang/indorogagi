@@ -1,4 +1,6 @@
-# indoro 환자측 화면 인벤토리 v1.0
+# indoro 환자측 화면 인벤토리 v1.0 (초기 와이어프레임 기록)
+
+> **2026-07-10 구현 정정:** 아래 v1.0의 약×시간 매트릭스, 전개 카드, 미디어 placeholder는 초기 탐색 기록이다. 인도 레퍼런스 조사와 모바일 QA 후 실제 서버 정본은 [`server/templates/patient.html`](../server/templates/patient.html)의 **아침→점심→저녁→밤 인포그래픽 행동 띠**로 바뀌었다. 약별 상세는 핵심 흐름 아래의 네이티브 `details`, 미구현 음성·영상 UI는 제거, `/privacy`는 구현, `OD_NIGHT`는 H(밤) 슬롯으로 정리했다. 환자 렌더는 실시간 의약품 카탈로그가 아니라 처방 항목에 저장된 발급 스냅샷 또는 약사가 입력한 자유 원문을 사용한다. 선택 근거는 [`05-india-medication-poster-research.md`](05-india-medication-poster-research.md), 최신 검증 결과는 [`07-infographic-poster-visual-qa.md`](07-infographic-poster-visual-qa.md)를 정본으로 본다.
 
 **TL;DR**
 
@@ -140,7 +142,7 @@ html[data-lang="hi"] [lang="en"], html[data-lang="en"] [lang="hi"] { display: no
 | S5 코드 입력 / S6 고지 / S7 오류 | ≤10KB / ≤10KB / ≤5KB | 1 | JS 불요 |
 | 영상 / 음성 | 개당 ≤3MB / ≤150KB (예산 외) | 탭 시에만 Range | `preload` 없음 — 탭 전 0바이트 |
 
-- SVG 심볼셋(≤15KB) 내역: 슬롯 4 + 식전후 4 + 패턴 아이콘 9(`patterns.yaml icon_key`) + 단위 7(`unit.*` 아이콘) + 기능 아이콘(재생·스피커·공유·복사·카메라·경고·모래시계·달력·봉투·체크) — 전부 단색 스트로크 단순 도형(저해상도 가독), 카드에서는 `<use>` 재사용이라 항목 수와 무관하게 증분 0(§3.6).
+- SVG 심볼셋 내역: 슬롯 4 + 식전후 4 + 패턴 아이콘 9(`patterns.yaml icon_key`) + 단위 14종의 자체 SVG + 기능 아이콘(공유·복사·경고·모래시계·달력·봉투·체크). `drop`은 같은 저장 단위를 쓰되 route에 따라 oral/eye/ear/nasal 라벨을 병기한다. 전부 단색 스트로크 단순 도형이고 `<use>`로 재사용한다.
 - 항목당 HTML 증분(hi+en 텍스트 이중화 포함) 약 1.2KB gzip — **최악 10항목에서도 HTML ≤25KB 성립**. §7.2의 로컬 체크 스크립트에 **10항목·전 패턴 픽스처**를 포함해 검증한다.
 - 렌더 순서: RTT 1에 헤더+시간표+카드 텍스트/SVG 완결 → lazy 포스터 → 유휴 beacon → 탭 시 미디어(§7.2).
 
@@ -200,17 +202,17 @@ html[data-lang="hi"] [lang="en"], html[data-lang="en"] [lang="hi"] { display: no
 | 요소 | 바인딩 | 표시 규칙 |
 |---|---|---|
 | 번호 배지 | `prescription_items.position` | 색+숫자 원형 40px+ — 봉투 유성펜 번호와 대조(§3.3). 카드 좌상단 고정 |
-| 약명 | `prescription_items.drug_name_raw` | 라틴 원문 그대로 20px+(정본 — §3.3). 번역·음차 금지 |
-| 부가 정보 | `drugs.generic_name`, `drugs.strength` (`drug_id` 매칭 시만) | 소자 회색 — 장식(enrichment). 미매칭 항목과 렌더 경로 완전 동일(§3.6) |
+| 약명 | `prescription_items.drug_name_raw`와 발급 시 `drug_catalog_snapshot_json.short_display_name` | 약사가 확인한 표시명을 그대로 사용한다. 발급 뒤 live catalog 변경으로 조용히 바꾸거나 번역·음차하지 않음 |
+| 부가 정보 | `prescription_items.drug_catalog_snapshot_json`의 약사가 확인한 성분·함량·제형 일부 | 필요할 때만 보조 표시. 제조사·가격·출처·원본 ID·승인 해시는 환자 응답에서 제외하고, 미매칭 자유 입력과 동일한 복약 렌더 경로를 사용 |
 | 음성 버튼 | `patterns.yaml audio_key` → `assets.yaml`(kind=audio, lang, variant) 폴백 체인 | **카드 행동 최상단 — 영상보다 항상 위(§7.2)**. 스피커 아이콘+"듣기", 재생 중 파형 피드백. 자산 결측 시 비렌더(H11). **포함 여부 §10-6 미결정** |
 | 패턴 이름 | `pattern_key` → i18n `pattern.{key}.name` + `icon_key` 심볼 | 예: "दिन में 3 बार" |
 | **4칸 스트립 인포그래픽** | `patterns.yaml slots` + `dose_morning/noon/evening/night` + 슬롯 아이콘 | M/N/E/H 고정 순서. 사용 칸 = 해/달 아이콘 + 수량 숫자, 미사용 칸 = 흐림. 스트립 아래 **"1-0-1" 숫자열 병기** — 약사 구두 설명·봉투 기입 관행과의 브리지. 0.5 → "½" |
 | 식전후 행 | `timing_food` → `timing.*` + 아이콘 | NULL이면 행 자체 미표시 |
 | 기간·총량 행 | `duration_days` + `ui.days_suffix`(달력 아이콘) / `total_quantity` + `unit.*`(알약 더미 아이콘) | `dose_unit='ml'`이면 총량도 ml — "시럽이 गोली로 렌더되면 안전 사고"(§3.3) 규칙의 화면측 집행. 예: "5일 · 총 15 गोली" / "5 ml씩 · 총 100 ml" |
-| PRN 블록 (`schedule_type=prn`) | `prn_reason_key`→`prn.*`, `prn_max_per_day`, `prn_min_gap_hours` | 스트립 대신 "필요할 때만" 카드: "하루 최대 **N**회 · 최소 **N**시간 간격" — 숫자 대자, 경고 톤 |
+| PRN 블록 (`schedule_type=prn`) | `extra_params_json.dose_per_use`, `prn_reason_key`→`prn.*`, `prn_max_per_day`, `prn_min_gap_hours` | 스트립 대신 "필요할 때만" 카드: **"매번 N 단위"** + "하루 최대 **N**회 · 최소 **N**시간 간격" — 세 수치 모두 발급 필수, 기존 누락 데이터는 약국 확인 경고, 숫자 대자, 경고 톤 |
 | CUSTOM 변형 | `extra_params_json.instructions` 원문 | 영상·음성·스트립 없음. 경고 아이콘 + `ui.custom_warning`("약사의 설명을 따르세요" hi/en) + 원문 — 잘못된 패턴 영상이 무영상보다 위험(§3.4) |
 | 영상 블록 | `patterns.yaml video_key` → payload `pattern.video.url/.duration_sec/.size_label` | 공용 포스터 1장(무언어, `loading=lazy`, 전 카드 동일 URL이라 요청 1회) + 재생 오버레이 + "동영상 보기 · 약 3MB · 30초" 라벨(§7.2 용량 고지) |
-| 주의 배지 | `drugs.caution_keys_json` → `caution.*` (매칭 시만) | 경고 아이콘 + 한 줄 |
+| 주의 배지 | 약사가 처방에 명시한 주의 문구 | live catalog의 불완전한 경고나 적응증을 자동으로 환자 안내에 추가하지 않음 |
 | 항목 메모 | `prescription_items.note` (있을 때만) | 말풍선 아이콘, 소자 |
 
 **상태 변형**: 로딩 — S1과 동일 문서라 없음(영상 탭 후 버퍼링은 브라우저 기본). 오프라인 — 미디어 탭 실패 시 토스트+버튼 유지, 인포그래픽은 항상 성립(영상 = 순수 progressive enhancement §7.2). 에러 — 자산 결측·404는 폴백 체인(요청 lang → std → any → hi, §3.4), 최종 결측 시 해당 버튼만 비렌더(카드 성립 무영향 — H11). 빈 — daily는 슬롯 합>0 검증(§4.3)이라 빈 스트립 불가, PRN/CUSTOM은 전용 블록.
@@ -252,14 +254,14 @@ html[data-lang="hi"] [lang="en"], html[data-lang="en"] [lang="hi"] { display: no
 
 ## 6. C2 — 가족 공유 + 스크린샷 보관 (S1 하단 섹션)
 
-**목적**: 가족 분담 문화(의사-환자-가족 3자)를 1탭 공유로 지원하고, 동시에 오프라인 사본(메시지·스크린샷)을 만든다.
+**목적**: 가족 분담 문화(의사-환자-가족 3자)를 1탭 공유로 지원하고, 스크린샷으로 오프라인 사본을 만든다.
 
 **핵심 요소 · 바인딩**:
 
 | 요소 | 바인딩/내용 | 규칙 |
 |---|---|---|
 | 공유 버튼(전폭 56px) | 생성 URL = `/p/{token}?lang={현재 표시 언어}&src=share` (D12) | ① `navigator.share` OS 시트(method=webshare) ② `wa.me/?text=` 링크 — **JS 없이도 성립**(method=whatsapp) ③ 링크 복사(method=copy, JS) |
-| 공유 메시지 본문 | URL + 핵심 요약: 항목별 `drug_name_raw` + "1-0-1" 숫자열 + `duration_days`일 (§7.3-②) | **메시지 자체가 오프라인 사본**. `patient_label` 미포함(§8.1) |
+| 공유 메시지 본문 | 일반적인 "복약 안내" 문구 + 불투명 토큰 URL | wa.me URL·메타데이터에 약명·용법·`patient_label`을 넣지 않는다. |
 | 스크린샷 보관 카드 | 정적 `ui.save_screenshot` + 카메라 아이콘 | "화면을 캡처해 보관하세요"(§7.3-①) — 저사양 환경의 사실상 표준 오프라인 사본. 계측 불가(감수) |
 
 **상태 변형**: `navigator.share` 미지원(구형 WebView) — wa.me+복사 폴백 자동 표기. 오프라인 — 시트·복사는 로컬 동작(전송은 메신저 몫). 에러/빈 — 해당 없음.
@@ -268,7 +270,7 @@ html[data-lang="hi"] [lang="en"], html[data-lang="en"] [lang="hi"] { display: no
 
 **계측 포인트**: 클라 `share.clicked`(method). 도달 검증은 서버 — `src=share` + 새 ivid의 `view.opened`(가장 신뢰 가능한 공유 신호 §6.4). 한계 각주 고정: WhatsApp 인앱 웹뷰 쿠키 분리(과대), URL 직접 복사 시 src 소실(하한선).
 
-**프라이버시 정합**: og/`<title>` 고정 "복약 안내 (indoro)" — 프리뷰 봇에 약명·별칭 미노출(§8.2). `wa.me`는 환자 페이지의 **유일한 외부 링크 예외**(의도된 공유 행동, `no-referrer`라 Referer 경유 토큰 유출 없음 — §5.1과 정합).
+**프라이버시 정합**: og/`<title>` 고정 "복약 안내 (indoro)"이고 공유 문구도 일반 문구+불투명 토큰 링크만 사용해 프리뷰·URL에 약명·별칭을 노출하지 않는다. `wa.me`는 환자 페이지의 **유일한 외부 링크 예외**다.
 
 ---
 

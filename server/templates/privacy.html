@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ UI.page_title }}</title>
+<link rel="icon" href="data:,">
+<style>
+:root { color-scheme: light only; --paper:#fffaf0; --ink:#17211d; --green:#0b3b2c; --yellow:#f4c85a; --line:#d8d3c4; }
+* { box-sizing: border-box; }
+body { margin:0 auto; max-width:480px; min-height:100dvh; overflow-x:hidden; background:var(--paper); color:var(--ink); font-family:"Noto Sans Devanagari","Nirmala UI",Mangal,system-ui,sans-serif; font-size:17px; line-height:1.72; }
+header { padding:20px 16px; color:#fff; background:var(--green); border-bottom:8px solid #c96a16; }
+h1 { margin:0; font-size:1.7rem; line-height:1.6; }
+main { padding:16px; }
+section { padding:14px 0; border-bottom:1px solid var(--line); }
+h2 { margin:0 0 5px; color:var(--green); font-size:1.08rem; line-height:1.6; }
+p { margin:0; overflow-wrap:anywhere; }
+.en { color:#5b665f; font-size:.9rem; line-height:1.65; }
+a { min-height:52px; margin-top:20px; padding:10px 12px; display:flex; align-items:center; justify-content:center; color:var(--green); background:var(--yellow); border:2px solid var(--green); border-radius:7px; text-align:center; font-weight:850; }
+</style>
+</head>
+<body>
+<header><h1><span lang="hi">{{ UI.privacy.title.hi }}</span><br><span class="en" lang="en" style="color:#fff">{{ UI.privacy.title.en }}</span></h1></header>
+<main>
+  <section><p lang="hi">{{ UI.privacy.intro.hi }}</p><p class="en" lang="en">{{ UI.privacy.intro.en }}</p></section>
+  <section><h2><span lang="hi">{{ UI.privacy.stores_title.hi }}</span> · <span lang="en">{{ UI.privacy.stores_title.en }}</span></h2><p lang="hi">{{ UI.privacy.stores_body.hi }}</p><p class="en" lang="en">{{ UI.privacy.stores_body.en }}</p></section>
+  <section><h2><span lang="hi">{{ UI.privacy.sharing_title.hi }}</span> · <span lang="en">{{ UI.privacy.sharing_title.en }}</span></h2><p lang="hi">{{ UI.privacy.sharing_body.hi }}</p><p class="en" lang="en">{{ UI.privacy.sharing_body.en }}</p></section>
+  <section><h2><span lang="hi">{{ UI.privacy.help_title.hi }}</span> · <span lang="en">{{ UI.privacy.help_title.en }}</span></h2><p lang="hi">{{ UI.privacy.help_body.hi }}</p><p class="en" lang="en">{{ UI.privacy.help_body.en }}</p></section>
+  <a href="/" onclick="if (history.length > 1) { history.back(); return false; }"><span lang="hi">{{ UI.privacy.back.hi }}</span> · <span lang="en">{{ UI.privacy.back.en }}</span></a>
+</main>
+</body>
+</html>

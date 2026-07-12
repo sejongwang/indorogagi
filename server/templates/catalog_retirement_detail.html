@@ -1,0 +1,56 @@
+{% extends "catalog_ops_base.html" %}
+{% block title %}Retirement batch {{ batch.id }}{% endblock %}
+{% block content %}
+<article data-qa="catalog-retirement-detail" class="ops-stack">
+  <a class="ops-back" href="/catalog/retirements">← Retirement batches</a>
+  <header class="ops-page-heading"><div><p class="ops-eyebrow">{{ batch.source_slug }} · full snapshot comparison</p><h1>{{ batch.source_name }}</h1><p>Baseline {{ batch.baseline_version }} → incoming {{ batch.import_version }}</p><p class="ops-mono">{{ batch.baseline_import_run_id }} → {{ batch.import_run_id }}</p></div><div class="ops-record__status"><span class="ops-status lifecycle-{{ batch.status }}">Batch: {{ batch.status|replace('_',' ') }}</span><span>{{ batch.candidate_count }} candidates · {{ batch.unresolved_count }} unresolved{% if batch.stale_count %} · {{ batch.stale_count }} stale{% endif %}</span></div></header>
+  <div class="ops-message ops-message--warning">Choosing <b>Retire</b> does not change search. Only a separate batch approval and apply transaction can set lifecycle to retired. Issued prescription snapshots remain unchanged.</div>
+
+  <section class="ops-stack"><div class="ops-result-heading"><h2>Missing source records</h2><p>Every candidate must be kept or marked to retire before approval.</p></div>
+    {% for item in batch.candidates %}
+    <article class="card ops-candidate" data-qa="retirement-candidate" data-presentation-id="{{ item.presentation_id }}">
+      <div class="ops-candidate__identity"><p class="ops-eyebrow ops-mono">{{ item.source_record_id }}</p><h3>{{ item.brand_name_raw }}</h3><p>{{ item.generic_name_raw or 'Ingredient missing' }}{% if item.strength_raw %} · {{ item.strength_raw }}{% endif %}{% if item.dosage_form_raw %} · {{ item.dosage_form_raw }}{% endif %}{% if item.route_raw %} · {{ item.route_raw }}{% endif %}</p></div>
+      <div class="ops-record__status"><span class="ops-status">Candidate: {{ item.decision|replace('_',' ') }}</span><span class="ops-status lifecycle-{{ item.operational_lifecycle_status }}">Current search: {{ item.operational_lifecycle_status }}</span>{% if item.applied_at %}<span class="ops-status review-approved">Applied after version check</span>{% elif item.current_presentation_version != item.expected_presentation_version %}<span class="ops-status review-rejected">Stale presentation version</span>{% endif %}</div>
+      {% if batch.status in ['proposed','under_review'] and item.current_presentation_version == item.expected_presentation_version %}
+      <form method="post" action="/catalog/retirements/{{ batch.id }}/candidates/{{ item.id }}" class="ops-candidate-form" data-qa="candidate-decision">
+        <input type="hidden" name="expected_candidate_version" value="{{ item.record_version }}">
+        <input type="hidden" name="expected_presentation_version" value="{{ item.current_presentation_version }}">
+        <label class="field"><span class="field-label">Decision</span><select class="input" name="decision" required><option value="">Choose…</option><option value="keep_active" {% if item.decision == 'keep_active' %}selected{% endif %}>Keep active</option><option value="retire" {% if item.decision == 'retire' %}selected{% endif %}>Mark to retire</option><option value="needs_investigation" {% if item.decision == 'needs_investigation' %}selected{% endif %}>Needs investigation</option></select></label>
+        <label class="field"><span class="field-label">Reviewer ID</span><input class="input" name="reviewer_id" required></label>
+        <label class="field"><span class="field-label">Reviewer role</span><input class="input" name="reviewer_role" required value="pharmacist reviewer"></label>
+        <label class="field"><span class="field-label">Reason code</span><input class="input" name="reason_code" required></label>
+        <label class="field ops-candidate-form__note"><span class="field-label">Required note</span><textarea class="input" name="note" required>{{ item.review_note or '' }}</textarea></label>
+        <button class="btn btn-secondary" type="submit">Record candidate decision</button>
+      </form>
+      {% elif batch.status in ['proposed','under_review','approved'] and not item.applied_at and item.current_presentation_version != item.expected_presentation_version %}<p class="ops-message ops-message--warning">Newer source or review evidence invalidated this candidate. Do not retire it from this batch; cancel the batch and investigate the newer record.</p>
+      {% else %}<p>{{ item.reviewer_id or 'No reviewer' }} · {{ item.review_note or 'No note' }}</p>{% endif %}
+    </article>
+    {% endfor %}
+  </section>
+
+  {% if batch.status in ['proposed','under_review','approved'] %}
+  <section class="card ops-batch-action">
+    <p class="ops-eyebrow">Batch control</p><h2>{% if batch.status == 'approved' %}Apply approved retirement{% else %}Approve or cancel this proposal{% endif %}</h2>
+    <form method="post" class="ops-stack" action="/catalog/retirements/{{ batch.id }}/{% if batch.status == 'approved' %}apply{% else %}approve{% endif %}">
+      <input type="hidden" name="expected_batch_version" value="{{ batch.record_version }}">
+      <div class="ops-form-grid">
+        <label class="field"><span class="field-label">Operator ID</span><input class="input" name="reviewer_id" required></label>
+        <label class="field"><span class="field-label">Operator role</span><input class="input" name="reviewer_role" required value="catalog governance approver"></label>
+        <label class="field"><span class="field-label">Reason code</span><input class="input" name="reason_code" required value="full_snapshot_reviewed"></label>
+        <label class="field ops-form-grid__wide"><span class="field-label">Required decision note</span><textarea class="input" name="note" required></textarea></label>
+      </div>
+      {% if batch.status == 'approved' %}<button class="btn btn-danger btn-wide" type="submit" data-qa="batch-apply" {% if batch.stale_count %}disabled{% endif %}>Apply: retire marked records</button>{% else %}<button class="btn btn-primary" type="submit" data-qa="batch-approve" {% if batch.unresolved_count or batch.stale_count %}disabled{% endif %}>Approve resolved batch</button>{% endif %}
+    </form>
+    <form method="post" action="/catalog/retirements/{{ batch.id }}/cancel" class="ops-cancel-form">
+      <input type="hidden" name="expected_batch_version" value="{{ batch.record_version }}">
+      <input type="hidden" name="reviewer_role" value="catalog governance approver"><input type="hidden" name="reason_code" value="batch_cancelled_by_operator">
+      <label class="field"><span class="field-label">Operator ID to cancel</span><input class="input" name="reviewer_id" required></label>
+      <label class="field"><span class="field-label">Cancellation note</span><input class="input" name="note" required></label>
+      <button class="btn btn-secondary" type="submit" data-qa="batch-cancel">Cancel batch</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <section class="card"><p class="ops-eyebrow">Append-only batch ledger</p><h2>Batch history</h2><div class="ops-timeline">{% for event in batch.events %}<article><time>{{ event.created_at }}</time><h3>{{ event.action|replace('_',' ') }}</h3><p>{{ event.actor_id }} · {{ event.actor_role }}</p><p><b>{{ event.reason_code }}</b> · {{ event.note }}</p></article>{% endfor %}</div></section>
+</article>
+{% endblock %}

@@ -39,6 +39,11 @@ EVENTS_MAX_BODY_BYTES = 2048   # §4.7: 요청당 ≤2KB
 EVENTS_MAX_COUNT = 20          # §4.7: 요청당 ≤20개
 
 REISSUE_REASONS = ("wrong_patient", "input_error", "other")  # §4.4
+ADMINISTRATION_ROUTES = (
+    "oral", "ophthalmic", "otic", "nasal", "inhalation", "topical",
+    "rectal", "vaginal", "transdermal", "intravenous", "intramuscular",
+    "subcutaneous", "other",
+)
 # §6.2 scan.failed reason enum — 스캔 불가 단말 비율 실측(§2.5)
 SCAN_FAILURE_REASONS = ("no_qr_camera", "camera_broken", "feature_phone", "refused")
 
@@ -116,6 +121,17 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
         name = item.get("drug_name_raw")
         if not isinstance(name, str) or not name.strip():
             return _verr(f"{p}.drug_name_raw", "required")
+        input_raw = item.get("drug_input_raw")
+        if input_raw is not None and not isinstance(input_raw, str):
+            return _verr(f"{p}.drug_input_raw", "must be a string or null")
+        match_state = item.get("drug_match_state")
+        if match_state is not None and match_state not in (
+            "free_text", "selected", "selected_then_modified"
+        ):
+            return _verr(
+                f"{p}.drug_match_state",
+                "must be free_text, selected, or selected_then_modified",
+            )
 
         key = item.get("pattern_key")
         pat = patterns.get(key) if isinstance(key, str) else None
@@ -156,6 +172,14 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
         if schedule_type == "weekly":
             if not extra or extra.get("day_of_week") not in days:
                 return _verr(f"{p}.extra_params.day_of_week", "required for weekly pattern")
+        if schedule_type == "prn":
+            dose_per_use = (extra or {}).get("dose_per_use")
+            if not _is_num(dose_per_use) or dose_per_use <= 0:
+                return _verr(f"{p}.extra_params.dose_per_use", "required number > 0 for PRN")
+            for prn_field in ("prn_max_per_day", "prn_min_gap_hours"):
+                pv = item.get(prn_field)
+                if not _is_num(pv) or pv <= 0:
+                    return _verr(f"{p}.{prn_field}", "required number > 0 for PRN")
         # §4.3: CUSTOM은 instructions + verbal_counseling_given=true 필수
         if schedule_type == "custom":
             instructions = (extra or {}).get("instructions")
@@ -163,15 +187,27 @@ def _validate_items(cfg: dict[str, Any], items: Any, path: str = "items") -> JSO
                 return _verr(f"{p}.extra_params.instructions", "required for CUSTOM")
             if (extra or {}).get("verbal_counseling_given") is not True:
                 return _verr(f"{p}.extra_params.verbal_counseling_given", "must be true for CUSTOM")
-        # §4.3: prn은 상한 '권장' — 검증 실패 사유로 삼지 않는다(형식만 확인)
+        # PRN 외 일정에 잔존 값이 있어도 잘못된 숫자는 받지 않는다.
+        # PRN의 상한·최소 간격은 위에서 필수로 검증된다.
         for prn_field in ("prn_max_per_day", "prn_min_gap_hours"):
             pv = item.get(prn_field)
             if pv is not None and (not _is_num(pv) or pv <= 0):
                 return _verr(f"{p}.{prn_field}", "must be a number > 0")
 
         unit = item.get("dose_unit")
-        if unit is not None and unit not in DOSE_UNITS:
+        if not isinstance(unit, str) or unit not in DOSE_UNITS:
             return _verr(f"{p}.dose_unit", f"must be one of {list(DOSE_UNITS)}")
+        route = item.get("administration_route")
+        if route is not None and route not in ADMINISTRATION_ROUTES:
+            return _verr(
+                f"{p}.administration_route",
+                f"must be one of {list(ADMINISTRATION_ROUTES)} or null",
+            )
+        if unit == "drop" and route not in ("oral", "ophthalmic", "otic", "nasal"):
+            return _verr(
+                f"{p}.administration_route",
+                "oral, ophthalmic, otic, or nasal route is required for drops",
+            )
         tf = item.get("timing_food")
         if tf is not None and tf not in TIMING_FOOD:
             return _verr(f"{p}.timing_food", f"must be one of {list(TIMING_FOOD)} or null")
@@ -269,6 +305,10 @@ async def create_prescription(request: Request):
             # §2.3: 조용한 재생성 금지 — 클라가 약사 확인 목록에 올린다
             return _err(409, "TOKEN_COLLISION",
                         "pre-generated token already exists; do not regenerate silently")
+        except db.IdempotencyConflictError:
+            # §4.1: 동일 멱등키 + 다른 본문 — 조용한 replay는 수정 내용을 유실시킨다
+            return _err(409, "IDEMPOTENCY_CONFLICT",
+                        "same client_input_id was already issued with a different body")
         result = _attach_url(result, _base_url(request))
         return JSONResponse(result, status_code=200 if result["replayed"] else 201)
     finally:
@@ -330,6 +370,10 @@ async def reissue_prescription(prescription_id: str, request: Request):
             result = db.reissue(conn, prescription_id, pharmacy_id, payload)
         except LookupError:
             return _err(404, "NOT_FOUND", "not found")  # 미존재·타 약국 — 존재 은닉
+        except ValueError:
+            # 이미 폐기된 구건 — 폐기 시각·감사를 덮어쓰지 않는다. 활성 대체본을 재발급.
+            return _err(410, "LINK_REVOKED",
+                        "prescription already revoked; reissue its active replacement")
         except db.TokenCollisionError:
             return _err(409, "TOKEN_COLLISION",
                         "pre-generated token already exists; do not regenerate silently")
@@ -465,6 +509,9 @@ async def edit_prescription(prescription_id: str, request: Request):
         except ValueError:
             # revoked 처방은 수정 불가(§5.2) — 구건은 부활하지 않는다
             return _err(410, "LINK_REVOKED", "cannot edit a revoked prescription")
+        except db.PrescriptionExpiredError:
+            # 만료 후 수정 허용은 expires_at 재산정으로 죽은 토큰을 되살린다(§5.2)
+            return _err(410, "LINK_EXPIRED", "cannot edit an expired prescription; reissue instead")
         return JSONResponse(_bundle_to_detail(bundle, _base_url(request)), status_code=200)
     finally:
         conn.close()
@@ -531,7 +578,12 @@ async def scan_failure(prescription_id: str, request: Request):
 @router.get("/drugs")
 def search_drugs(request: Request):
     """§4.5 자동완성 — q 2자 미만 빈 배열, limit 기본 8·최대 20.
-    어떤 실패로도 200 + 배열(입력 흐름을 절대 막지 않는다) — 쿼리 파싱도 직접 수행."""
+    어떤 실패로도 200 + 배열(입력 흐름을 절대 막지 않는다) — 쿼리 파싱도 직접 수행.
+
+    운영 검색에는 승인된 production source만 포함한다. 명시적 데모 약국에서만
+    Tier 3 demo source를 더해 UX를 시연한다. 클라이언트가 임의 쿼리 파라미터로
+    demo 범위를 켤 수 없게 약국 컨텍스트만 사용한다.
+    """
     try:
         q = request.query_params.get("q") or ""
         try:
@@ -540,7 +592,10 @@ def search_drugs(request: Request):
             limit = 8
         conn = db.get_conn()
         try:
-            return db.search_drugs(conn, q, limit=limit)
+            include_demo = (
+                request.headers.get("X-Pharmacy-Id") == db.DEMO_CATALOG_PHARMACY_ID
+            )
+            return db.search_drugs(conn, q, limit=limit, include_demo=include_demo)
         finally:
             conn.close()
     except Exception:

@@ -1,18 +1,23 @@
 # indoro server (v0 관통 프로토타입)
 
-시드 DB 약 검색 → P1 처방 입력 → 발급(토큰+QR) → 환자 폰 스캔 → S1 인포그래픽 열람.
-정본 스펙: `docs/01-dataflow.md` · 렌더 정본: `wireframes/patient/s1-landing.html` · DB: `server/var/indoro.db`(gitignore).
+출처 추적 의약품 검색 → P1 처방 입력 → 발급(토큰+실제 SVG QR) → 환자 폰 스캔 → 하루 흐름 복약 포스터 열람.
+정본 스펙: `docs/01-dataflow.md` · 환자 렌더 정본: `server/templates/patient.html` · DB: `server/var/indoro.db`(gitignore).
 
-## 명령 4개
+## 주요 명령
 
 ```bash
 cd server && uv run uvicorn app.main:app --port 8600      # 실행 (첫 실행 전 uv sync)
-cd server && uv run python scripts/seed_import.py         # 시드 임포트 (627건 + ph-demo-001, 재실행 멱등)
-cd server && uv run python scripts/demo.py                # 데모 처방 1건(FX-A 3항목) 생성 → 토큰 URL 출력
-cd server && uv run pytest -q                             # 테스트 (18 passed)
+cd server && uv run python scripts/seed_import.py --dry-run --report-dir ../data/reports
+cd server && uv run python scripts/seed_import.py --report-dir ../data/reports
+cd server && uv run python scripts/seed_import.py --catalog-scope demo --db-path var/indoro-demo.db --report-dir ../data/reports/demo
+cd server && INDORO_DB_PATH=var/indoro-demo.db uv run uvicorn app.main:app --port 8600
+cd server && uv run python scripts/demo.py                # 1약·3약·6약 + 상태 데모 URL 출력
+cd server && uv run python scripts/catalog_governance_demo.py --db-path var/catalog-governance-demo.db
+cd server && INDORO_DB_PATH=var/catalog-governance-demo.db INDORO_CATALOG_OPS_ENABLED=1 uv run uvicorn app.main:app --host 127.0.0.1 --port 8610
+cd server && uv run pytest -q                             # 전체 회귀 테스트
 ```
 
-데모 흐름: `demo.py`가 출력한 patient URL을 폰/브라우저로 열면 S1 인포그래픽,
+데모 흐름: `demo.py`가 출력한 patient URL을 폰/브라우저로 열면 S1 복약 포스터,
 pharmacist QR URL을 열면 P3 QR 화면. 새 처방 입력은 `http://127.0.0.1:8600/rx/new`.
 
 ## 라우트 지도
@@ -22,23 +27,32 @@ pharmacist QR URL을 열면 P3 QR 화면. 새 처방 입력은 `http://127.0.0.1
 | `POST /api/prescriptions` | 발급 (멱등 D10 — 재전송 200 + replayed) |
 | `POST /api/prescriptions/{id}/reissue` | 폐기 후 재발급 (D5 — 구토큰 410) |
 | `GET /api/prescriptions/{id}` | P3용 요약 |
-| `GET /api/drugs?q=` | 자동완성 (항상 200 + 배열) |
+| `GET /api/prescriptions/{id}/qr` | 같은 QR URL 재표시 + `qr.redisplayed` 계측(발급 직후 첫 화면은 제외) |
+| `GET /api/drugs?q=` | 출처 추적 자동완성 (항상 200 + 배열, 자유 입력 fallback 유지) |
 | `POST /api/events` | 계측 비콘 (항상 204, D16) |
-| `GET /p/{token}` | S1 환자 인포그래픽 (active 200 / 미존재 200 대기 D8 / expired·revoked 410) |
+| `GET /p/{token}` | S1 환자 복약 포스터 (active 200 / 미존재 200 대기 D8 / expired·revoked 410) |
 | `GET /c/{code}` | 가족 공유 짧은 코드 → 302 `/p/{token}?src=code` |
 | `GET /rx/new` | P1 처방 입력 |
 | `GET /rx/{id}/qr` | P3 QR 표시·인쇄 |
+| `GET /privacy` | 환자 링크의 최소 개인정보 안내 |
+| `GET /catalog/review` | 내부 review queue. 기본 비활성·loopback prototype |
+| `GET /catalog/review/{presentation_id}` | 원본/정규화/감사 상세 |
+| `POST /catalog/review/{presentation_id}/decision` | version-locked review/lifecycle 결정 + append-only audit |
+| `GET /catalog/retirements[/<batch_id>]` | full snapshot 누락 후보 batch 목록/상세 |
+| `POST /catalog/retirements/...` | 후보 결정, batch 승인·적용·취소. GET mutation 없음 |
 
 ## 80% 범위표
 
 | 상태 | 항목 |
 |---|---|
-| **구현** | 발급 API(멱등·검증 422·오프라인 토큰 409)·reissue(D5)·drugs 검색·이벤트 비콘(화이트리스트·dedup)·S1 렌더(매트릭스·픽토그램·식전후 스트립·날짜 점·hi/en D12)·대기 페이지(D8)·410 페이지·짧은 코드 /c(Crockford 정규화)·view.first 원자 선점·ivid 쿠키·P1 입력(자동완성·사전검증·P2 시트·계측)·P3 QR(클라 SVG 렌더·인쇄 뷰·전체화면)·시드 임포트 627건·테스트 18건 |
-| **스텁** (코드 주석 명기) | 음성 안내·프리렌더 영상(placeholder UI만)·오프라인 제출(자동완성 비활성+인라인 재시도만, outbox 완전판 아님)·If-None-Match 304(ETag 발급만)·홈 `/` 코드 입력 폼(/c 자체는 동작)·`/privacy`(S6) |
-| **제외** | P0/P4/P6 화면·Postgres·배포·rate limit/tarpit·purge 스크립트·IDEMPOTENCY_CONFLICT 409(항상 replay)·media.video_complete 발행(실재생 없음) |
+| **구현** | 발급 API(멱등·검증 422·오프라인 토큰 409·**동일 멱등키+다른 본문 409 IDEMPOTENCY_CONFLICT**)·reissue(D5, **revoked 재발급 410 — 폐기 provenance 불변**)·수정(D4, **만료 건 410 — expired→active 부활 금지**)·source/version/raw/importer/normalization 추적 의약품 검색·자유 입력·review/lifecycle 분리(**projection 변경 시에도 사람 rejected 유지**)·optimistic locking·append-only audit·delta/full snapshot retirement workflow·loopback 운영 UI·이벤트 비콘·S1 하루 시간 흐름 포스터(첫눈 실약명·봉투 색+번호·단위별 자체 SVG·PRN 1회량/일일최대/최소간격·식전후 순서·기간·hi/en D12)·대기/410/코드 재입력/개인정보 화면·view.first 원자 선점·ivid 쿠키·P1 자동완성/확인·P3 실제 SVG QR/인쇄/전체화면·3종 데모 |
+| **스텁** (코드 주석 명기) | 완전한 오프라인 제출(outbox)·If-None-Match 304(ETag 발급만)·현지 검증 전 음성/영상. 미구현 미디어 placeholder는 환자 화면에서 제거 |
+| **제외** | P0/P4/P6 화면·Postgres·배포·rate limit/tarpit·purge 스크립트(D+50 백로그 — docs/01 §9.2)·pre_sync 소급 인정(§2.3)·media.video_complete 발행(실재생 없음) |
 
 ## 메모
 
 - 약국 식별: `X-Pharmacy-Id` 헤더 (화면은 localStorage `indoro.pharmacy`, 기본 `ph-demo-001`).
-- 렌더 예산: S1 gzip 약 9.5KB (예산 80KB).
+- 카탈로그 운영 UI: 기본 404. `INDORO_CATALOG_OPS_ENABLED=1` + loopback peer/Host에서만 활성. non-loopback 우회는 없고 browser cross-origin POST를 거부하며 운영 경로는 OpenAPI에서 숨긴다. reverse proxy·tunnel·port-forward에 연결하지 않는다. 실제 인증·RBAC·CSRF가 없으므로 public/production 노출 금지.
+- 렌더 예산: 6약·긴 약명 S1 실측 Python gzip-9 9,586 bytes (테스트 예산 24KB).
 - 설정 단일 소스: `config/patterns.yaml` · `config/i18n.yaml` (fixtures.js META에서 추출) — UI 문구·패턴 추가는 YAML에.
+- 의약품 데이터: [`../docs/08-india-drug-data-foundation.md`](../docs/08-india-drug-data-foundation.md) · 운영 절차: [`../docs/09-drug-catalog-operations.md`](../docs/09-drug-catalog-operations.md). NPPA 11건만 production DB에 적재하며 합성 fixture 16건은 별도 demo DB 전용이다. 상업 사이트 참고분이 섞인 기존 627건 파일은 제거했다.

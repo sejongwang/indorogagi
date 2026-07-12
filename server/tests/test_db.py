@@ -115,9 +115,27 @@ def test_import_and_search_drugs(conn):
     assert conn.execute("SELECT COUNT(*) AS n FROM drugs").fetchone()["n"] == 2
 
     assert db.search_drugs(conn, "d") == []                      # 2자 미만
-    assert db.search_drugs(conn, "dolo")[0]["brand_name"] == "Dolo 650"
-    assert db.search_drugs(conn, "amoxicillin")[0]["brand_name"] == "Augmentin 625 Duo"
-    assert db.search_drugs(conn, "augmen")[0]["aliases"] == ["Augmentin"]  # aliases 매칭
+    assert db.search_drugs(conn, "dolo", include_demo=True)[0]["brand_name"] == "Dolo 650"
+    assert db.search_drugs(conn, "amoxicillin", include_demo=True)[0]["brand_name"] == "Augmentin 625 Duo"
+    assert db.search_drugs(conn, "augmen", include_demo=True)[0]["aliases"] == ["Augmentin"]  # aliases 매칭
+
+
+def test_legacy_search_fallback_is_never_exposed_to_production(conn):
+    # A migrated installation can temporarily have legacy rows but no v2 catalog.
+    # Their provenance scope is unknowable, so production search must fail closed.
+    conn.execute(
+        """INSERT INTO drugs
+           (id, brand_name, generic_name, aliases_json, source, verified, created_at)
+           VALUES ('legacy-only', 'Legacy Demo Only', 'Invented', '[]',
+                   'legacy-demo-seed', 0, ?)""",
+        (db.now_utc(),),
+    )
+    conn.commit()
+
+    assert db.search_drugs(conn, "Legacy Demo", include_demo=False) == []
+    assert db.search_drugs(conn, "Legacy Demo", include_demo=True)[0][
+        "usage_scope"
+    ] == "demo"
 
 
 def test_config_loads_and_validates():
@@ -125,6 +143,34 @@ def test_config_loads_and_validates():
     assert cfg["pattern_order"][0] == "OD_MORNING"
     assert len(cfg["pattern_order"]) == 9
     assert cfg["patterns"]["TDS"]["slots"] == ["M", "N", "E"]
+    assert cfg["patterns"]["OD_NIGHT"]["slots"] == ["H"]
+    assert cfg["patterns"]["OD_NIGHT"]["digits"] == "0-0-0-1"
     assert cfg["patterns"]["TDS"]["name"]["hi"] == "दिन में 3 बार"
     assert cfg["i18n"]["dose_units"]["tablet"]["hi"] == "गोली"
     assert cfg["i18n"]["duration_presets"] == [3, 5, 7, 10, 15, 30]
+
+
+def test_init_migrates_unambiguous_legacy_od_night_to_bedtime(tmp_path):
+    path = tmp_path / "legacy.db"
+    db.init_db(path)
+    c = db.get_conn(path)
+    try:
+        db.upsert_pharmacy(c, {"id": "ph-demo-001", "name": "Demo Pharmacy"})
+        p = payload("legacy-od-night")
+        p["items"][0].update({
+            "pattern_key": "OD_NIGHT",
+            "doses": {"M": 0, "N": 0, "E": 1, "H": 0},
+        })
+        issued = db.create_prescription(c, "ph-demo-001", p)
+    finally:
+        c.close()
+
+    db.init_db(path)
+    db.init_db(path)  # 재기동에도 멱등
+    c = db.get_conn(path)
+    try:
+        status, bundle = db.get_bundle_by_token(c, issued["token"])
+        assert status == "active"
+        assert bundle["items"][0]["doses"] == {"M": 0, "N": 0, "E": 0, "H": 1}
+    finally:
+        c.close()

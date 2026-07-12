@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>indoro · Infographic strip prototype</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  color-scheme: light only;
+  --paper: #fff9eb;
+  --paper-strong: #f7edcf;
+  --ink: #172019;
+  --muted: #566159;
+  --green: #19553f;
+  --green-dark: #0d3d2e;
+  --green-pale: #e3efe5;
+  --saffron: #bd5d12;
+  --yellow: #f2c85c;
+  --line: #cfc6ad;
+  --white: #fffef9;
+  --danger: #8a2228;
+  --focus: #bd5d12;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: #e7e2d7; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0 auto;
+  min-width: 0;
+  max-width: 480px;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: Arial, "Noto Sans", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
+.icon, .dose-pict { display: block; width: 24px; height: 24px; flex: none; }
+.icon-lg { display: block; width: 36px; height: 36px; flex: none; }
+.masthead { padding: 13px 14px 14px; color: #fff; background: var(--green-dark); border-bottom: 7px solid var(--saffron); }
+.mast-top { display: grid; grid-template-columns: 46px minmax(0,1fr); gap: 10px; }
+.pharmacy-mark { width: 44px; height: 44px; display: grid; place-items: center; color: var(--green-dark); background: var(--yellow); border: 2px solid #fff8; }
+.eyebrow { font-size: .76rem; opacity: .86; font-weight: 700; }
+.pharmacy-name { font-size: 1.18rem; font-weight: 850; }
+.pharmacy-area { font-size: .82rem; opacity: .9; }
+.trust-line { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .76rem; }
+.trust-line span { display: inline-flex; align-items: center; gap: 5px; }
+.trust-line .icon { width: 17px; height: 17px; }
+.lang-switch { margin-top: 10px; min-height: 48px; display: grid; place-items: center; color: var(--green-dark); background: var(--yellow); border: 1px solid #fff8; font-size: .9rem; font-weight: 900; }
+.rx-note { padding: 10px 14px; display: flex; gap: 9px; color: #432b00; background: var(--yellow); border-bottom: 1px solid #9f6d08; font-size: .8rem; font-weight: 850; }
+.poster-intro { padding: 18px 14px 15px; background: var(--paper-strong); border-bottom: 3px solid var(--green-dark); }
+.hero-kicker { color: #914108; font-size: .8rem; font-weight: 950; letter-spacing: .055em; }
+.poster-intro h1 { margin-top: 2px; color: var(--green-dark); font-size: clamp(1.72rem, 8vw, 2.28rem); line-height: 1.28; letter-spacing: -.025em; }
+.hero-sub { margin-top: 5px; color: var(--muted); font-size: .93rem; font-weight: 700; }
+.packet-rule { margin-top: 13px; padding: 10px 9px; display: grid; grid-template-columns: 40px minmax(0,1fr); align-items: center; gap: 9px; color: #3f2b00; background: #fff7d5; border: 2px solid #946405; font-size: .9rem; font-weight: 850; }
+.section-band { padding: 10px 14px; color: #fff; background: var(--green); font-size: 1rem; font-weight: 900; }
+.packet-wrap { text-align: center; }
+.packet-badge { width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: var(--badge-bg,#4f5960); border: 3px solid #fff; outline: 2px solid var(--badge-bg,#4f5960); border-radius: 50%; font-size: 1.4rem; line-height: 1; font-weight: 950; }
+.packet-label { margin-top: 4px; display: block; color: var(--muted); font-size: .69rem; line-height: 1.55; font-weight: 850; }
+.hue-1 { --badge-bg: #165d94; }
+.hue-2 { --badge-bg: #98490c; }
+.hue-3 { --badge-bg: #2a6a33; }
+.hue-4 { --badge-bg: #704087; }
+.dose-fact { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 3px; color: var(--green-dark); }
+.dose-picts { display: inline-flex; gap: 2px; }
+.dose-pict { width: 25px; height: 25px; color: var(--green-dark); }
+.dose-number { font-size: 1.35rem; line-height: 1.15; font-weight: 950; }
+.dose-unit { font-size: .78rem; font-weight: 900; }
+.special-head { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 10px; align-items: center; }
+.special-title { font-size: .98rem; line-height: 1.65; font-weight: 900; }
+.special-label { display: flex; align-items: center; gap: 6px; color: var(--danger); font-size: .86rem; line-height: 1.6; font-weight: 950; }
+.special-facts { margin-top: 10px; }
+.footer-prototype { padding: 18px 14px 24px; color: #fff; background: var(--green-dark); font-size: .8rem; }
+</style>
+<link rel="stylesheet" href="/static/patient-poster.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="mast-top">
+    <span class="pharmacy-mark"><svg class="icon-lg" aria-hidden="true"><use href="#i-clinic"/></svg></span>
+    <div>
+      <p class="eyebrow">From your pharmacy</p>
+      <p class="pharmacy-name">Seva Community Pharmacy</p>
+      <p class="pharmacy-area">Delhi · Demonstration pharmacy</p>
+    </div>
+  </div>
+  <div class="trust-line">
+    <span><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg>Issued 10 Jul 2026</span>
+    <span><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Valid till 9 Aug 2026</span>
+  </div>
+  <span class="lang-switch">English</span>
+</header>
+
+<aside class="rx-note"><svg class="icon" aria-hidden="true"><use href="#i-warn"/></svg><span>DEMO ONLY · NOT MEDICAL ADVICE</span></aside>
+
+<main>
+  <section class="poster-intro" aria-labelledby="prototype-title">
+    <p class="hero-kicker">TODAY'S MEDICINES</p>
+    <h1 id="prototype-title">Take today's medicines in this order</h1>
+    <p class="hero-sub">Follow from morning to night, top to bottom</p>
+    <div class="packet-rule"><svg class="icon-lg" aria-hidden="true"><use href="#i-envelope"/></svg><span>Match the number on your packet with the same number below.</span></div>
+  </section>
+
+  <p class="section-band">When and how much to take today</p>
+  <div class="infographic-flow" aria-label="Medicine order from morning to night">
+    <section class="time-panel slot-M" id="time-M">
+      <header class="time-banner">
+        <span class="time-visual"><svg class="icon-lg" aria-hidden="true"><use href="#i-slot-m"/></svg><span class="step-number">1</span></span>
+        <span><span class="time-step">Step 1</span><h2 class="time-name">Morning</h2><span class="start-flag">START HERE</span></span>
+        <span class="panel-packets"><span class="panel-packet hue-1">1</span><span class="panel-packet hue-2">2</span></span>
+      </header>
+      <div class="time-body">
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-1">1</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 1</p><h3 class="drug-name">Demo half-tablet medicine</h3></div>
+          </div>
+          <div class="action-sequence" data-food="before_food">
+            <div class="action-node"><span class="node-label">Take this amount</span><span class="dose-fact"><span class="dose-picts"><svg class="dose-pict" aria-hidden="true"><use href="#p-tab-half"/></svg></span><strong class="dose-number">½</strong><span class="dose-unit">tab</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Food order</span><svg class="meal-figure" aria-hidden="true"><use href="#i-tf-before"/></svg><strong class="node-value">Before food</strong></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>30</strong></span><strong class="node-value">30 days</strong></div>
+          </div>
+        </article>
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-2">2</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 2</p><h3 class="drug-name">Demo measured cough syrup</h3></div>
+          </div>
+          <div class="action-sequence" data-food="after_food">
+            <div class="action-node"><span class="node-label">Take this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-spoon"/></svg><strong class="dose-number">5</strong><span class="dose-unit">ml</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Food order</span><svg class="meal-figure" aria-hidden="true"><use href="#i-tf-after"/></svg><strong class="node-value">After food</strong></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>5</strong></span><strong class="node-value">5 days</strong></div>
+          </div>
+          <p class="action-note"><svg class="icon" aria-hidden="true"><use href="#p-spoon"/></svg><span>Measure with a marked cup or oral syringe.</span></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="time-panel slot-N" id="time-N">
+      <header class="time-banner">
+        <span class="time-visual"><svg class="icon-lg" aria-hidden="true"><use href="#i-slot-n"/></svg><span class="step-number">2</span></span>
+        <span><span class="time-step">Step 2</span><h2 class="time-name">Afternoon</h2></span>
+        <span class="panel-packets"><span class="panel-packet hue-2">2</span><span class="panel-packet hue-4">4</span></span>
+      </header>
+      <div class="time-body">
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-2">2</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 2</p><h3 class="drug-name">Demo measured cough syrup</h3></div>
+          </div>
+          <div class="action-sequence" data-food="after_food">
+            <div class="action-node"><span class="node-label">Take this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-spoon"/></svg><strong class="dose-number">5</strong><span class="dose-unit">ml</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Food order</span><svg class="meal-figure" aria-hidden="true"><use href="#i-tf-after"/></svg><strong class="node-value">After food</strong></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>5</strong></span><strong class="node-value">5 days</strong></div>
+          </div>
+          <p class="action-note"><svg class="icon" aria-hidden="true"><use href="#p-spoon"/></svg><span>Measure with a marked cup or oral syringe.</span></p>
+        </article>
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-4">4</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 4</p><h3 class="drug-name">Demo lubricating eye drops, preservative-free multi-dose bottle</h3></div>
+          </div>
+          <div class="action-sequence">
+            <div class="action-node"><span class="node-label">Use this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-drop"/></svg><strong class="dose-number">1</strong><span class="dose-unit">drop</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>7</strong></span><strong class="node-value">7 days</strong></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="time-panel slot-E" id="time-E">
+      <header class="time-banner">
+        <span class="time-visual"><svg class="icon-lg" aria-hidden="true"><use href="#i-slot-e"/></svg><span class="step-number">3</span></span>
+        <span><span class="time-step">Step 3</span><h2 class="time-name">Evening</h2></span>
+        <span class="panel-packets"><span class="panel-packet hue-2">2</span><span class="panel-packet hue-4">4</span></span>
+      </header>
+      <div class="time-body">
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-2">2</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 2</p><h3 class="drug-name">Demo measured cough syrup</h3></div>
+          </div>
+          <div class="action-sequence" data-food="after_food">
+            <div class="action-node"><span class="node-label">Take this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-spoon"/></svg><strong class="dose-number">5</strong><span class="dose-unit">ml</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Food order</span><svg class="meal-figure" aria-hidden="true"><use href="#i-tf-after"/></svg><strong class="node-value">After food</strong></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>5</strong></span><strong class="node-value">5 days</strong></div>
+          </div>
+          <p class="action-note"><svg class="icon" aria-hidden="true"><use href="#p-spoon"/></svg><span>Measure with a marked cup or oral syringe.</span></p>
+        </article>
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-4">4</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 4</p><h3 class="drug-name">Demo lubricating eye drops, preservative-free multi-dose bottle</h3></div>
+          </div>
+          <div class="action-sequence">
+            <div class="action-node"><span class="node-label">Use this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-drop"/></svg><strong class="dose-number">1</strong><span class="dose-unit">drop</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>7</strong></span><strong class="node-value">7 days</strong></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="time-panel slot-H" id="time-H">
+      <header class="time-banner">
+        <span class="time-visual"><svg class="icon-lg" aria-hidden="true"><use href="#i-slot-h"/></svg><span class="step-number">4</span></span>
+        <span><span class="time-step">Step 4</span><h2 class="time-name">Night</h2></span>
+        <span class="panel-packets"><span class="panel-packet hue-4">4</span></span>
+      </header>
+      <div class="time-body">
+        <article class="medicine-strip">
+          <div class="medicine-identity">
+            <div class="packet-wrap"><span class="packet-badge hue-4">4</span><span class="packet-label">Packet</span></div>
+            <div><p class="medicine-label">Packet 4</p><h3 class="drug-name">Demo lubricating eye drops, preservative-free multi-dose bottle</h3></div>
+          </div>
+          <div class="action-sequence">
+            <div class="action-node"><span class="node-label">Use this amount</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-drop"/></svg><strong class="dose-number">1</strong><span class="dose-unit">drop</span></span></div>
+            <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            <div class="action-node"><span class="node-label">Continue for</span><span class="calendar-figure"><svg class="icon-lg" aria-hidden="true"><use href="#i-cal"/></svg><strong>7</strong></span><strong class="node-value">7 days</strong></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="special-zone" aria-labelledby="special-title">
+      <h2 class="section-band" id="special-title">Only when needed</h2>
+      <article class="special-item">
+        <div class="special-head">
+          <div class="packet-wrap"><span class="packet-badge hue-5">5</span><span class="packet-label">Packet</span></div>
+          <div><h3 class="special-title">Demo SOS pain tablet</h3><p class="special-label"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Only when needed</p></div>
+        </div>
+        <div class="action-sequence special-sequence prn-dose-sequence" data-food="after_food">
+          <div class="action-node"><span class="node-label">Each time</span><span class="dose-fact"><svg class="dose-pict" aria-hidden="true"><use href="#p-tab"/></svg><strong class="dose-number">1</strong><span class="dose-unit">tab</span></span></div>
+          <svg class="sequence-arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          <div class="action-node"><span class="node-label">Food order</span><svg class="meal-figure" aria-hidden="true"><use href="#i-tf-after"/></svg><strong class="node-value">After food</strong></div>
+        </div>
+        <div class="prn-rules" aria-label="Only when needed rules">
+          <div class="prn-rule"><svg class="icon-lg" aria-hidden="true"><use href="#i-repeat"/></svg><span><span class="node-label">At most</span><strong class="prn-rule-number">3</strong><strong class="prn-rule-unit">times a day</strong></span></div>
+          <div class="prn-rule"><svg class="icon-lg" aria-hidden="true"><use href="#i-clock"/></svg><span><span class="node-label">Gap of at least</span><strong class="prn-rule-number">6</strong><strong class="prn-rule-unit">hours</strong></span></div>
+        </div>
+      </article>
+    </section>
+  </div>
+</main>
+
+<footer class="footer-prototype"><strong>Infographic strip prototype</strong><br>Illustrations prioritize actions, packet numbers, dose, food order and duration. Diagnosis is not inferred or displayed.</footer>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs>
+  <symbol id="i-clinic" viewBox="0 0 32 32"><path fill="currentColor" d="M5 10h22v17H5z"/><path fill="#f2c85c" d="M13 4h6v7h7v6h-7v7h-6v-7H6v-6h7z"/></symbol>
+  <symbol id="i-slot-m" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 24h26M10 24a6 6 0 0 1 12 0M16 14V9M8 17l-4-3M24 17l4-3"/></g></symbol>
+  <symbol id="i-slot-n" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="16" cy="16" r="6"/><path d="M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5 25 25M25 7l-3.5 3.5M10.5 21.5 7 25"/></g></symbol>
+  <symbol id="i-slot-e" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 21h26M10 21a6 6 0 0 1 12 0M16 26v3M8 18l-4 3M24 18l4 3"/></g></symbol>
+  <symbol id="i-slot-h" viewBox="0 0 32 32"><path d="M22 21A10 10 0 0 1 12 5a11 11 0 1 0 10 16Z" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="m24 6 1 2.5L28 9l-3 .8-1 2.5-1-2.5L20 9l3-.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-tf-before" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="11" height="7" rx="3.5"/><path d="M6.5 13v7M15 16.5h8m-3-3 3 3-3 3"/><circle cx="37" cy="17" r="8"/><path d="M31 18h12M33 14h.1M37 13h.1M41 14h.1"/></g><g font-family="Arial,sans-serif" font-size="6" font-weight="900" text-anchor="middle"><circle cx="6" cy="6" r="5" fill="currentColor"/><text x="6" y="8" fill="#fff">1</text><circle cx="38" cy="6" r="5" fill="currentColor"/><text x="38" y="8" fill="#fff">2</text></g></symbol>
+  <symbol id="i-tf-after" viewBox="0 0 48 32"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="17" r="8"/><path d="M4 18h12M6 14h.1M10 13h.1M14 14h.1M21 16.5h8m-3-3 3 3-3 3"/><rect x="35" y="13" width="11" height="7" rx="3.5"/><path d="M40.5 13v7"/></g><g font-family="Arial,sans-serif" font-size="6" font-weight="900" text-anchor="middle"><circle cx="10" cy="6" r="5" fill="currentColor"/><text x="10" y="8" fill="#fff">1</text><circle cx="41" cy="6" r="5" fill="currentColor"/><text x="41" y="8" fill="#fff">2</text></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="21" rx="3"/><path d="M4 13h24M10 4v6M22 4v6"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8l5 3"/></g></symbol>
+  <symbol id="i-repeat" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16a10 10 0 0 1 17-7M25 16a10 10 0 0 1-17 7"/><path d="M24 4v6h-6M8 28v-6h6"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 32 32"><path d="m6 17 6 6L26 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4 29 27H3Z"/><path d="M16 12v7M16 23v.5"/></g></symbol>
+  <symbol id="i-envelope" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="7" width="26" height="19" rx="3"/><path d="m4 9 12 9L28 9"/></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 32 32"><path d="M5 16h20m-7-7 7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="p-tab" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="16" cy="16" r="11"/><path d="M16 5v22"/></g></symbol>
+  <symbol id="p-tab-half" viewBox="0 0 32 32"><path d="M16 5a11 11 0 0 0 0 22Z" fill="currentColor"/><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="p-spoon" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h18l-2 22H9Z"/><path d="M9 11h5M9 16h7M9 21h5"/></g></symbol>
+  <symbol id="p-drop" viewBox="0 0 32 32"><path d="M16 4c6 7 9 11 9 16a9 9 0 1 1-18 0c0-5 3-9 9-16Z" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+</defs>
+</svg>
+</body>
+</html>

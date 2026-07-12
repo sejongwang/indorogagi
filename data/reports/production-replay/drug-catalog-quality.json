@@ -1,0 +1,185 @@
+{
+  "dangerous_similar_name_candidates": [
+    {
+      "left": "glimepiride 2 mg tablet",
+      "left_id": "e090eac6-ba90-4849-a687-116d44b78855",
+      "right": "glimepiride 1 mg tablet",
+      "right_id": "707cb87b-79c8-4ff2-8e34-a356800a2b75",
+      "similarity": 0.957
+    },
+    {
+      "left": "metformin 1000 mg tablet",
+      "left_id": "4b875be9-32bc-42d5-bd28-6227e0358351",
+      "right": "metformin 500 mg tablet",
+      "right_id": "2223af64-11e5-45d3-9e30-4509bf58e571",
+      "similarity": 0.936
+    }
+  ],
+  "database_mode": "production",
+  "database_quality": {
+    "dangerous_similar_name_candidates": [
+      {
+        "left": "glimepiride 2 mg tablet",
+        "left_id": "e090eac6-ba90-4849-a687-116d44b78855",
+        "right": "glimepiride 1 mg tablet",
+        "right_id": "707cb87b-79c8-4ff2-8e34-a356800a2b75",
+        "similarity": 0.957
+      },
+      {
+        "left": "metformin 1000 mg tablet",
+        "left_id": "4b875be9-32bc-42d5-bd28-6227e0358351",
+        "right": "metformin 500 mg tablet",
+        "right_id": "2223af64-11e5-45d3-9e30-4509bf58e571",
+        "similarity": 0.936
+      }
+    ],
+    "database_mode": "production",
+    "duplicate_candidates": 0,
+    "excluded": 0,
+    "generated_at": "2026-07-10T10:30:30Z",
+    "import_run_record_links": 22,
+    "imported": 11,
+    "missing_brand_name": 0,
+    "missing_dosage_form": 0,
+    "missing_generic_name": 0,
+    "missing_manufacturer": 11,
+    "missing_source": 0,
+    "missing_strength": 0,
+    "needs_review": 0,
+    "quarantined": 0,
+    "quarantined_records": [],
+    "raw_total": 12,
+    "same_brand_different_ingredient_candidates": [],
+    "same_composition_multiple_brand_candidates": [
+      {
+        "brand_norms": [
+          "disposable pen containing insulin glargine 100 iu/ml",
+          "insulin glargine 100 iu/ml injection"
+        ],
+        "composition": [
+          "insulin glargine",
+          "100 iu ml",
+          "injection",
+          ""
+        ]
+      },
+      {
+        "brand_norms": [
+          "metformin 1000 mg tablet",
+          "metformin modified release 1000 mg tablet"
+        ],
+        "composition": [
+          "metformin",
+          "1000 mg",
+          "tablet",
+          ""
+        ]
+      }
+    ],
+    "source_breakdown": [
+      {
+        "presentations": 11,
+        "slug": "nppa-antidiabetes-formulations-2026-03",
+        "tier": 1,
+        "usage_scope": "production"
+      }
+    ],
+    "unknown_dosage_form": 0,
+    "unknown_strength_unit": 0
+  },
+  "dry_run": false,
+  "duplicate_candidates": 0,
+  "excluded": 0,
+  "failed_records": [],
+  "generated_at": "2026-07-10T10:30:30Z",
+  "imported": 11,
+  "missing_brand_name": 0,
+  "missing_dosage_form": 0,
+  "missing_generic_name": 0,
+  "missing_manufacturer": 11,
+  "missing_source": 0,
+  "missing_strength": 0,
+  "needs_review": 0,
+  "quarantined": 0,
+  "raw_total": 11,
+  "replayed": true,
+  "same_brand_different_ingredient_candidates": [],
+  "same_composition_multiple_brand_candidates": [
+    {
+      "brand_norms": [
+        "disposable pen containing insulin glargine 100 iu/ml",
+        "insulin glargine 100 iu/ml injection"
+      ],
+      "composition": [
+        "insulin glargine",
+        "100 iu ml",
+        "injection",
+        ""
+      ]
+    },
+    {
+      "brand_norms": [
+        "metformin 1000 mg tablet",
+        "metformin modified release 1000 mg tablet"
+      ],
+      "composition": [
+        "metformin",
+        "1000 mg",
+        "tablet",
+        ""
+      ]
+    }
+  ],
+  "source_breakdown": [
+    {
+      "presentations": 11,
+      "slug": "nppa-antidiabetes-formulations-2026-03",
+      "tier": 1,
+      "usage_scope": "production"
+    }
+  ],
+  "source_count": 1,
+  "source_reports": [
+    {
+      "approval_registry_sha256": "4d304b6ef995ac6b4770497b2667025a038ebc3dd6d9bf3c2b16f20bb7fe453e",
+      "dry_run": false,
+      "duplicate_candidates": 0,
+      "excluded": 0,
+      "failed_records": [],
+      "imported": 11,
+      "input_sha256": "b4413c5423a9c31b4062ffa3572e2fdf606118a2f21e1e5ae048d65c4f25456a",
+      "license_name": "NPPA Copyright Policy",
+      "license_url": "https://www.nppa.gov.in/en/copyrightpolicy",
+      "missing_brand_name": 0,
+      "missing_dosage_form": 0,
+      "missing_generic_name": 0,
+      "missing_manufacturer": 11,
+      "missing_source": 0,
+      "missing_strength": 0,
+      "needs_review": 0,
+      "quarantined": 0,
+      "quarantined_records": [],
+      "raw_total": 11,
+      "records_sha256": "e06801716c56985d4a3d57d4c9c188b85aee95dbbde518861521dc23668a5ad7",
+      "replayed": true,
+      "reuse_status": "approved",
+      "source_accessed_at": "2026-07-10",
+      "source_artifact_bytes": 401697,
+      "source_artifact_manifest": "data/catalog/nppa-anti-diabetes-2026-03.source-manifest.json",
+      "source_artifact_sha256": "fd23814ae3a0009a0d8d6e14d079ff3e72605edfae6041e3529ccd988f311e62",
+      "source_input_uri": "https://www.nppa.gov.in/storage/uploads/pdf/2845-fb-posts-anti-diabetes-a2491c25ce7e20c9200884e1f92cf68a.pdf",
+      "source_slug": "nppa-antidiabetes-formulations-2026-03",
+      "source_updated_at": "2026-05-06",
+      "source_version": "2026-03",
+      "transformation_method": "Human-reviewed PDF table transcription to committed CSV, then deterministic CSV-to-package conversion.",
+      "unknown_dosage_form": 0,
+      "unknown_strength_unit": 0,
+      "usage_scope": "production"
+    }
+  ],
+  "source_slugs": [
+    "nppa-antidiabetes-formulations-2026-03"
+  ],
+  "unknown_dosage_form": 0,
+  "unknown_strength_unit": 0
+}

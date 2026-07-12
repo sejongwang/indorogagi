@@ -15,8 +15,8 @@ patterns:
     name: { hi: "दिन में 1 बार — सुबह", en: "Once a day — morning" }
   OD_NIGHT:
     schedule_type: daily
-    slots: [E]
-    digits: "0-0-1"
+    slots: [H]
+    digits: "0-0-0-1"
     sort_order: 2
     is_active: true
     name: { hi: "दिन में 1 बार — रात", en: "Once a day — night" }

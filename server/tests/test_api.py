@@ -84,21 +84,61 @@ def test_expires_policy_d6(issue, rx_payload, duration_days, expect_days):
     assert _days(j["issued_at"], j["expires_at"]) == expect_days
 
 
+def test_prn_requires_and_persists_dose_and_limits(client, rx_payload):
+    """PRN은 1회량·일일 최대·최소 간격이 모두 있어야 발급된다."""
+    payload = rx_payload(pattern_key="PRN")
+    item = payload["items"][0]
+    item.update({
+        "doses": {"M": 0, "N": 0, "E": 0, "H": 0},
+        "prn_reason_key": "pain",
+        "prn_max_per_day": 3,
+        "prn_min_gap_hours": 6,
+        "extra_params": None,
+    })
+    missing = client.post("/api/prescriptions", json=payload, headers=PHARMACY_HEADERS)
+    assert missing.status_code == 422
+    assert missing.json()["error"]["field"] == "items.0.extra_params.dose_per_use"
+
+    item["extra_params"] = {"dose_per_use": 0.5}
+    for field in ("prn_max_per_day", "prn_min_gap_hours"):
+        saved = item[field]
+        item[field] = None
+        payload["client_input_id"] = str(uuid.uuid4())
+        missing_limit = client.post(
+            "/api/prescriptions", json=payload, headers=PHARMACY_HEADERS
+        )
+        assert missing_limit.status_code == 422
+        assert missing_limit.json()["error"]["field"] == f"items.0.{field}"
+        item[field] = saved
+
+    payload["client_input_id"] = str(uuid.uuid4())
+    created = client.post("/api/prescriptions", json=payload, headers=PHARMACY_HEADERS)
+    assert created.status_code == 201
+    bundle = client.get(
+        f"/api/prescriptions/{created.json()['id']}", headers=PHARMACY_HEADERS
+    ).json()
+    assert bundle["items"][0]["extra_params"] == {"dose_per_use": 0.5}
+
+
 # ---------------------------------------------------------------- 4. drugs 검색 (§4.5)
 
 def test_drugs_search_contract(client):
-    """'do' → Dolo 포함, 1자 → 빈 배열, 0건도 항상 200 + 빈 배열."""
-    r = client.get("/api/drugs", params={"q": "do"})
+    """데모 약국의 'do' → Dolo 포함, 1자/0건도 항상 200 + 빈 배열."""
+    r = client.get("/api/drugs", params={"q": "do"}, headers=PHARMACY_HEADERS)
     assert r.status_code == 200
     results = r.json()
     assert isinstance(results, list)
     assert any("Dolo" in d["brand_name"] for d in results)
 
-    r1 = client.get("/api/drugs", params={"q": "d"})  # 2자 미만
+    r1 = client.get(
+        "/api/drugs", params={"q": "d"}, headers=PHARMACY_HEADERS
+    )  # 2자 미만
     assert r1.status_code == 200
     assert r1.json() == []
 
-    r0 = client.get("/api/drugs", params={"q": "zzqqxx"})  # 0건도 200 — 입력 흐름을 막지 않음
+    r0 = client.get(
+        "/api/drugs", params={"q": "zzqqxx"}, headers=PHARMACY_HEADERS
+    )  # 0건도 200 — 입력 흐름을 막지 않음
     assert r0.status_code == 200
     assert r0.json() == []
 

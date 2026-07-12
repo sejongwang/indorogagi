@@ -1,0 +1,92 @@
+{% extends "catalog_ops_base.html" %}
+{% block title %}Review {{ detail.brand_name_raw }}{% endblock %}
+{% block content %}
+<article data-qa="catalog-review-detail" class="ops-stack">
+  <a class="ops-back" href="/catalog/review">← Review queue</a>
+  <header class="ops-page-heading">
+    <div>
+      <p class="ops-eyebrow">{{ detail.source_slug }} · source record <span class="ops-mono">{{ detail.source_record_id }}</span></p>
+      <h1>{{ detail.brand_name_raw }}</h1>
+      <p>Record version <b data-qa="record-version">{{ detail.record_version }}</b>. A stale form is rejected with HTTP 409.</p>
+    </div>
+    <div class="ops-record__status">
+      <span class="ops-status review-{{ detail.workflow_review_status }}" data-qa="review-status">Review: {{ detail.workflow_review_status|replace('_',' ') }}</span>
+      <span class="ops-status lifecycle-{{ detail.operational_lifecycle_status }}" data-qa="lifecycle-status">Lifecycle: {{ detail.operational_lifecycle_status }}</span>
+    </div>
+  </header>
+
+  <div class="ops-evidence-grid">
+    <section class="card ops-panel ops-panel--normalized" data-qa="normalized-panel">
+      <p class="ops-eyebrow">Normalized result</p><h2>Catalog presentation</h2>
+      <dl class="ops-definition">
+        <div><dt>Display / brand name</dt><dd>{{ detail.brand_name_raw }}</dd></div>
+        <div><dt>Ingredient</dt><dd>{{ detail.generic_name_raw or 'Missing' }}</dd></div>
+        <div><dt>Strength</dt><dd>{{ detail.strength_raw or 'Missing' }}</dd></div>
+        <div><dt>Dosage form</dt><dd>{{ detail.dosage_form_code or detail.dosage_form_raw or 'Missing' }}</dd></div>
+        <div><dt>Route</dt><dd>{{ detail.route_code or detail.route_raw or 'Missing' }}</dd></div>
+        <div><dt>Manufacturer</dt><dd>{{ detail.manufacturer_name or 'Not supplied' }}</dd></div>
+        <div><dt>Projection SHA-256</dt><dd class="ops-mono">{{ detail.normalized_projection_sha256 or 'Legacy projection not yet reprocessed' }}</dd></div>
+      </dl>
+      {% if detail.ingredients %}<h3>Ingredient components</h3><ul>{% for ingredient in detail.ingredients %}<li>{{ ingredient.name_raw }}{% if ingredient.strength_raw %} · {{ ingredient.strength_raw }}{% endif %}</li>{% endfor %}</ul>{% endif %}
+      <p><b>Unit candidates only:</b> {{ detail.unit_options|join(', ') if detail.unit_options else 'none' }}. These never determine a prescription dose.</p>
+      {% if detail.incomplete_fields %}<p class="ops-warning">Missing: {{ detail.incomplete_fields|join(', ') }}</p>{% endif %}
+      {% if detail.warnings %}<p class="ops-warning">Warnings: {{ detail.warnings|join(', ') }}</p>{% endif %}
+      {% if not detail.normalized_projection_ready %}<p class="ops-warning" data-qa="projection-reprocess-required">This legacy or invalid normalized projection must be reprocessed before it can be approved or rejected. Lifecycle controls remain separate.</p>{% endif %}
+    </section>
+
+    <section class="card ops-panel ops-panel--source" data-qa="source-panel">
+      <p class="ops-eyebrow">Original source evidence</p><h2>Immutable raw record</h2>
+      <dl class="ops-definition">
+        <div><dt>Source version</dt><dd>{{ detail.source_version or 'Unknown' }}</dd></div>
+        <div><dt>Projection import run</dt><dd class="ops-mono">{{ detail.import_run_id or 'Unknown' }}</dd></div>
+        <div><dt>Raw SHA-256</dt><dd class="ops-mono">{{ detail.raw_sha256 or 'Unknown' }}</dd></div>
+        <div><dt>Pipeline</dt><dd>{{ detail.importer_version }} · {{ detail.normalization_version }} · schema {{ detail.package_schema_version }}</dd></div>
+        <div><dt>Snapshot</dt><dd>{{ detail.snapshot_mode }}</dd></div>
+      </dl>
+      <details open><summary>Raw source JSON</summary><pre data-qa="raw-json">{{ detail.raw_record|tojson(indent=2) }}</pre></details>
+      {% if detail.latest_import_run_id %}
+      <h3>Latest import evidence</h3>
+      <dl class="ops-definition" data-qa="latest-import-evidence">
+        <div><dt>Latest run</dt><dd class="ops-mono">{{ detail.latest_import_run_id }}</dd></div>
+        <div><dt>Ingest status</dt><dd>{{ detail.latest_ingest_status }}</dd></div>
+        <div><dt>Latest raw SHA-256</dt><dd class="ops-mono">{{ detail.latest_raw_sha256 or 'Unknown' }}</dd></div>
+        <div><dt>Latest pipeline</dt><dd>{{ detail.latest_importer_version }} · {{ detail.latest_normalization_version }} · schema {{ detail.latest_package_schema_version }}</dd></div>
+      </dl>
+      {% if not detail.latest_evidence_is_current %}
+      <p class="ops-warning">This newer source evidence was not applied to the current normalized projection. Review its ingest errors and append-only audit before deciding.</p>
+      {% if detail.latest_ingest_errors %}<p class="ops-warning">Ingest issues: {{ detail.latest_ingest_errors|join(', ') }}</p>{% endif %}
+      <details><summary>Latest un-applied source JSON</summary><pre data-qa="latest-raw-json">{{ detail.latest_raw_record|tojson(indent=2) }}</pre></details>
+      {% endif %}
+      {% endif %}
+    </section>
+  </div>
+
+  <section class="card ops-decision" data-qa="decision-form">
+    <p class="ops-eyebrow">Human decision</p><h2>Review or catalog lifecycle</h2>
+    <p>These are separate decisions. Retired is never available here; it requires an approved full-snapshot batch.</p>
+    <form method="post" action="/catalog/review/{{ detail.id }}/decision" class="ops-stack">
+      <input type="hidden" name="expected_record_version" value="{{ detail.record_version }}">
+      <fieldset><legend>Review status</legend><div class="ops-actions">
+        {% if not detail.normalized_projection_ready %}<p>Approval and rejection are unavailable until a current importer run creates a verifiable normalized projection.</p>{% else %}
+          {% if detail.workflow_review_status in ['unverified','rejected','approved'] %}<button class="btn btn-secondary" name="action" value="review_requested" type="submit">Request review</button>{% endif %}
+          {% if detail.workflow_review_status == 'needs_review' %}<button class="btn btn-primary" name="action" value="review_approved" type="submit">Approve reviewed data</button><button class="btn btn-danger" name="action" value="review_rejected" type="submit">Reject catalog record</button>{% endif %}
+        {% endif %}
+      </div></fieldset>
+      <fieldset><legend>Catalog lifecycle</legend><div class="ops-actions">
+        {% if detail.operational_lifecycle_status == 'active' %}<button class="btn btn-warning" name="action" value="lifecycle_inactivated" type="submit">Make inactive</button>{% elif detail.operational_lifecycle_status == 'inactive' %}<button class="btn btn-secondary" name="action" value="lifecycle_reactivated" type="submit">Restore active search</button>{% else %}<p>Retired records require a separately governed restoration procedure and cannot be reactivated here.</p>{% endif %}
+      </div></fieldset>
+      <div class="ops-form-grid">
+        <label class="field"><span class="field-label">Reviewer ID</span><input class="input" name="reviewer_id" required autocomplete="off"></label>
+        <label class="field"><span class="field-label">Reviewer role</span><input class="input" name="reviewer_role" required value="pharmacist reviewer"></label>
+        <label class="field"><span class="field-label">Reason code</span><input class="input" name="reason_code" required placeholder="source_verified, incomplete_data…"></label>
+        <label class="field ops-form-grid__wide"><span class="field-label">Required review note</span><textarea class="input" name="note" required></textarea></label>
+      </div>
+      <p class="ops-muted">Inactivation stops this match from new search. Issued prescriptions and their patient display remain unchanged.</p>
+    </form>
+  </section>
+
+  <section class="card"><p class="ops-eyebrow">Append-only ledger</p><h2>Decision history</h2><div class="ops-timeline">
+    {% for event in detail.audit_events %}<article data-qa="audit-event"><time>{{ event.created_at }}</time><h3>{{ event.action|replace('_',' ') }}</h3><p>{{ event.reviewer_id }} · {{ event.reviewer_role }}</p><p>Review: {{ event.previous_review_status }} → {{ event.next_review_status }} · Lifecycle: {{ event.previous_lifecycle_status }} → {{ event.next_lifecycle_status }}</p><p><b>{{ event.reason_code }}</b> · {{ event.note }}</p>{% if event.normalized_projection_sha256 %}<p class="ops-mono">Normalized projection: {{ event.normalized_projection_sha256 }}</p>{% endif %}{% if event.normalized_snapshot %}<details><summary>Normalized snapshot at decision</summary><pre class="ops-audit-json">{{ event.normalized_snapshot|tojson(indent=2) }}</pre></details>{% endif %}</article>{% else %}<p>No human or importer decision events yet.</p>{% endfor %}
+  </div></section>
+</article>
+{% endblock %}

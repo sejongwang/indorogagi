@@ -1,72 +1,112 @@
-# indoro 인도 의약품 마스터 시드 (drugs-seed.json)
+# indoro 의약품 카탈로그 데이터
 
-- **수집일**: 2026-07-07 (원격 수집 트랙, 인도 방문 전)
-- **총 건수**: 629건 (브랜드 379건 + NLEM 성분 백본 250건)
-- **스키마 버전**: 1
-- **용도**: v0 자동완성(`GET /api/drugs?q=`) 및 P1 약사 입력 자동완성 목업 데이터. 25만 SKU 풀 덤프가 아닌 top 브랜드 + NLEM 중심 큐레이션.
+- 기준일: 2026-07-10
+- 설계·출처 평가: [`../docs/08-india-drug-data-foundation.md`](../docs/08-india-drug-data-foundation.md)
+- 운영 절차: [`../docs/09-drug-catalog-operations.md`](../docs/09-drug-catalog-operations.md)
+- 출처 레지스트리: [`drug-sources.json`](drug-sources.json)
 
-## 소스별 기여
+## 데이터셋 구분
 
-| 소스 | 기여 | URL |
-|---|---|---|
-| NLEM 2022 (CDSCO, 인도 필수의약품 목록) | 성분 백본 250건 (`is_generic: true`) | https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadConsumer/nlem2022.pdf |
-| Pharmarack PharmaTrac 보도 (top 브랜드 랭킹) | 77건이 근거로 인용, 그중 75건에 `priority_rank` 부여. 주 근거: PharmaTrac MAT Mar-2026 Top 40 | Medical Dialogues PDF: https://medicaldialogues.in/pdf_upload/2026/04/10/ipm-performance-pharmatrac-mat-mar-2026-1-340944.pdf · BioSpectrum(May 2026): https://www.biospectrumindia.com/news/73/27970/mounjaro-retains-no-1-position-as-25-leading-pharma-brands-register-double-digit-growth-in-may-2026-pharmarack.html · Business Standard(FY25): https://www.business-standard.com/industry/news/robust-chronic-performance-drives-8-4-growth-for-indian-pharma-mkt-in-fy25-125040801060_1.html · MedicinMan(Apr 2025): https://medicinman.net/2025/05/indian-pharma-market-performance-april-2025/ |
-| 온라인 약국 목록 페이지 (1mg · Netmeds · PharmEasy, 보조: Apollo Pharmacy · Truemeds · MedPlusMart) | 353건이 강도·성분·제형 확인 근거로 인용. 랭킹 근거 없는 브랜드 276건은 치료군별 다빈도 큐레이션 | 1mg 예: https://www.1mg.com/search/all?name=Thyronorm · Netmeds 예: https://www.netmeds.com/prescriptions/naxdom-500-tablet-15s · PharmEasy 예: https://pharmeasy.in/online-medicine-order/zerodol-sp-tablet-14794 |
-| IQVIA 보도 | 0건 — 최종 시드 근거로는 Pharmarack 계열 보도만 사용됨 | — |
-| Jan Aushadhi (PMBJP 제네릭 스토어 목록) | 0건 — 이번 원격 시드에 미편입. 저가 제네릭 표기 수요 확인 후 현지 트랙에서 편입 후보 | http://janaushadhi.gov.in/ |
+| 파일 | 범위 | 분류 | 사용 가능 범위 |
+| --- | --- | --- | --- |
+| [`catalog/nppa-anti-diabetes-2026-03.json`](catalog/nppa-anti-diabetes-2026-03.json) | NPPA가 2026년 3월 기준으로 게시한 11개 항당뇨 formulation과 단위·ceiling price 원문 사실 | Tier 1, production | NPPA 자체 작성 자료의 formulation 식별 보조. 브랜드·제조사·복용법을 추정하지 않음 |
+| [`catalog/indoro-synthetic-demo-v1.json`](catalog/indoro-synthetic-demo-v1.json) | 프로젝트가 작성한 가상 상품·가상 성분 16건 | Tier 3, demo | `ph-demo-001`의 제형·경로·검색 UX·테스트 전용. 실제 의약품 또는 복약 권고가 아님 |
+| [`drug-sources.json`](drug-sources.json) | 공식·참고 출처의 Tier, 라이선스, 자동 수집 정책 | 메타데이터 | source gate와 법무 검토 기록 |
 
-항목별 세부 근거는 각 entry의 `source` 배열(수집 페이지 URL 또는 문서명+URL)에 있다. Schedule H1 통제약 중 Alprax(alprazolam)·Zolfresh(zolpidem)는 약사 입력 실수요 기준으로 포함했고, Spasmo-Proxyvon Plus(tramadol 복합)는 정책 확정 전 보류했다.
+**정부 사이트에 공개된 자료라는 사실은 자동으로 자유 재사용을 뜻하지 않는다.** 각 source는 파일별 라이선스, 버전, 입력 URL, 접근일을 추적한다. Tier 2는 현지 법무 승인 전 운영 import를 막고, Tier 3는 운영 데이터와 합치지 않는다.
 
-## 스키마
+production 패키지는 패키지 내부의 `reuse_status`만으로 승인되지 않는다. [`drug-sources.json`](drug-sources.json)의 별도 `approved_packages` 항목에 package slug, canonical records SHA-256, `accessed_at`을 포함한 source metadata SHA-256, `approved_at`, `approved_by_role`이 정확히 일치해야 한다. 현재 승인 범위는 `nppa-antidiabetes-formulations-2026-03`의 고정된 11건뿐이다. canonical record 값이나 승인 대상 source metadata가 바뀌면 새 해시와 별도 현지 법무·데이터 거버넌스 승인이 필요하다.
 
-| 필드 | 타입 | 설명 | 예시 |
-|---|---|---|---|
-| `id` | string | 임시 ID(`seed-일련번호`). 병합/임포트 단계에서 재부여 | `"seed-0001"` |
-| `brand_name` | string | 표시명. NLEM 성분 항목은 INN명 그대로 | `"Dolo 650"`, `"Paracetamol"` |
-| `generic_name` | string | 성분 문자열. 복합제는 `" + "` 연결 | `"Amoxicillin + Clavulanic Acid"` |
-| `molecules` | string[] | 구조화 성분 배열(복합제는 성분별 원소) | `["Amoxicillin", "Clavulanic Acid"]` |
-| `strength` | string | `"650 mg"` \| `"500/125 mg"` \| `"per 5 ml"` \| `"60000 IU"` 표기 규칙 | `"500/125 mg"` |
-| `form` | string | tablet·capsule·syrup·suspension·drops·injection·cream·ointment·inhaler·sachet·gel·other | `"tablet"` |
-| `is_generic` | boolean | `true` = NLEM 성분 백본 항목(브랜드 아님) | `false` |
-| `priority_rank` | int \| null | top 판매 근거(Pharmarack 보도) 있는 브랜드만 정수(1이 최상), 그 외 null | `1` |
-| `category` | string | 치료군 16종(analgesic_antipyretic, antibiotic, cardiovascular …) | `"antibiotic"` |
-| `aliases` | string[] | 실존 표기 변형만(하이픈·시장 통용 축약·성분명). 발명 금지 | `["Augmentin", "Augmentin 625"]` |
-| `source` | {label,url}[] | 근거 필수 — 수집 페이지 URL 또는 문서명+URL | `[{"label": "1mg", "url": "https://…"}]` |
+## 공식 NPPA 패키지
 
-같은 브랜드의 다른 강도는 별도 항목(예: Dolo 500 vs Dolo 650, 대표 강도 1~3개). 외형 필드(색·크기·모양·사진)와 복용법/용량 기본값은 **의도적으로 배제**했다(아래 한계 참조).
+`catalog/nppa-anti-diabetes-2026-03.json`은 [NPPA 치료군별 ceiling price 목록](https://www.nppa.gov.in/en/therapeuticcategorywiseceilingpricelist)이 연결한 2026년 3월 PDF에서 NPPA 작성 formulation 11개를 전사한 작은 공식 패키지다. [NPPA 저작권 정책](https://www.nppa.gov.in/en/copyrightpolicy)은 별도 표시가 없는 NPPA 사이트 자료를 정확하고 비훼손적이며 오해를 일으키지 않는 방식으로, 출처를 명확히 표시해 재현할 수 있게 한다. 제3자 저작물은 이 허용에서 제외된다.
 
-### docs/01 drugs 테이블 매핑
+따라서 이 패키지는 다음으로 제한한다.
 
-| 시드 필드 | drugs 테이블 컬럼 | 비고 |
-|---|---|---|
-| `molecules` | `generic_name` | `" + "` 연결 문자열로 평탄화 |
-| `aliases` | `aliases_json` | JSON 배열 그대로 |
-| `source` | `source` (TEXT) | 직렬화 저장 |
-| `brand_name` / `strength` / `form` | 동명 컬럼 | 그대로 |
-| `priority_rank` · `is_generic` · `category` | (컬럼 없음) | **시드 전용** — 자동완성 정렬·큐레이션 관리용 |
-| — | `verified` | 임포트 시 일괄 `0` (현지/약사 검증 전) |
+- NPPA가 작성한 formulation, 단위, 원문 price fact만 저장
+- `source_url`, 버전, 접근일, 원본 행 번호와 attribution 보존
+- 상품 브랜드, 제조사, 마케팅 회사, 진단, 용량, 대체약을 추정하지 않음
+- ceiling price를 환자 화면에 표시하거나 복약 안내 생성에 사용하지 않음
+- NPPA 전체 사이트나 제3자 시장·제조사 데이터를 같은 라이선스로 간주하지 않음
 
-## 라이선스 / 법적 메모
+11건은 전국 상품 마스터가 아니다. 안전하게 재사용 가능한 공식 입력과 import/update 경로를 검증하는 최소 운영 패키지다.
 
-- **NLEM 2022**는 인도 정부(CDSCO) 공공 문서로, 성분 목록의 사용에 제약이 없다.
-- 브랜드명·성분·강도는 **사실 정보(facts)의 소량 큐레이션**이다. 특정 상업 DB(1mg, PharmEasy 등)의 실질적 복제가 아니며, 소스당 소수의 목록·보도 페이지만 참조해 629건을 선별했다.
-- 판매 랭킹(`priority_rank`)은 Pharmarack PharmaTrac **보도 인용**에 근거하며, 출처(매체명+URL)를 각 entry의 `source`에 명시했다. 원 데이터셋 자체를 재배포하지 않는다.
+원본과 변환 경계는 다음 파일로 고정한다.
 
-## 검증 요약
+- `catalog/nppa-anti-diabetes-2026-03.source-manifest.json`: 공식 PDF URL, ETag, Last-Modified, 401,697 bytes, SHA-256
+- `catalog/nppa-anti-diabetes-2026-03.source.json`: package source metadata
+- `catalog/nppa-anti-diabetes-2026-03.rows.csv`: PDF 11행을 사람이 대조한 reviewed transcription
+- `catalog/nppa-anti-diabetes-2026-03.json`: 결정적으로 생성되는 importer package
 
-- 스팟체크 30건, 오류율 **3.3%** (1건).
-- 오류 발견 치료군(cat_acute)은 **재수집** 완료. 갭 보강 41건은 2026-07-07 웹 재확인 완료.
-- 2차 재검증(2026-07-07): 다성분 OTC 36건 전수 — 오류 4건 교정/삭제(교정 3: Digene Gel·Gelusil MPS 성분 누락, Cheston Cold 구제형 → New Formula / 삭제 1: Phensedyl 코데인 FDC 금지·단종), 잔여 오류율 0%.
-- 3차 확인(2026-07-07, 메인 세션 직접 검증): Cheston Cold Suspension(seed-0391)도 동일 금지 FDC 조성(Cetirizine+PCM+PE)으로 확인되어 삭제 — 627건 확정. 리테일 리스팅은 잔여 재고 유통으로 판단.
-- 임포트 시 전 항목 `verified=0`으로 들어가며, 현지 파트너 약국 검증을 통과한 항목만 `verified=1`로 승격한다.
+```bash
+cd server
+uv run python scripts/fetch_catalog_source.py \
+  ../data/catalog/nppa-anti-diabetes-2026-03.source-manifest.json \
+  --output-dir var/catalog-sources
+uv run python scripts/nppa_package.py --check
+```
 
-## 한계
+원본 PDF hash가 바뀌거나 reviewed CSV와 package가 다르면 명령은 실패한다. OCR/layout 추정을 자동 반영하지 말고, 새 version 파일에서 원문 대조·현지 약사/법무·데이터 거버넌스 검토와 승인 레지스트리 해시 갱신을 수행한다.
 
-- **전국 top 판매 기준의 큐레이션이므로, 파트너 약국의 실제 처방 믹스로 현지 보정이 반드시 필요하다.** 지역·약국별 취급 브랜드는 전국 랭킹과 다를 수 있다.
-- **외형 필드(색·크기·모양·사진) 미포함**: 같은 브랜드도 제조사·배치별로 제각각이라 원격 수집 값은 오답 위험이 있다. 현지 검증 트랙의 몫이다.
-- **복용법/용량 기본값(패턴·식전후·1일 횟수) 미포함**: 용법은 약사 입력 영역이므로 시드가 기본값을 제안하면 안 된다. `meta.pattern_candidates`는 UI 픽스처 대조용 후보일 뿐 복약 지시가 아니다.
-- **지역 언어 별칭(힌디어·타밀어 등) 미수집**: 실존 표기 확인이 원격으로 어려워 현지 트랙으로 미뤘다. 현재 `aliases`는 영문 표기 변형만 담는다.
+## 합성 demo fixture
 
-## 갱신 절차
+`catalog/indoro-synthetic-demo-v1.json`은 외부 사이트나 실제 제품 카탈로그를 복제하지 않고 프로젝트가 직접 만든 식별 테스트 자료다. 모든 상품·성분명이 가상이며 source slug는 `indoro-synthetic-demo-v1`, usage scope는 `demo`다.
 
-파일럿 운영 중 약사 입력 화면에서 자동완성에 매칭되지 않은 원문 입력을 `drug_name_raw`로 로그에 남긴다. 주기적으로(주 1회 권장) 미매칭 로그를 빈도순으로 집계해 상위 항목을 검토하고, 실존 브랜드/강도로 확인된 것만 소스 URL과 함께 시드에 편입한다(신규 항목도 `verified=0`으로 시작). 이 루프가 전국 top 기준 시드를 파트너 약국의 실제 처방 믹스에 수렴시키는 핵심 보정 장치다.
+다음 회귀 사례를 포함한다.
+
+- 같은 이름의 250 mg/500 mg 정제와 500 mg 캡슐
+- 복합제의 성분 순서와 성분별 함량
+- SR과 ER
+- syrup과 suspension
+- ophthalmic, otic, oral drops
+- 긴 상품명·긴 성분 조합, 하이픈·공백·`500mg` 변형, Devanagari 별칭
+- 위험한 유사 이름 후보, 불완전 검토 레코드, inactive 레코드
+
+합성 fixture도 실제 처방 자료로 오해되지 않도록 UI에서 Demo·검토 상태를 표시하고, `ph-demo-001` 헤더 컨텍스트에서만 검색한다. production으로 자동 승격할 수 없다.
+
+apply는 반드시 `--db-path`로 지정한 비기본 SQLite에만 허용된다. `scripts/seed_import.py`와 단일 패키지용 `scripts/catalog_import.py` 모두 demo 패키지를 기본 production DB에 적용하는 요청을 거부한다.
+
+apply가 성공하면 `catalog_database_meta`가 해당 SQLite 파일의 물리적 역할을 `production` 또는 `demo`로 고정한다. 이후 반대 역할의 import는 경로 이름과 무관하게 거부되므로, 합성 fixture가 실수로 운영 DB에 섞이거나 운영 DB가 demo 데이터로 재분류되지 않는다.
+
+## 레거시 627건의 격리
+
+기존 `drugs-seed.json`은 NLEM 성분 백본 외에 상업 약국·보도에서 확인한 브랜드 큐레이션이 섞여 있었고, 전체 레코드의 데이터 공급 계약·상업적 재사용 라이선스가 없었다. 이 작업에서 파일을 저장소와 seed importer에서 제거했다.
+
+금지 사항:
+
+- 실제 환자 서비스, 자동완성 demo, 운영 master에서 사용
+- 1mg, PharmEasy, Netmeds, Apollo 등 상업 사이트에서 추가 수집
+- 상품 설명·가격·이미지·리뷰 복제
+- 명시적 계약 없이 `demo`, `verified`, `production`으로 전환
+
+이미 외부 저장소에 push된 Git 이력이 있다면 working tree 삭제만으로 과거 blob이 사라지지 않는다. 공개 이력 삭제 또는 보존의 법적 필요성은 현지 법무·데이터 거버넌스 책임자가 별도로 결정해야 하며, 파괴적인 history rewrite는 이 구현 범위에서 수행하지 않았다.
+
+## 품질 보고서
+
+```bash
+cd server
+uv run python scripts/seed_import.py --dry-run --report-dir ../data/reports/production-dry
+uv run python scripts/seed_import.py --apply --report-dir ../data/reports/production
+uv run python scripts/seed_import.py --apply --report-dir ../data/reports/production-replay
+
+uv run python scripts/seed_import.py --catalog-scope demo --dry-run \
+  --report-dir ../data/reports/demo-dry
+uv run python scripts/seed_import.py --catalog-scope demo --apply \
+  --db-path var/indoro-demo.db --report-dir ../data/reports/demo
+uv run python scripts/seed_import.py --catalog-scope demo --apply \
+  --db-path var/indoro-demo.db --report-dir ../data/reports/demo-replay
+```
+
+JSON과 Markdown 보고서에는 최소한 원본, 정상 import, 제외, 격리, 검토 필요, 중복 후보, 필드 누락, 미확인 form/unit, 위험한 유사 이름을 기록한다. dry-run은 요청한 DB를 열거나 생성하지 않고 메모리 DB에서 관계형 품질 검사까지 수행한다. 같은 입력을 다시 apply해도 presentation/source record 수가 늘어나지 않아야 한다.
+
+## 검증의 의미
+
+문자열 정규화·중복 후보 검사와 테스트 통과는 의료적 정확성, 현지 판매 상태, 규제 상태, 환자 사용 안전성을 증명하지 않는다. 운영 전 다음을 별도로 완료해야 한다.
+
+- 현지 등록 약사의 상품명·성분·함량·제형·경로 검수
+- 인도 현지 법무의 파일별 상업적 재사용 승인
+- 공식 source의 갱신·철회·리콜 절차 확인
+- 파트너 약국 실제 처방 원문의 미매칭 분석
+- 지역어 별칭의 출처와 언어 검수
+
+미매칭 원문을 수집할 때 환자명, 전체 처방, 토큰을 로그로 남기지 않는다. 빈도만으로 새 상품을 운영 카탈로그에 자동 추가하지 않는다.

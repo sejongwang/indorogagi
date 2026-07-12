@@ -1,0 +1,17 @@
+{% extends "catalog_ops_base.html" %}
+{% block title %}Retirement batches{% endblock %}
+{% block content %}
+<section data-qa="catalog-retirement-page" class="ops-stack">
+  <div class="ops-page-heading"><div><p class="ops-eyebrow">Full snapshot controls</p><h1>Retirement batches</h1><p>Missing source records become review candidates. Import never deletes or retires them automatically.</p></div></div>
+  <div class="ops-record-list">
+    {% for batch in batches %}
+    <article class="card ops-batch" data-qa="retirement-batch-row" data-batch-id="{{ batch.id }}">
+      <div><p class="ops-eyebrow">{{ batch.source_slug }}</p><h2><a href="/catalog/retirements/{{ batch.id }}">{{ batch.source_name }}</a></h2><p class="ops-mono">{{ batch.baseline_import_run_id }} → {{ batch.import_run_id }}</p></div>
+      <div class="ops-record__status"><span class="ops-status lifecycle-{{ batch.status }}">Batch: {{ batch.status|replace('_',' ') }}</span><span>{{ batch.candidate_count }} candidates · {{ batch.unresolved_count or 0 }} unresolved</span></div>
+      <div><p>Created {{ batch.created_at }} by {{ batch.created_by }}</p>{% if batch.approved_by %}<p>Approved by {{ batch.approved_by }}</p>{% endif %}</div>
+      <a class="btn btn-secondary" href="/catalog/retirements/{{ batch.id }}">Open batch</a>
+    </article>
+    {% else %}<div class="card ops-empty">No retirement batches. Delta imports and first full snapshots do not create candidates.</div>{% endfor %}
+  </div>
+</section>
+{% endblock %}

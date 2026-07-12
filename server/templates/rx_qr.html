@@ -14,6 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Prescription QR — indoro</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="/static/rx.css">
 </head>
 <body class="page-qr" data-mode="screen">
@@ -29,7 +30,8 @@
 
 <main class="screen stack">
 
-  <!-- rx.created는 POST /api/prescriptions 커밋 트랜잭션에서 이미 서버 기록됨(§6.2) — 이 화면 추가 이벤트 없음 -->
+  <!-- 최초 발급 직후 표시는 rx.created만 유지한다. 일회성 ?from=issue 표지가 없는
+       직접 재방문·새로고침만 rx.js가 qr.redisplayed로 기록한다. -->
   <div class="hstack np" data-loaded hidden>
     <span class="status-chip st-active" id="stChip">Issued</span>
     <span class="t-supporting t-secondary" id="issueMeta"></span>
