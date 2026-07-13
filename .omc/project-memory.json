@@ -1,0 +1,135 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1783692659903,
+  "projectRoot": "/Users/min/Documents/GitHub/indorogagi",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "data": {
+      "path": "data",
+      "purpose": "Data files",
+      "fileCount": 2,
+      "lastAccessed": 1783692659887,
+      "keyFiles": [
+        "drugs-README.md",
+        "drugs-seed.json"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 4,
+      "lastAccessed": 1783692659887,
+      "keyFiles": [
+        "01-dataflow.md",
+        "02-wireframe-pharmacist.md",
+        "03-wireframe-patient.md",
+        "04-wireframe-plan.md"
+      ]
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1783692659887,
+      "keyFiles": [
+        "README.md",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    },
+    "wireframes": {
+      "path": "wireframes",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1783692659887,
+      "keyFiles": [
+        "README.md",
+        "index.html"
+      ]
+    },
+    "server/app": {
+      "path": "server/app",
+      "purpose": "Application code",
+      "fileCount": 4,
+      "lastAccessed": 1783692659888,
+      "keyFiles": [
+        "__init__.py",
+        "config.py",
+        "db.py"
+      ]
+    },
+    "server/config": {
+      "path": "server/config",
+      "purpose": "Configuration files",
+      "fileCount": 2,
+      "lastAccessed": 1783692659888,
+      "keyFiles": [
+        "i18n.yaml",
+        "patterns.yaml"
+      ]
+    },
+    "server/scripts": {
+      "path": "server/scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 2,
+      "lastAccessed": 1783692659888,
+      "keyFiles": [
+        "demo.py",
+        "seed_import.py"
+      ]
+    },
+    "server/static": {
+      "path": "server/static",
+      "purpose": "Static files",
+      "fileCount": 3,
+      "lastAccessed": 1783692659888,
+      "keyFiles": [
+        "rx.css",
+        "rx.js"
+      ]
+    },
+    "server/tests": {
+      "path": "server/tests",
+      "purpose": "Test files",
+      "fileCount": 4,
+      "lastAccessed": 1783692659888,
+      "keyFiles": [
+        "conftest.py",
+        "test_api.py",
+        "test_db.py"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

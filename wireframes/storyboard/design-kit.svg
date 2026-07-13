@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1010" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <!-- ============================================================
+       indoro 모션그래픽 디자인 키트 v0 — 현재 시각 어휘 전량 (재디자인 출발점)
+       사용법: 이 파일을 Figma/Illustrator에 드래그 → 부품별로 분해·재디자인.
+       계약: 24×24 viewBox · stroke 1.6~1.8 · 단색(currentColor) · 스테이지 내 언어 0(숫자 허용)
+             · 필터/사진/그라디언트 금지 · 마지막 프레임 정보 완결 · 색은 보조(그레이스케일 성립)
+       ============================================================ -->
+  <defs>
+    <symbol id="i-slot-m" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17h17"/><path d="M8 17a4 4 0 0 1 8 0"/><path d="M12 10.5V7.5M6.6 12.2 4.8 10.8M17.4 12.2l1.8-1.4"/></g></symbol>
+    <symbol id="i-slot-n" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 4.5V6M12 18v1.5M4.5 12H6M18 12h1.5M6.9 6.9l1.1 1.1M16 16l1.1 1.1M17.1 6.9 16 8M8 16l-1.1 1.1"/></g></symbol>
+    <symbol id="i-slot-e" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 15.5h17"/><path d="M8 15.5a4 4 0 0 1 8 0z" fill="currentColor"/><path d="M12 20.5V19"/></g></symbol>
+    <symbol id="i-slot-h" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.6 13.2A6.4 6.4 0 1 1 10.8 4.5a7.2 7.2 0 0 0 4.8 8.7z"/><path d="m17.8 5.2.4 1.2 1.2.4-1.2.4-.4 1.2-.4-1.2-1.2-.4 1.2-.4z" fill="currentColor" stroke="none"/></g></symbol>
+    <symbol id="i-plate-full" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="13" r="7.5"/><circle cx="12" cy="13" r="4.4"/><path d="M9.8 12.2c.6-.9 3.8-.9 4.4 0M10.4 14.4h3.2" stroke-width="1.3"/><path d="M4.5 5.5c.8.9 2 .9 2.8 0M10.6 4.5c.8.9 2 .9 2.8 0M16.7 5.5c.8.9 2 .9 2.8 0" stroke-width="1.2"/></g></symbol>
+    <symbol id="i-plate-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="7.5"/><circle cx="12" cy="13" r="4.4" stroke-dasharray="2.5 2.5"/></g></symbol>
+    <symbol id="i-tf-before" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.2" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M5.4 9.7v4.6"/><path d="M10.6 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><circle cx="18.4" cy="12" r="3.4"/><circle cx="18.4" cy="12" r="1.2"/></g></symbol>
+    <symbol id="i-tf-after" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.6" cy="12" r="3.4"/><circle cx="5.6" cy="12" r="1.2"/><path d="M10.8 12h2.6m-1.1-1.4 1.4 1.4-1.4 1.4"/><rect x="15.4" y="9.7" width="6.4" height="4.6" rx="2.3"/><path d="M18.6 9.7v4.6"/></g></symbol>
+    <symbol id="i-tf-with" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="4.6"/><circle cx="12" cy="14" r="1.6"/><rect x="9" y="3.4" width="6" height="4" rx="2"/><path d="M12 3.4v4"/></g></symbol>
+    <symbol id="i-tf-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14.5" r="4.6"/><rect x="14.8" y="4.2" width="6" height="4" rx="2"/><path d="M17.8 4.2v4"/></g></symbol>
+    <symbol id="p-tab" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6v16.8" stroke-width="1.4"/></g></symbol>
+    <symbol id="p-tab-half" viewBox="0 0 24 24"><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="p-cap" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.6" y="8" width="18.8" height="8" rx="4"/><path d="M12 8v8" stroke-width="1.4"/><path d="M6.4 10.4v3.2" stroke-width="1.4" stroke-linecap="round"/></g></symbol>
+    <symbol id="p-spoon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="8.2" cy="15.6" rx="5.4" ry="3.6"/><path d="M4 15.2h8.4" stroke-width="1.4"/><path d="m12.9 12.4 7.3-7.3"/></g></symbol>
+    <symbol id="p-generic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.6" y="4.6" width="14.8" height="14.8" rx="4.4" stroke-dasharray="3 3"/><path d="M9.2 12h5.6" stroke-width="1.4" stroke-linecap="round"/></g></symbol>
+    <symbol id="i-fever-face" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="12.5" r="7"/><path d="M8 11h.01M13 11h.01" stroke-width="2.4"/><path d="M8.3 15.8c1.3-1 3.1-1 4.4 0"/><path d="M19.5 4.5v7.2" stroke-width="1.6"/><circle cx="19.5" cy="14.2" r="2.1"/><path d="M19.5 8.5v5.7" stroke-width="2.4"/></g></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M9 10h.01M15 10h.01" stroke-width="2.6"/><path d="M8.5 14.2a4.6 4.6 0 0 0 7 0"/></g></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 11.5V6.8a1.4 1.4 0 0 1 2.8 0v4M10.3 10.5V5.2a1.4 1.4 0 0 1 2.8 0v5.3M13.1 10.8V6.4a1.4 1.4 0 0 1 2.8 0v5.8"/><path d="M15.9 12.2l1.9-1.7a1.5 1.5 0 0 1 2 2.2l-4.3 5.4a5 5 0 0 1-3.9 1.9H10a4.5 4.5 0 0 1-4.5-4.5v-4a1.4 1.4 0 0 1 2-1.3"/></g></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V4"/><path d="M6 4.5h11.5l-3 3.5 3 3.5H6z" fill="currentColor" fill-opacity=".15"/></g></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0 1 12-4.9M19 12a7 7 0 0 1-12 4.9"/><path d="M17 4v3.2h-3.2M7 20v-3.2h3.2"/></g></symbol>
+    <symbol id="i-pharm" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M12 8v8M8 12h8" stroke-width="2.2" stroke-linecap="round"/></g></symbol>
+    <symbol id="i-doctor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="3.2"/><path d="M5 20.5a7 7 0 0 1 14 0"/><path d="M12 14.5v3M10.5 16h3" stroke-width="1.6"/></g></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+    <symbol id="i-strip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="7.5" cy="10" r="1.4"/><circle cx="12" cy="10" r="1.4"/><circle cx="16.5" cy="10" r="1.4"/><circle cx="7.5" cy="14" r="1.4"/><circle cx="12" cy="14" r="1.4"/><circle cx="16.5" cy="14" r="1.4"/></g></symbol>
+    <symbol id="i-envelope" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.7 4.6 4.6L19 8"/></g></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 21.2 19.6H2.8z"/><path d="M12 9.5v4.5M12 16.8v.3"/></g></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16v-3l1.7-3.6A2 2 0 0 1 8 8.2h6.4a2 2 0 0 1 1.8 1.2L17.9 13v3"/><circle cx="7.8" cy="16.6" r="1.6"/><circle cx="15" cy="16.6" r="1.6"/></g></symbol>
+    <symbol id="i-alco-no" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5h10L12 11z"/><path d="M12 11v7M9 20.5h6"/><path d="M4 21 21 4" stroke-width="2"/></g></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3.5v17M4.6 7.75l14.8 8.5M19.4 7.75 4.6 16.25"/><path d="M12 3.5 10 5.5M12 3.5l2 2M12 20.5l-2-2M12 20.5l2-2"/></g></symbol>
+    <symbol id="i-shake" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="7" width="6" height="12" rx="2"/><path d="M10.5 7V4.8h3v2"/><path d="M5.5 9.5c-1.1 1.7-1.1 3.8 0 5.5M18.5 9.5c1.1 1.7 1.1 3.8 0 5.5"/></g></symbol>
+    <symbol id="i-sugar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M7.8 12 4.5 9.5v5zM16.2 12l3.3-2.5v5z"/></g></symbol>
+  </defs>
+
+  <style>
+    .cellbox { fill: #fff; stroke: #e3e3e3; }
+    .lbl  { font-size: 11px; fill: #737373; text-anchor: middle; }
+    .code { font-size: 9px;  fill: #a3a3a3; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+    .sect { font-size: 13px; font-weight: 700; fill: #171717; }
+    .icon { color: #171717; }
+  </style>
+
+  <rect width="980" height="1010" fill="#f6f6f6"/>
+  <text x="24" y="34" font-size="17" font-weight="700" fill="#171717">indoro 모션그래픽 디자인 키트 v0 — 시각 어휘 전량</text>
+  <text x="24" y="54" font-size="11" fill="#737373">계약: 24×24 · stroke 1.6~1.8 · 단색(currentColor) · 스테이지 내 언어 0(숫자 허용) · 필터·사진·그라디언트 금지 · 마지막 프레임 정보 완결 · 그레이스케일 성립</text>
+
+  <!-- ===== 행 1: 시간 슬롯 (순서 고정 M→N→E→H) ===== -->
+  <text x="24" y="86" class="sect">시간 슬롯 — 순서 고정 M→N→E→H</text>
+  <g transform="translate(24,96)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-slot-m" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">아침 M</text><text x="70" y="86" class="code">i-slot-m</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-slot-n" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">점심 N</text><text x="70" y="86" class="code">i-slot-n</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-slot-e" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">저녁 E</text><text x="70" y="86" class="code">i-slot-e</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-slot-h" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">밤/취침 H</text><text x="70" y="86" class="code">i-slot-h</text></g>
+  </g>
+
+  <!-- ===== 행 2: 식사(식전후) — 접시 서사(모션용)와 tf 아이콘(정적용) 병존 → 통합 재설계 후보 ===== -->
+  <text x="24" y="222" class="sect">식사 표현 — 모션은 접시 서사(순서=의미), 정적은 tf 아이콘. 통합 재설계 후보</text>
+  <g transform="translate(24,232)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-plate-full" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">밥 (가득)</text><text x="70" y="86" class="code">i-plate-full</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-plate-empty" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">밥 (비움=먹음)</text><text x="70" y="86" class="code">i-plate-empty</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-tf-before" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">식전</text><text x="70" y="86" class="code">i-tf-before</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-tf-after" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">식후</text><text x="70" y="86" class="code">i-tf-after</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-tf-with" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">식사와 함께</text><text x="70" y="86" class="code">i-tf-with</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-tf-empty" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">공복</text><text x="70" y="86" class="code">i-tf-empty</text></g>
+  </g>
+
+  <!-- ===== 행 3: 복용 단위·알약 형태 (파라미터: drugs.shape_key / color_key / dose_unit) ===== -->
+  <text x="24" y="358" class="sect">복용 단위·알약 형태 — 파라미터 슬롯: shape_key · color_key · dose_unit · ½정</text>
+  <g transform="translate(24,368)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#p-tab" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">정제 1</text><text x="70" y="86" class="code">p-tab</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#p-tab-half" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">반 알 ½</text><text x="70" y="86" class="code">p-tab-half</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#p-cap" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">캡슐</text><text x="70" y="86" class="code">p-cap</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#p-spoon" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">스푼 (ml)</text><text x="70" y="86" class="code">p-spoon</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#p-generic" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">외형 미검증 폴백</text><text x="70" y="86" class="code">p-generic</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <g transform="translate(20,18)">
+        <rect x="0" y="6" width="46" height="13" rx="6.5" fill="#fdfdfd" stroke="#8f8f8f" stroke-width="1.4"/><path d="M23 6v13" stroke="#c0c0c0" stroke-width="1.2"/>
+        <circle cx="62" cy="12.5" r="9" fill="#fdfdfd" stroke="#8f8f8f" stroke-width="1.4"/><path d="M62 3.5v18" stroke="#c0c0c0" stroke-width="1.2"/>
+        <ellipse cx="88" cy="12.5" rx="14" ry="7" fill="#fdfdfd" stroke="#8f8f8f" stroke-width="1.4"/><path d="M88 5.5v14" stroke="#c0c0c0" stroke-width="1.2"/>
+      </g>
+      <text x="70" y="72" class="lbl">장방·원형·타원 (색 꽂힘)</text><text x="70" y="86" class="code">shape_key × color_key</text></g>
+  </g>
+
+  <!-- ===== 행 4: 서사 부품 (샷의 동사들) ===== -->
+  <text x="24" y="494" class="sect">서사 부품 — 샷의 동사: 증상→복용→간격, 호전에도 계속, 완주, 순환, 재방문</text>
+  <g transform="translate(24,504)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-fever-face" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">증상 (열) — PRN 트리거</text><text x="70" y="86" class="code">i-fever-face</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-clock" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">간격 (바늘이 쓸고 감)</text><text x="70" y="86" class="code">i-clock + 숫자</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-smile" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">호전 (그래도 계속)</text><text x="70" y="86" class="code">i-smile</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-hand" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">멈춤 (슬래시 대상)</text><text x="70" y="86" class="code">i-hand</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-flag" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">완주 (끝이 있다)</text><text x="70" y="86" class="code">i-flag</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-repeat" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">순환 (끝이 없다)</text><text x="70" y="86" class="code">i-repeat</text></g>
+  </g>
+  <g transform="translate(24,610)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-pharm" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">약국 (리필)</text><text x="70" y="86" class="code">i-pharm</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-doctor" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">의사 (재방문)</text><text x="70" y="86" class="code">i-doctor</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-cal" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">달력 (플립 + 숫자)</text><text x="70" y="86" class="code">i-cal</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-strip" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">스트립 (비어감)</text><text x="70" y="86" class="code">i-strip</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-envelope" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">봉투 (번호 = 배지)</text><text x="70" y="86" class="code">i-envelope + 숫자</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-check" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">체크 (완료)</text><text x="70" y="86" class="code">i-check</text></g>
+  </g>
+
+  <!-- ===== 행 5: 주의 칩 (금지 = 빨간 슬래시 오버레이) ===== -->
+  <text x="24" y="736" class="sect">주의 칩 — 금지는 빨간 슬래시 오버레이 하나로 통일 (그레이스케일·문자가림 테스트 대상)</text>
+  <g transform="translate(24,746)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/><g><use href="#i-car" x="48" y="10" width="44" height="44" class="icon"/><line x1="48" y1="54" x2="92" y2="10" stroke="#a50c25" stroke-width="3" stroke-linecap="round"/></g><text x="70" y="72" class="lbl">졸음 — 운전 금지</text><text x="70" y="86" class="code">i-car + slash</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-alco-no" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">술 금지</text><text x="70" y="86" class="code">i-alco-no</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-sugar" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">저혈당 — 단 것</text><text x="70" y="86" class="code">i-sugar</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-snow" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">냉장 보관</text><text x="70" y="86" class="code">i-snow</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-shake" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">흔들어서</text><text x="70" y="86" class="code">i-shake</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/><use href="#i-warn" x="48" y="10" width="44" height="44" class="icon"/><text x="70" y="72" class="lbl">주의 (일반)</text><text x="70" y="86" class="code">i-warn</text></g>
+  </g>
+
+  <!-- ===== 행 6: 상태 부호 (파라미터 슬롯의 대표) ===== -->
+  <text x="24" y="872" class="sect">상태 부호 — 파라미터 슬롯: 배지 hue=position · 점 × duration_days · 오늘 링</text>
+  <g transform="translate(24,882)">
+    <g transform="translate(0,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <circle cx="46" cy="34" r="15" fill="#1d4ed8"/><text x="46" y="39" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+      <circle cx="80" cy="34" r="15" fill="#c2410c"/><text x="80" y="39" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+      <text x="70" y="72" class="lbl">항목 배지 (10 hue)</text><text x="70" y="86" class="code">badge-item hue-N</text></g>
+    <g transform="translate(152,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <circle cx="42" cy="34" r="11" fill="#007004"/><path d="m36.5 34 3.6 3.6 7-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="70" cy="34" r="11" fill="#fff" stroke="#171717" stroke-width="2.8"/>
+      <circle cx="98" cy="34" r="11" fill="#fff" stroke="#d4d4d4" stroke-width="1.6"/>
+      <text x="70" y="72" class="lbl">한 날 = 점: 완료·오늘·예정</text><text x="70" y="86" class="code">ddot done/today/future</text></g>
+    <g transform="translate(304,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <g transform="translate(48,10)"><use href="#p-tab" width="44" height="44" class="icon" opacity=".35"/><line x1="2" y1="42" x2="42" y2="2" stroke="#a50c25" stroke-width="3.4" stroke-linecap="round"/></g>
+      <text x="70" y="72" class="lbl">금지 슬래시 (통일 부호)</text><text x="70" y="86" class="code">.slash</text></g>
+    <g transform="translate(456,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <rect x="46" y="12" width="48" height="46" rx="7" fill="#fff" stroke="#171717" stroke-width="2"/><rect x="46" y="12" width="48" height="12" rx="7" fill="#a50c25"/><text x="70" y="47" font-size="22" font-weight="700" fill="#171717" text-anchor="middle">8</text>
+      <text x="70" y="80" class="lbl">달력 타일 (숫자 꽂힘)</text><text x="70" y="94" class="code">flipcal + N</text></g>
+    <g transform="translate(608,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <circle cx="70" cy="34" r="20" fill="none" stroke="#171717" stroke-width="2.4"/><path d="M70 34 70 17" stroke="#171717" stroke-width="2.6" stroke-linecap="round"/><path d="M70 14a20 20 0 0 1 0 40" fill="none" stroke="#a50c25" stroke-width="4"/>
+      <text x="70" y="72" class="lbl">시계 스윕 (간격 N시간)</text><text x="70" y="86" class="code">clockface + N</text></g>
+    <g transform="translate(760,0)"><rect class="cellbox" width="140" height="96" rx="8"/>
+      <rect x="30" y="16" width="80" height="38" rx="6" fill="none" stroke="#171717" stroke-width="2" stroke-dasharray="5 4"/><text x="70" y="41" font-size="13" fill="#737373" text-anchor="middle">360×300</text>
+      <text x="70" y="72" class="lbl">스테이지 프레임 (샷 6종)</text><text x="70" y="86" class="code">motion.html 참조</text></g>
+  </g>
+
+  <text x="24" y="1000" font-size="10" fill="#a3a3a3">원본: wireframes/storyboard/motion.html·scenes.html의 defs — 재디자인 후 SVG로 돌려주면 코드에 이식됩니다. 라벨·설명 텍스트는 이 시트 전용(제품에는 안 들어감).</text>
+</svg>

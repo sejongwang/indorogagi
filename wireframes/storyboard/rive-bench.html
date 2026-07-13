@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  화면 ID : SB-R — Rive 테스트 벤치 (제품 화면 아님 · 디자이너 반복 도구)
+  목적    : Rive 에디터(rive.app)에서 export한 .riv를 드래그하면 제품 스테이지
+            (360×300)에서 즉시 재생 + 판정: 파일 크기 · 아트보드 크기 ·
+            스테이트 머신 입력(=파라미터 슬롯) 자동 검출·라이브 주입 ·
+            텍스트 런(n_*) 치환 테스트.
+  규약    : 아트보드 360×300 · 스테이트 머신 이름 "scene" 권장 ·
+            숫자 입력 n_* (n_days, n_qty_m …) · 불리언 v_* (v_chronic …) ·
+            숫자 텍스트 런 n_* (n_badge, n_date …) · 스테이지 내 언어 0(숫자 허용)
+  런타임  : shared/vendor/rive.min.js + rive.wasm (로컬 벤더 — 오프라인 동작)
+  ============================================================
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>indoro Rive 테스트 벤치</title>
+<link rel="stylesheet" href="../shared/wf.css">
+<style>
+  .sb-banner {
+    background: repeating-linear-gradient(135deg, #f5efdc 0 8px, #eadfae 8px 16px);
+    border-bottom: 1px solid #c9b96a; padding: 10px 16px; text-align: center;
+    font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); color: #4a3f14;
+  }
+  .p-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .p-card { padding: 14px; }
+  .drop {
+    border: 2px dashed var(--color-border-emphasized); border-radius: var(--radius-element);
+    padding: 18px; text-align: center; color: var(--color-text-secondary); cursor: pointer;
+    font-size: var(--text-body-size);
+  }
+  .drop.is-over { border-color: var(--color-accent); color: var(--color-text-primary); background: var(--color-accent-muted); }
+  .stage {
+    position: relative; height: 300px; margin-top: 12px;
+    border: 2px solid var(--color-accent); border-radius: var(--radius-element);
+    background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+  .stage canvas { width: 360px; height: 300px; max-width: 100%; }
+  .p-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .p-btn {
+    min-height: 40px; padding: 6px 14px; cursor: pointer;
+    border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-element);
+    background: var(--color-background-surface); font-size: var(--font-size-base);
+  }
+  .p-btn.is-on { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+  .report { margin-top: 10px; font-size: var(--font-size-sm); }
+  .report table { width: 100%; border-collapse: collapse; }
+  .report td, .report th { padding: 4px 6px; text-align: left; border-top: 1px solid var(--color-border); vertical-align: top; }
+  .report th { color: var(--color-text-secondary); font-weight: var(--font-weight-medium); white-space: nowrap; width: 130px; }
+  .ok   { color: var(--color-success); font-weight: var(--font-weight-bold); }
+  .bad  { color: var(--color-error); font-weight: var(--font-weight-bold); }
+  .warn { color: var(--color-warning); font-weight: var(--font-weight-bold); }
+  .param-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .param-row code { font-family: var(--font-family-code); font-size: var(--font-size-sm); min-width: 110px; }
+  .param-row input[type=number], .param-row input[type=text] {
+    width: 100px; min-height: 36px; padding: 4px 8px;
+    border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-inner); font-size: var(--font-size-base);
+  }
+  .p-note { font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+  .p-note b { color: var(--color-text-primary); }
+  .subh { font-size: var(--text-heading-5-size); font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="sb-banner">Rive 테스트 벤치 — rive.app에서 export한 .riv를 드래그하면 즉시 재생 · 입력(파라미터) 라이브 주입</div>
+
+<div class="p-wrap">
+  <article class="card p-card">
+    <div class="drop" id="drop">.riv 파일을 여기로 드래그 (또는 클릭해서 선택)<br>
+      <span style="font-size:var(--font-size-sm)">런타임 동작 확인용: <button class="p-btn" id="btn-sample" type="button" style="min-height:32px;padding:2px 10px">공개 샘플 재생</button></span>
+    </div>
+    <input type="file" id="file" accept=".riv" style="display:none">
+    <div class="stage"><canvas id="canvas" width="720" height="600"></canvas></div>
+    <div class="p-row">
+      <button class="p-btn" id="btn-play" type="button">일시정지</button>
+      <span class="p-note" id="status"></span>
+    </div>
+    <div class="report" id="report"></div>
+    <div class="subh" id="inputs-h" style="display:none">스테이트 머신 입력 (파라미터 슬롯) — 값을 바꾸면 즉시 반영</div>
+    <div id="inputs"></div>
+    <div class="subh">텍스트 런 치환 테스트 (규약: 숫자 자리 이름 n_*)</div>
+    <div class="param-row">
+      <input type="text" id="run-name" value="n_badge" placeholder="텍스트 런 이름">
+      <input type="text" id="run-value" value="3" placeholder="값">
+      <button class="p-btn" id="btn-run" type="button">주입</button>
+      <span class="p-note" id="run-result"></span>
+    </div>
+  </article>
+
+  <article class="card p-card">
+    <p class="p-note"><b>Rive 제작 규약 (indoro 씬)</b> — ① 아트보드 <b>360×300</b> ② 스테이트 머신 이름 <b>scene</b> (Entry→재생, 끝나면 정지 상태 = 정보 완결 프레임) ③ 숫자 파라미터는 Number 입력 <code>n_*</code>(예: n_days, n_qty_m), 변형 스위치는 Boolean <code>v_*</code>(예: v_chronic) ④ 화면에 보이는 숫자는 텍스트 런 이름 <code>n_*</code>로 — 코드가 실데이터 주입 ⑤ 스테이지 내 언어 0(숫자만) ⑥ 이미지 임베드 금지(벡터만), 파일 목표 <b>씬당 ≤100KB</b> ⑦ 금지 표현 = 빨간 슬래시.</p>
+    <p class="p-note" style="margin-top:6px"><b>무게 회계 (실측 gzip)</b> — Rive 런타임 JS 35KB + WASM 445KB = <b>~480KB</b> + 씬 .riv 수십 KB. 환자 첫 페인트는 0바이트(▶ 탭 후 lazy-load, 이후 캐시)지만 <b>2G 첫 탭에서는 수십 초</b>가 될 수 있음 — 이 트레이드오프는 팀 판정 사안. 카운터 태블릿은 로컬이라 무관. 참고: Lottie 경로는 77KB.</p>
+  </article>
+</div>
+
+<script src="../shared/vendor/rive.min.js"></script>
+<script>
+"use strict";
+rive.RuntimeLoader.setWasmUrl("../shared/vendor/rive.wasm"); /* 오프라인 벤더 — CDN 미사용 */
+
+var r = null, rawSize = 0, fileName = "", playing = true;
+var canvas = document.getElementById("canvas"), report = document.getElementById("report");
+var inputsEl = document.getElementById("inputs"), inputsH = document.getElementById("inputs-h");
+var statusEl = document.getElementById("status");
+
+function fmtKB(n) { return (n / 1024).toFixed(1) + " KB"; }
+
+function renderReport(contents, smName, animName) {
+  var sizeOK = rawSize <= 100 * 1024;
+  var abs = (contents && contents.artboards) || [];
+  var html = "<table>";
+  html += "<tr><th>파일</th><td>" + fileName + "</td></tr>";
+  html += "<tr><th>크기</th><td class='" + (sizeOK ? "ok" : "bad") + "'>" + fmtKB(rawSize) + (sizeOK ? " — 예산(100KB) 내" : " — 예산 초과") + "</td></tr>";
+  html += "<tr><th>아트보드</th><td>" + abs.map(function (a) { return a.name; }).join(", ") + "</td></tr>";
+  html += "<tr><th>재생 중</th><td>" + (smName ? "스테이트 머신 <b>" + smName + "</b>" : animName ? "애니메이션 <b>" + animName + "</b>" : "—") +
+          (smName === "scene" ? " <span class='ok'>규약 일치</span>" : smName ? " <span class='warn'>규약은 'scene' 권장</span>" : "") + "</td></tr>";
+  var bounds = r && r.bounds;
+  if (bounds) {
+    var w = Math.round(bounds.maxX - bounds.minX), h = Math.round(bounds.maxY - bounds.minY);
+    var bOK = (w === 360 && h === 300);
+    html += "<tr><th>아트보드 크기</th><td class='" + (bOK ? "ok" : "warn") + "'>" + w + "×" + h + (bOK ? " — 규약 일치" : " — 규약 360×300 (스케일 재생됨)") + "</td></tr>";
+  }
+  html += "</table>";
+  report.innerHTML = html;
+}
+
+function renderInputs(smName) {
+  inputsEl.innerHTML = ""; inputsH.style.display = "none";
+  if (!r || !smName) return;
+  var inputs = [];
+  try { inputs = r.stateMachineInputs(smName) || []; } catch (e) {}
+  if (!inputs.length) return;
+  inputsH.style.display = "block";
+  inputs.forEach(function (inp) {
+    var row = document.createElement("div");
+    row.className = "param-row";
+    if (inp.type === rive.StateMachineInputType.Number) {
+      row.innerHTML = "<code>" + inp.name + "</code>";
+      var num = document.createElement("input");
+      num.type = "number"; num.value = inp.value;
+      num.addEventListener("input", function () { inp.value = parseFloat(num.value) || 0; });
+      row.appendChild(num);
+    } else if (inp.type === rive.StateMachineInputType.Boolean) {
+      row.innerHTML = "<code>" + inp.name + "</code>";
+      var b = document.createElement("button");
+      b.className = "p-btn" + (inp.value ? " is-on" : ""); b.type = "button"; b.textContent = String(inp.value);
+      b.addEventListener("click", function () { inp.value = !inp.value; b.textContent = String(inp.value); b.classList.toggle("is-on", inp.value); });
+      row.appendChild(b);
+    } else { /* Trigger */
+      row.innerHTML = "<code>" + inp.name + "</code>";
+      var t = document.createElement("button");
+      t.className = "p-btn"; t.type = "button"; t.textContent = "발사";
+      t.addEventListener("click", function () { inp.fire(); });
+      row.appendChild(t);
+    }
+    inputsEl.appendChild(row);
+  });
+}
+
+function load(buffer, name) {
+  fileName = name; rawSize = buffer.byteLength;
+  if (r) { r.cleanup(); r = null; }
+  statusEl.textContent = "로딩…";
+  r = new rive.Rive({
+    buffer: buffer, canvas: canvas, autoplay: true, autoBind: true,
+    onLoad: function () {
+      r.resizeDrawingSurfaceToCanvas();
+      var c = r.contents || {};
+      var ab = (c.artboards && c.artboards[0]) || {};
+      var smName = null, animName = null;
+      if (ab.stateMachines && ab.stateMachines.length) {
+        smName = (ab.stateMachines.find(function (s) { return s.name === "scene"; }) || ab.stateMachines[0]).name;
+        r.stop(); r.play(smName);
+      } else if (ab.animations && ab.animations.length) {
+        animName = ab.animations[0]; /* contents의 animations는 문자열 배열 */
+        if (animName && animName.name) animName = animName.name;
+      }
+      playing = true;
+      document.getElementById("btn-play").textContent = "일시정지";
+      statusEl.textContent = "";
+      renderReport(c, smName, animName);
+      renderInputs(smName);
+    },
+    onLoadError: function (e) { statusEl.textContent = ""; report.innerHTML = "<span class='bad'>로드 실패 — Download(.riv, runtime export)인지 확인. " + e + "</span>"; }
+  });
+}
+
+/* 파일 입력 */
+var drop = document.getElementById("drop"), fileIn = document.getElementById("file");
+drop.addEventListener("click", function (e) { if (e.target.tagName !== "BUTTON") fileIn.click(); });
+["dragover", "dragleave", "drop"].forEach(function (ev) {
+  drop.addEventListener(ev, function (e) {
+    e.preventDefault();
+    drop.classList.toggle("is-over", ev === "dragover");
+    if (ev === "drop" && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+});
+fileIn.addEventListener("change", function () { if (fileIn.files[0]) readFile(fileIn.files[0]); });
+function readFile(f) {
+  var rd = new FileReader();
+  rd.onload = function () { load(rd.result, f.name); };
+  rd.readAsArrayBuffer(f);
+}
+
+function loadSample() {
+  fetch("samples/sample.riv").then(function (res) { return res.arrayBuffer(); })
+    .then(function (buf) { load(buf, "sample.riv (Rive 공개 데모)"); });
+}
+document.getElementById("btn-sample").addEventListener("click", loadSample);
+if (new URLSearchParams(location.search).get("sample") === "1") loadSample();
+document.getElementById("btn-play").addEventListener("click", function () {
+  if (!r) return;
+  playing ? r.pause() : r.play(); playing = !playing;
+  this.textContent = playing ? "일시정지" : "재생";
+});
+document.getElementById("btn-run").addEventListener("click", function () {
+  if (!r) return;
+  var name = document.getElementById("run-name").value, val = document.getElementById("run-value").value;
+  var out = document.getElementById("run-result");
+  try { r.setTextRunValue(name, String(val)); out.textContent = "주입됨: " + name + " = " + val; out.className = "p-note ok"; }
+  catch (e) { out.textContent = "런 없음: " + name + " (에디터에서 텍스트 런 이름 확인)"; out.className = "p-note bad"; }
+});
+</script>
+</body>
+</html>

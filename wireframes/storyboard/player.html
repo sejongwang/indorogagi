@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  화면 ID : SB-P — 모션그래픽 테스트 벤치 (제품 화면 아님 · 디자이너 반복 도구)
+  목적    : After Effects(Bodymovin/Lottie) 등에서 export한 씬 JSON을 드래그하면
+            제품과 같은 스테이지(360×300)에서 즉시 재생 + 통과/탈락 판정 정보 제공:
+            파일 크기(무게 예산) · 길이 · 텍스트 레이어(=파라미터 슬롯 후보) · 이미지 사용(금지) 검출.
+  파이프라인: Illustrator(아트웍) → AE(모션) → Bodymovin export → 이 벤치에서 검증
+            → 통과하면 제가 S1 씬 러너에 이식(탭 후 lazy-load).
+  파라미터 규약: 숫자가 꽂힐 텍스트 레이어 이름은 #n_ 접두 (#n_badge, #n_days, #n_gap, #n_date)
+            — 벤치가 자동 검출해 값 주입 테스트 UI를 띄운다.
+  ============================================================
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>indoro 모션 테스트 벤치</title>
+<link rel="stylesheet" href="../shared/wf.css">
+<style>
+  .sb-banner {
+    background: repeating-linear-gradient(135deg, #f5efdc 0 8px, #eadfae 8px 16px);
+    border-bottom: 1px solid #c9b96a; padding: 10px 16px; text-align: center;
+    font-size: var(--text-supporting-size); font-weight: var(--font-weight-semibold); color: #4a3f14;
+  }
+  .p-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .p-card { padding: 14px; }
+  .drop {
+    border: 2px dashed var(--color-border-emphasized); border-radius: var(--radius-element);
+    padding: 18px; text-align: center; color: var(--color-text-secondary); cursor: pointer;
+    font-size: var(--text-body-size);
+  }
+  .drop.is-over { border-color: var(--color-accent); color: var(--color-text-primary); background: var(--color-accent-muted); }
+  .stage {
+    position: relative; height: 300px; margin-top: 12px;
+    border: 2px solid var(--color-accent); border-radius: var(--radius-element);
+    background: #fff; overflow: hidden;
+  }
+  .stage > div { width: 100%; height: 100%; }
+  .p-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .p-btn {
+    min-height: 40px; padding: 6px 14px; cursor: pointer;
+    border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-element);
+    background: var(--color-background-surface); font-size: var(--font-size-base);
+  }
+  .p-btn.is-on { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+  .scrub { flex: 1; }
+  .report { margin-top: 10px; font-size: var(--font-size-sm); }
+  .report table { width: 100%; border-collapse: collapse; }
+  .report td, .report th { padding: 4px 6px; text-align: left; border-top: 1px solid var(--color-border); vertical-align: top; }
+  .report th { color: var(--color-text-secondary); font-weight: var(--font-weight-medium); white-space: nowrap; width: 130px; }
+  .ok   { color: var(--color-success); font-weight: var(--font-weight-bold); }
+  .bad  { color: var(--color-error); font-weight: var(--font-weight-bold); }
+  .warn { color: var(--color-warning); font-weight: var(--font-weight-bold); }
+  .param-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .param-row code { font-family: var(--font-family-code); font-size: var(--font-size-sm); min-width: 90px; }
+  .param-row input { width: 90px; min-height: 36px; padding: 4px 8px; border: 1px solid var(--color-border-emphasized); border-radius: var(--radius-inner); font-size: var(--font-size-base); }
+  .p-note { font-size: var(--text-supporting-size); color: var(--color-text-secondary); }
+  .p-note b { color: var(--color-text-primary); }
+</style>
+</head>
+<body>
+
+<div class="sb-banner">모션 테스트 벤치 — AE(Bodymovin)·Lottie JSON을 드래그하면 제품 스테이지에서 즉시 재생·판정</div>
+
+<div class="p-wrap">
+  <article class="card p-card">
+    <div class="drop" id="drop">Lottie JSON을 여기로 드래그 (또는 클릭해서 선택)<br>
+      <span style="font-size:var(--font-size-sm)">내장 샘플: <button class="p-btn" id="btn-sample" type="button" style="min-height:32px;padding:2px 10px">샘플 재생</button></span>
+    </div>
+    <input type="file" id="file" accept=".json,application/json" style="display:none">
+    <div class="stage"><div id="stage"></div></div>
+    <div class="p-row">
+      <button class="p-btn" id="btn-play" type="button">일시정지</button>
+      <button class="p-btn" id="btn-loop" type="button">루프: 켬</button>
+      <button class="p-btn" data-speed="0.5" type="button">0.5×</button>
+      <button class="p-btn is-on" data-speed="1" type="button">1×</button>
+      <button class="p-btn" data-speed="1.5" type="button">1.5×</button>
+      <input class="scrub" id="scrub" type="range" min="0" max="1000" value="0">
+    </div>
+    <div class="report" id="report"></div>
+    <div id="params"></div>
+  </article>
+
+  <article class="card p-card">
+    <p class="p-note"><b>AE → Bodymovin export 체크리스트</b> — ① 벡터 셰이프만(이미지·비트맵 금지 — 벤치가 검출) ② expressions 굽기(Convert to keyframes) ③ 글꼴 쓰지 말 것 — 숫자는 텍스트 레이어로 두되 이름을 <b>#n_</b> 접두로(<code>#n_badge</code> <code>#n_days</code> <code>#n_gap</code> <code>#n_date</code>) — 코드가 찾아서 실데이터를 주입합니다 ④ 컴포 360×300, 30fps ⑤ 목표 크기: <b>씬당 raw ≤ 60KB</b>(벤치가 표시).</p>
+    <p class="p-note" style="margin-top:6px"><b>무게 회계</b> — 플레이어(lottie-web) gzip 약 90KB + 씬 JSON: 환자 첫 페인트에는 0바이트(▶ 탭 후 lazy-load — "영상은 탭 전 0바이트" 원칙 그대로), 정적 매트릭스가 보장 계층으로 유지됩니다. 카운터 태블릿은 로컬이라 무제약.</p>
+  </article>
+</div>
+
+<script src="../shared/vendor/lottie.min.js"></script>
+<script>
+"use strict";
+var anim = null, animData = null, rawSize = 0, playing = true, looping = true, fileName = "";
+var stageEl = document.getElementById("stage"), report = document.getElementById("report"), paramsEl = document.getElementById("params");
+
+/* 내장 샘플 — 알약 드롭 + 점 채우기 흉내 (형식 확인용 최소 Lottie) */
+var SAMPLE = {"v":"5.7.4","fr":30,"ip":0,"op":75,"w":360,"h":300,"nm":"sample","ddd":0,"assets":[],"layers":[
+  {"ddd":0,"ind":1,"ty":4,"nm":"pill","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},
+    "p":{"a":1,"k":[{"t":0,"s":[180,40],"e":[180,150],"i":{"x":[0.4],"y":[1]},"o":{"x":[0.6],"y":[0]}},{"t":22,"s":[180,150]}]},
+    "a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},
+   "shapes":[{"ty":"gr","nm":"g1","it":[
+     {"ty":"rc","d":1,"s":{"a":0,"k":[110,34]},"p":{"a":0,"k":[0,0]},"r":{"a":0,"k":17}},
+     {"ty":"st","c":{"a":0,"k":[0.2,0.2,0.2,1]},"o":{"a":0,"k":100},"w":{"a":0,"k":4},"lc":2,"lj":2},
+     {"ty":"fl","c":{"a":0,"k":[0.99,0.99,0.99,1]},"o":{"a":0,"k":100}},
+     {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],
+   "ip":0,"op":75,"st":0},
+  {"ddd":0,"ind":2,"ty":4,"nm":"dot1","sr":1,"ks":{"o":{"a":1,"k":[{"t":28,"s":[0],"e":[100]},{"t":36,"s":[100]}]},"r":{"a":0,"k":0},
+    "p":{"a":0,"k":[120,230]},"a":{"a":0,"k":[0,0,0]},
+    "s":{"a":1,"k":[{"t":28,"s":[40,40,100],"e":[100,100,100],"i":{"x":[0.3,0.3,0.3],"y":[1,1,1]},"o":{"x":[0.7,0.7,0.7],"y":[0,0,0]}},{"t":38,"s":[100,100,100]}]}},
+   "shapes":[{"ty":"gr","nm":"g2","it":[
+     {"ty":"el","d":1,"s":{"a":0,"k":[30,30]},"p":{"a":0,"k":[0,0]}},
+     {"ty":"fl","c":{"a":0,"k":[0,0.44,0.02,1]},"o":{"a":0,"k":100}},
+     {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],
+   "ip":0,"op":75,"st":0},
+  {"ddd":0,"ind":3,"ty":4,"nm":"dot2","sr":1,"ks":{"o":{"a":1,"k":[{"t":40,"s":[0],"e":[100]},{"t":48,"s":[100]}]},"r":{"a":0,"k":0},
+    "p":{"a":0,"k":[180,230]},"a":{"a":0,"k":[0,0,0]},
+    "s":{"a":1,"k":[{"t":40,"s":[40,40,100],"e":[100,100,100],"i":{"x":[0.3,0.3,0.3],"y":[1,1,1]},"o":{"x":[0.7,0.7,0.7],"y":[0,0,0]}},{"t":50,"s":[100,100,100]}]}},
+   "shapes":[{"ty":"gr","nm":"g3","it":[
+     {"ty":"el","d":1,"s":{"a":0,"k":[30,30]},"p":{"a":0,"k":[0,0]}},
+     {"ty":"fl","c":{"a":0,"k":[0,0.44,0.02,1]},"o":{"a":0,"k":100}},
+     {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],
+   "ip":0,"op":75,"st":0},
+  {"ddd":0,"ind":4,"ty":4,"nm":"dot3","sr":1,"ks":{"o":{"a":1,"k":[{"t":52,"s":[0],"e":[100]},{"t":60,"s":[100]}]},"r":{"a":0,"k":0},
+    "p":{"a":0,"k":[240,230]},"a":{"a":0,"k":[0,0,0]},
+    "s":{"a":1,"k":[{"t":52,"s":[40,40,100],"e":[100,100,100],"i":{"x":[0.3,0.3,0.3],"y":[1,1,1]},"o":{"x":[0.7,0.7,0.7],"y":[0,0,0]}},{"t":62,"s":[100,100,100]}]}},
+   "shapes":[{"ty":"gr","nm":"g4","it":[
+     {"ty":"el","d":1,"s":{"a":0,"k":[30,30]},"p":{"a":0,"k":[0,0]}},
+     {"ty":"fl","c":{"a":0,"k":[0,0.44,0.02,1]},"o":{"a":0,"k":100}},
+     {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],
+   "ip":0,"op":75,"st":0}
+]};
+
+function fmtKB(n) { return (n / 1024).toFixed(1) + " KB"; }
+
+function scanJSON(data) {
+  var textLayers = [], images = 0;
+  (function walk(layers) {
+    (layers || []).forEach(function (l) {
+      if (l.ty === 5) textLayers.push(l.nm || "(이름 없음)");
+      if (l.ty === 2) images++;
+      if (l.layers) walk(l.layers);
+    });
+  })(data.layers);
+  (data.assets || []).forEach(function (a) { if (a.p || a.u) images++; if (a.layers) arguments.callee; });
+  return { textLayers: textLayers, images: images };
+}
+
+function renderReport(data) {
+  var scan = scanJSON(data);
+  var durS = ((data.op - data.ip) / data.fr).toFixed(1);
+  var sizeOK = rawSize <= 60 * 1024;
+  var comp = (data.w === 360 && data.h === 300);
+  var html = "<table>";
+  html += "<tr><th>파일</th><td>" + (fileName || "내장 샘플") + "</td></tr>";
+  html += "<tr><th>크기</th><td class='" + (sizeOK ? "ok" : "bad") + "'>" + fmtKB(rawSize) + (sizeOK ? " — 예산(60KB) 내" : " — 예산 초과, 셰이프 단순화 필요") + "</td></tr>";
+  html += "<tr><th>길이</th><td>" + durS + "초 · " + data.fr + "fps · " + (data.layers || []).length + "레이어</td></tr>";
+  html += "<tr><th>컴포 크기</th><td class='" + (comp ? "ok" : "warn") + "'>" + data.w + "×" + data.h + (comp ? "" : " — 스테이지는 360×300 (스케일 재생됨)") + "</td></tr>";
+  html += "<tr><th>이미지 사용</th><td class='" + (scan.images ? "bad" : "ok") + "'>" + (scan.images ? scan.images + "개 — 금지(벡터만)" : "없음 — 통과") + "</td></tr>";
+  html += "<tr><th>텍스트 레이어</th><td>" + (scan.textLayers.length ? scan.textLayers.join(", ") : "없음") + "</td></tr>";
+  html += "</table>";
+  report.innerHTML = html;
+
+  paramsEl.innerHTML = "";
+  scan.textLayers.filter(function (n) { return n.indexOf("#n_") === 0; }).forEach(function (n) {
+    var row = document.createElement("div");
+    row.className = "param-row";
+    row.innerHTML = "<code>" + n + "</code><input type='number' value='3'><button class='p-btn' type='button' style='min-height:36px'>주입</button>";
+    row.querySelector("button").addEventListener("click", function () {
+      var v = row.querySelector("input").value;
+      (function walk(layers) {
+        (layers || []).forEach(function (l) {
+          if (l.ty === 5 && l.nm === n) { try { l.t.d.k[0].s.t = String(v); } catch (e) {} }
+          if (l.layers) walk(l.layers);
+        });
+      })(animData.layers);
+      load(animData, fileName); /* 값 주입 후 재로드 — 제품에서는 이 자리에서 서버 데이터가 들어감 */
+    });
+    paramsEl.appendChild(row);
+  });
+}
+
+function load(data, name) {
+  animData = data; fileName = name || "";
+  if (anim) anim.destroy();
+  stageEl.innerHTML = "";
+  anim = lottie.loadAnimation({ container: stageEl, renderer: "svg", loop: looping, autoplay: true, animationData: JSON.parse(JSON.stringify(data)) });
+  playing = true;
+  document.getElementById("btn-play").textContent = "일시정지";
+  anim.addEventListener("enterFrame", function () {
+    var t = anim.totalFrames ? anim.currentFrame / anim.totalFrames : 0;
+    document.getElementById("scrub").value = Math.round(t * 1000);
+  });
+  renderReport(data);
+}
+
+/* 파일 입력 */
+var drop = document.getElementById("drop"), fileIn = document.getElementById("file");
+drop.addEventListener("click", function (e) { if (e.target.tagName !== "BUTTON") fileIn.click(); });
+["dragover", "dragleave", "drop"].forEach(function (ev) {
+  drop.addEventListener(ev, function (e) {
+    e.preventDefault();
+    drop.classList.toggle("is-over", ev === "dragover");
+    if (ev === "drop" && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+});
+fileIn.addEventListener("change", function () { if (fileIn.files[0]) readFile(fileIn.files[0]); });
+function readFile(f) {
+  var r = new FileReader();
+  r.onload = function () {
+    try { rawSize = f.size; load(JSON.parse(r.result), f.name); }
+    catch (e) { report.innerHTML = "<span class='bad'>JSON 파싱 실패 — Bodymovin export 파일인지 확인: " + e.message + "</span>"; }
+  };
+  r.readAsText(f);
+}
+
+/* 컨트롤 */
+document.getElementById("btn-sample").addEventListener("click", function () {
+  rawSize = JSON.stringify(SAMPLE).length; load(SAMPLE, "");
+});
+document.getElementById("btn-play").addEventListener("click", function () {
+  if (!anim) return;
+  playing ? anim.pause() : anim.play(); playing = !playing;
+  this.textContent = playing ? "일시정지" : "재생";
+});
+document.getElementById("btn-loop").addEventListener("click", function () {
+  looping = !looping; this.textContent = "루프: " + (looping ? "켬" : "끔");
+  if (animData) load(animData, fileName);
+});
+document.querySelectorAll("[data-speed]").forEach(function (b) {
+  b.addEventListener("click", function () {
+    document.querySelectorAll("[data-speed]").forEach(function (x) { x.classList.remove("is-on"); });
+    b.classList.add("is-on");
+    if (anim) anim.setSpeed(parseFloat(b.dataset.speed));
+  });
+});
+document.getElementById("scrub").addEventListener("input", function () {
+  if (!anim) return;
+  anim.pause(); playing = false; document.getElementById("btn-play").textContent = "재생";
+  anim.goToAndStop((this.value / 1000) * anim.totalFrames, true);
+});
+
+/* 초기: 샘플 자동 재생 */
+rawSize = JSON.stringify(SAMPLE).length; load(SAMPLE, "");
+</script>
+</body>
+</html>
