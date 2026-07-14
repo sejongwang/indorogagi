@@ -14,7 +14,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [의약품 데이터 기반](docs/08-india-drug-data-foundation.md), [검토·감사·retirement 운영](docs/09-drug-catalog-operations.md), [최신 인포그래픽 시각 QA](docs/07-infographic-poster-visual-qa.md) |
+| [`docs/`](docs/) | 데이터플로우, 화면 인벤토리, [인도 레퍼런스 조사](docs/05-india-medication-poster-research.md), [의약품 데이터 기반](docs/08-india-drug-data-foundation.md), [검토·감사·retirement 운영](docs/09-drug-catalog-operations.md), [최신 인포그래픽 시각 QA](docs/07-infographic-poster-visual-qa.md), [현장 사용자 조사 계획서](docs/10-field-research/README.md) |
 | [`wireframes/`](wireframes/) | 초기 클릭형 와이어프레임. 환자 화면의 현재 정본은 `server/templates/patient.html` |
 | [`server/`](server/) | FastAPI + SQLite 관통 프로토타입. 출처 추적 카탈로그 검색 → 발급 → 실제 QR → 모바일 복약 포스터가 동작 |
 | [`data/`](data/) | NPPA 공식 formulation 11건과 프로젝트가 작성한 합성 demo fixture 16건. 라이선스가 불명확한 레거시 627건 파일은 제거. 출처·한계는 [`data/drugs-README.md`](data/drugs-README.md) |
