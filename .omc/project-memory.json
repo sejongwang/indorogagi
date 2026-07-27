@@ -1,0 +1,225 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1784167699438,
+  "projectRoot": "/Users/min/Documents/GitHub/indorogagi",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "data": {
+      "path": "data",
+      "purpose": "Data files",
+      "fileCount": 2,
+      "lastAccessed": 1784167699423,
+      "keyFiles": [
+        "drug-sources.json",
+        "drugs-README.md"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 9,
+      "lastAccessed": 1784167699423,
+      "keyFiles": [
+        "01-dataflow.md",
+        "02-wireframe-pharmacist.md",
+        "03-wireframe-patient.md",
+        "04-wireframe-plan.md",
+        "05-india-medication-poster-research.md"
+      ]
+    },
+    "formal": {
+      "path": "formal",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1784167699423,
+      "keyFiles": [
+        "README.md",
+        "counterexamples.md",
+        "spec.md",
+        "traceability.md",
+        "verdict.md"
+      ]
+    },
+    "output": {
+      "path": "output",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1784167699423,
+      "keyFiles": []
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "README.md",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    },
+    "wireframes": {
+      "path": "wireframes",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "README.md",
+        "index.html"
+      ]
+    },
+    "server/app": {
+      "path": "server/app",
+      "purpose": "Application code",
+      "fileCount": 6,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "__init__.py",
+        "catalog_governance.py",
+        "config.py"
+      ]
+    },
+    "server/config": {
+      "path": "server/config",
+      "purpose": "Configuration files",
+      "fileCount": 2,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "i18n.yaml",
+        "patterns.yaml"
+      ]
+    },
+    "server/scripts": {
+      "path": "server/scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 6,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "catalog_governance_demo.py",
+        "catalog_import.py",
+        "demo.py"
+      ]
+    },
+    "server/static": {
+      "path": "server/static",
+      "purpose": "Static files",
+      "fileCount": 7,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "catalog-ops.css",
+        "patient-poster.css",
+        "rx.css"
+      ]
+    },
+    "server/tests": {
+      "path": "server/tests",
+      "purpose": "Test files",
+      "fileCount": 13,
+      "lastAccessed": 1784167699424,
+      "keyFiles": [
+        "conftest.py",
+        "test_api.py",
+        "test_catalog_governance.py"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "docs/10-field-research/09-prototype-usability-tasks.md",
+      "accessCount": 2,
+      "lastAccessed": 1784178870782,
+      "type": "file"
+    },
+    {
+      "path": "docs/사업지원서.pdf",
+      "accessCount": 2,
+      "lastAccessed": 1784181342729,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/README.md",
+      "accessCount": 2,
+      "lastAccessed": 1784181628858,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/02-questionnaire-patient.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168081988,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/03-questionnaire-caregiver.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168082820,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/04-questionnaire-pharmacist.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168083297,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/05-questionnaire-doctor.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168083807,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/06-questionnaire-nurse.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168084720,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/07-questionnaire-hospital-ops.md",
+      "accessCount": 1,
+      "lastAccessed": 1784168085372,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/01-goals-participants-screener-consent.md",
+      "accessCount": 1,
+      "lastAccessed": 1784181342786,
+      "type": "file"
+    },
+    {
+      "path": "docs/10-field-research/14-quick-intercept-interview.md",
+      "accessCount": 1,
+      "lastAccessed": 1784181601275,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
